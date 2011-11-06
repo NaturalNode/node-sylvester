@@ -41,6 +41,7 @@ Matrices
     require('sylvester');
 
 create two matrices
+
     var A = $M([[1, 2], [3, 4]]);
     var B = $M([[1, 2, 3], [4, 5, 6]]);
 
