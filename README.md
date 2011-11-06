@@ -7,6 +7,11 @@ The original project can be found at http://sylvester.jcoglan.com/
 
 This project is maintained by Chris Umbel (http://www.chrisumbel.com)
 
+Installation
+============
+
+    npm install sylvester
+
 Usage
 =====
 
