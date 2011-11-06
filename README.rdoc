@@ -2,7 +2,7 @@
 = node-sylvester
 
 node.js implementation of James Coglan's "Sylvester" matrix math library.
-The original project can be found at {sylvester.jcoglan.com}[http://sylvester.jcoglan.com/]
+The original project can be found at http://sylvester.jcoglan.com/
 
 This project is maintained by {Chris Umbel}[http://www.chrisumbel.com]
 
@@ -51,7 +51,7 @@ create a 2x3 matrix of ones
 == Old Stuff
 
 Below is a basic illustration of standard matrix/vector math using the standard
-Sylvester API. This documentation is rather incomplete and for further details please consult {the official sylvester API documentation}[http://sylvester.jcoglan.com/docs] at {http://sylvester.jcoglan.com/docs}[http://sylvester.jcoglan.com/docs].
+Sylvester API. This documentation is rather incomplete and for further details please consult {the official sylvester API documentation}[http://sylvester.jcoglan.com/docs] at http://sylvester.jcoglan.com/docs.
 
 === Vectors
 
