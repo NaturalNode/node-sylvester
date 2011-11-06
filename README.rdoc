@@ -1,22 +1,22 @@
 
-= node-sylvester =
+= node-sylvester
 
 node.js implementation of James Coglan's "Sylvester" matrix math library.
 The original project can be found at http://sylvester.jcoglan.com/
 
 This project is maintained by Chris Umbel (http://www.chrisumbel.com)
 
-= Installation =
+= Installation
 
     npm install sylvester
 
-= Usage =
+= Usage
 
-== New Stuff ==
+== New Stuff
 
 First I'd like to show some examples of features that aren't in the standard (non-node) Sylvester. It'll likely attempt to commit these back to Sylvester at some point soon.
 
-=== log() for matrices and Vectors ===
+=== log() for matrices and Vectors
 
 Vector
 
@@ -39,7 +39,7 @@ outputs
     [0, 0.6931471805599453, 1.0986122886681098]
     [1.3862943611198906, 1.6094379124341003, 1.791759469228055]
 
-=== Matrix Creation ===
+=== Matrix Creation
 
     var sylvester = require('sylvester'),
         Matrix = sylvester.Matrix;
@@ -48,12 +48,12 @@ create a 2x3 matrix of ones
 
     var Ones = Matrix.ones(2, 3);
 
-== Old Stuff ==
+== Old Stuff
 
 Below is a basic illustration of standard matrix/vector math using the standard
 Sylvester API. This documentation is rather incomplete and for further details please consult [the official sylvester API documentation](http://sylvester.jcoglan.com/docs) at [http://sylvester.jcoglan.com/docs](http://sylvester.jcoglan.com/docs).
 
-=== Vectors ===
+=== Vectors
 
     require('sylvester');
 
@@ -74,7 +74,7 @@ multiply by scalar
 
     var d = a.x(2);
 
-=== Matrices ===
+=== Matrices
 
     require('sylvester');
 
@@ -92,7 +92,7 @@ transpose a matrix
     var B_T = B.transpose();
     // B is 2x3, B_T is 3x2
 
-= License =
+= License
 
 This project is released under The MIT License
 
