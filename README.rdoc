@@ -46,7 +46,7 @@ outputs
 
 create a 2x3 matrix of ones
 
-    var Ones = Matrix.ones(2, 3);
+    var Ones = Matrix.One(2, 3);
 
 == Old Stuff
 
