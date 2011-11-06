@@ -14,7 +14,7 @@ This project is maintained by Chris Umbel (http://www.chrisumbel.com)
 
 == New Stuff
 
-First I'd like to show some examples of features that aren't in the standard (non-node) Sylvester. It'll likely attempt to commit these back to Sylvester at some point soon.
+First I'd like to show some examples of features that aren't in the standard (non-node) Sylvester. I'll likely attempt to commit these back to Sylvester at some point soon.
 
 === log() for matrices and Vectors
 
