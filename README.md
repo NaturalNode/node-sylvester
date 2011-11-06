@@ -19,6 +19,9 @@ First I'd like to show some examples of features that aren't in the standard (no
 
 log() for matrices and Vectors
 ------------------------------
+
+Vector
+
     require('sylvester');
 
     var a = $V([1, 2, 3]);
@@ -28,6 +31,7 @@ outputs
 
     [0, 0.6931471805599453, 1.0986122886681098]
 
+Matrix
 
     var A = $M([[1, 2, 3], [4, 5, 6]]);
     console.log(A.log());
