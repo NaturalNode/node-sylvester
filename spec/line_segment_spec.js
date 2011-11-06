@@ -1,7 +1,8 @@
 
-var Line = require('../lib/node-sylvester/line');
-var LineSegment = require('../lib/node-sylvester/line.segment');
-var Vector = require('../lib/node-sylvester/vector');
+var sylvester = require('../lib/node-sylvester'),
+Line = sylvester.Line,
+LineSegment = sylvester.Line.Segment,
+Vector = sylvester.Vector;
 
 describe('line segment', function() {
     it('should create', function() {
