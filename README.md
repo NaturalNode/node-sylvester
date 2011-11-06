@@ -15,10 +15,30 @@ Installation
 Usage
 =====
 
-Below is a basic illustration of standard matrix/vector math using sylvester.
-This documentation is rather incomplete and for further details please consult
-[the official sylvester API documentation](http://sylvester.jcoglan.com/docs)
-at [http://sylvester.jcoglan.com/docs](http://sylvester.jcoglan.com/docs).
+First I'd like to show some examples of features that aren't in the standard (non-node) Sylvester. It'll likely attempt to commit these back to Sylvester at some point soon.
+
+log() for matrices and Vectors
+------------------------------
+    require('sylvester');
+
+    var a = $V([1, 2, 3]);
+    console.log(a.log);
+
+outputs
+
+    [0, 0.6931471805599453, 1.0986122886681098]
+
+
+    var A = $M([[1, 2, 3], [4, 5, 6]]);
+    console.log(A.log());
+
+outputs
+
+    [0, 0.6931471805599453, 1.0986122886681098]
+    [1.3862943611198906, 1.6094379124341003, 1.791759469228055]
+
+Below is a basic illustration of standard matrix/vector math using the standard
+Sylvester API. This documentation is rather incomplete and for further details please consult [the official sylvester API documentation](http://sylvester.jcoglan.com/docs) at [http://sylvester.jcoglan.com/docs](http://sylvester.jcoglan.com/docs).
 
 Vectors
 -------
