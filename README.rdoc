@@ -23,7 +23,7 @@ Vector
     require('sylvester');
 
     var a = $V([1, 2, 3]);
-    console.log(a.log);
+    console.log(a.log());
 
 outputs
 
