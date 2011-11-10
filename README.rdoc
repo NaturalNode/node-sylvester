@@ -29,17 +29,51 @@ outputs
 
     [0, 0.6931471805599453, 1.0986122886681098]
 
+    elementMultiply(vector)
+
+element-wise multiplication
+
+    chomp(n)
+
+remove first n nodes
+
+    top(n)
+
+returm vector with first n nodes
+
+    sum()
+        
+add all elements into a single number
+
+    augment(elements)
+
+return a vector with the elements parameter on the bottom
+
 Matrix
 
     var A = $M([[1, 2, 3], [4, 5, 6]]);
     console.log(A.log());
+
+    elementMultiply(vector)
 
 outputs
 
     [0, 0.6931471805599453, 1.0986122886681098]
     [1.3862943611198906, 1.6094379124341003, 1.791759469228055]
 
-=== Matrix Creation
+element-wise multiplication
+
+    sum()
+
+add all	elements into a	single number
+
+
+    column(n)
+
+returns a vector of all elements in column n of the receiving matrix
+
+
+=== Matrix
 
     var sylvester = require('sylvester'),
         Matrix = sylvester.Matrix;
