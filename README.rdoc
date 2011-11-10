@@ -4,7 +4,7 @@
 node.js implementation of James Coglan's "Sylvester" matrix math library.
 The original project can be found at http://sylvester.jcoglan.com/
 
-This project is maintained by {Chris Umbel}[http://www.chrisumbel.com]
+This project is maintained by {Chris Umbel}[http://www.chrisumbel.com] & Rob Ellis
 
 = Installation
 
@@ -130,7 +130,7 @@ transpose a matrix
 
 This project is released under The MIT License
 
-Copyright (c) 2011, Chris Umbel, James Coglan
+Copyright (c) 2011, Chris Umbel, Rob Ellis, James Coglan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
