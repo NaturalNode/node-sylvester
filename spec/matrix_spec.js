@@ -11,7 +11,7 @@ describe('matrix', function() {
     });
 
     it('columns should be retrievable as vectors', function() {
-	expect(A.column(1)).toEqual($V([2, 5]));;
+	expect(A.column(2)).toEqual($V([2, 5]));;
     });
 
     it('should log', function() {
