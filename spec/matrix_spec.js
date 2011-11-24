@@ -31,4 +31,23 @@ describe('matrix', function() {
 	var B = $M([[1, 2, 3], [4, 5, 6]]);
 	expect(A).toEqual(B);
     });
+
+    it('should evaluate equal matrices', function() {
+	var A = $M([[1, 2, 3], [4, 5, 6]]);
+	var B = $M([[1, 2, 3], [4, 5, 6]]);
+
+	expect(A.eql(B)).toBeTruthy();
+    });
+
+    it('should evaluate inequal matrices', function() {
+	var A = $M([[1, 2, 3], [4, 5, 6]]);
+	var B = $M([[1, 2, 3], [4, 5, 7]]);
+
+	expect(A.eql(B)).toBeFalsy();
+    });
+
+    it('should snap', function() {
+	expect($M([[1, 1.1, 1.00000001], [4, 5, 6]]).snapTo(1).eql(
+	    $M([[1, 1.1, 1], [4, 5, 6]]))).toBeTruthy();
+    });
 });
