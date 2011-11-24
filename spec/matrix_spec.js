@@ -50,4 +50,20 @@ describe('matrix', function() {
 	expect($M([[1, 1.1, 1.00000001], [4, 5, 6]]).snapTo(1).eql(
 	    $M([[1, 1.1, 1], [4, 5, 6]]))).toBeTruthy();
     });
+
+    it('should compute the minimum index of matrix rows', function() {
+	expect($M([[1, 2, 3], [2, 1, 3], [2, 1, 0]]).minColumnIndexes().eql($V([2, 1, 3])));
+    });
+
+    it('should compute the minimum value of matrix rows', function() {
+	expect($M([[1, 2, 3], [2, 1, 3], [2, 1, 0]]).minColumns().eql($V([1, 1, 0])));
+    });
+
+    it('should compute the maximum index of matrix rows', function() {
+	expect($M([[1, 2, 3], [2, 3, 2], [2, 1, 0]]).maxColumnIndexes().eql($V([3, 2, 1])));
+    });
+
+    it('should compute the maximum value of matrix rows', function() {
+	expect($M([[1, 2, 3], [2, 1, 3], [2, 1, 0]]).maxColumns().eql($V([3, 3, 2])));
+    });
 });
