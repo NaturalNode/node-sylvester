@@ -30,4 +30,16 @@ describe('vector', function() {
 	var b = Vector.create([2, 3, 4]);
 	expect(a).toEqual(b);
     });
+
+    it('show allow for scalar addition', function() {
+	var a = $V([2, 3, 4]);
+	var b = a.add(1);
+	expect(b.eql($V([3, 4, 5]))).toBeTruthy();
+    });
+
+    it('show add', function() {
+	var a = $V([2, 3, 4]);
+	var b = a.add($V([2, 4, 8]));
+	expect(b.eql($V([, 7, 12]))).toBeTruthy();
+    });
 });

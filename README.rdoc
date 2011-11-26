@@ -33,6 +33,10 @@ outputs
 
 element-wise multiplication
 
+    elementDivide(vector)
+
+element-wise division
+
     chomp(n)
 
 remove first n nodes
@@ -43,7 +47,11 @@ returm vector with first n nodes
 
     sum()
         
-add all elements into a single number
+add all elements into a single scalar
+
+    product()
+
+multiply all elements into a single scalar
 
     augment(elements)
 
