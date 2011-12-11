@@ -54,6 +54,7 @@ Matrix.prototype = {
 	return {Q: Q, R: A};
     },
 
+
     slice: function(startRow, endRow, startCol, endCol) {
 	var x = [];
 	

@@ -16,85 +16,94 @@ This project is maintained by {Chris Umbel}[http://www.chrisumbel.com] & Rob Ell
 
 First I'd like to show some examples of features that aren't in the standard (non-node) Sylvester. I'll likely attempt to commit these back to Sylvester at some point soon.
 
-=== log() for matrices and Vectors
-
-Vector
+=== Vector
 
     require('sylvester');
-
     var a = $V([1, 2, 3]);
+
+element-wise log:
+
     console.log(a.log());
 
-outputs
+norm computation:
 
-    [0, 0.6931471805599453, 1.0986122886681098]
+    console.log(a.norm());
 
-    elementMultiply(vector)
+element-wise multiplication:
 
-element-wise multiplication
+    a.elementMultiply(vector);
 
-    elementDivide(vector)
+element-wise division:
 
-element-wise division
+    a.elementDivide(vector);
 
-    chomp(n)
+remove first n nodes:
 
-remove first n nodes
+    a.chomp(n);
 
-    top(n)
+return vector with first n nodes:
 
-returm vector with first n nodes
+    a.top(n);
+
+add all elements into a single scalar:
 
     sum()
         
-add all elements into a single scalar
+multiply all elements into a single scalar:
 
     product()
 
-multiply all elements into a single scalar
+return a vector with the elements parameter on the bottom:
 
     augment(elements)
 
-return a vector with the elements parameter on the bottom
-
-Matrix
+=== Matrix
 
     var A = $M([[1, 2, 3], [4, 5, 6]]);
+
+return subset of rows, columns:
+
+    // startRow, endRow, startCol, endCol
+    A.slice(2, 3, 2, 3);
+
+divide matricies:
+
+    A.div($M([[0.5, 1], [1, 2], [2, 3]]));
+
+scalar addition/subtraction
+
+    A.add(1);
+    A.subtract(1);
+
+element-wise log:
+
     console.log(A.log());
+
+element-wise multiplication:
 
     elementMultiply(vector)
 
-element-wise multiplication, outputs
-
-    [0, 0.6931471805599453, 1.0986122886681098]
-    [1.3862943611198906, 1.6094379124341003, 1.791759469228055]
+add all	elements into a	single scalar:
 
     sum()
 
-add all	elements into a	single number
+returns a vector of the indexes of maximum values ([3 3]):
 
     $M([[1, 2, 3], [5, 4, 6]]).maxColumnIndexes()
 
-returns a vector of [3 3]
+returns a vector of minimum column indexes ([1 2]):
 
     $M([[1, 2, 3], [5, 4, 6]]).minColumnIndexes();
 
-returns a vector of [1 2]
+returns a vector of max values ([3 6]):
 
     $M([[1, 2, 3], [5, 4, 6]]).maxColumns()
 
-returns a vector of [3 6]
+returns a vector of minimum values ([1 4]):
 
     $M([[1, 2, 3], [5, 4, 6]]).minColumns()
 
-returns a vector of [1 4]
-
-=== Matrix
-
-    var sylvester = require('sylvester'),
-        Matrix = sylvester.Matrix;
-
-create a 2x3 matrix of ones
+create a 2x3 matrix of ones:
 
     var Ones = Matrix.One(2, 3);
 
@@ -107,20 +116,20 @@ Sylvester API. This documentation is rather incomplete and for further details p
 
     require('sylvester');
 
-create two vectors
+create two vectors:
 
     var a = $V([1, 2, 3]);
     var b = $V([2, 3, 4]);
 
-compute the dot product
+compute the dot product:
 
     var r = a.dot(b);
 
-add two vectors
+add two vectors:
 
     var c = a.add(b);
 
-multiply by scalar
+multiply by scalar:
 
     var d = a.x(2);
 
@@ -128,16 +137,16 @@ multiply by scalar
 
     require('sylvester');
 
-create two matrices
+create two matrices:
 
     var A = $M([[1, 2], [3, 4]]);
     var B = $M([[1, 2, 3], [4, 5, 6]]);
 
-multiply the matrices
+multiply the matrices:
 
     var C = A.x(B);
 
-transpose a matrix
+transpose a matrix:
 
     var B_T = B.transpose();
     // B is 2x3, B_T is 3x2
