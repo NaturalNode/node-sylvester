@@ -5,6 +5,10 @@ Vector = sylvester.Vector;
 var x = Vector.create([1, 2, 3]);
 
 describe('vector', function() {
+    it('should norm', function() {
+	expect($V([1, 2, 3]).norm()).toBe(3.7416573867739413);
+    });
+    
     it('should log', function() {
 	expect(x.log()).toEqual($V([0, 0.6931471805599453, 1.0986122886681098]));
     });

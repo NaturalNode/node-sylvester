@@ -4,6 +4,23 @@ Matrix = sylvester.Matrix;
 var A = Matrix.create([[1, 2, 3], [4, 5, 6]]);
 
 describe('matrix', function() {
+    it('should slice', function() {
+	var A2 = $M([[1,2,3], [4,5,6], [7,8,9]]);
+	var A3 = A2.slice(2, 3, 2, 3);
+	expect(A3).toEqual($M([[5, 6], [8, 9]]));
+    });
+
+    it('should qr', function() {
+	var A2 = $M([
+	    [1, -1, 2, 2],
+	    [-1, 2, 1, -1],
+	    [2, 1, 3, 2],
+	    [2, -1, 2, 1]
+	]);
+
+	console.log(A2.qr().Q);
+	console.log(A2.qr().R);
+    });
 
     it('should create a 1\'s matrix', function() {
 	var Ones = Matrix.One(2, 3);
