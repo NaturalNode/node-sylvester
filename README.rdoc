@@ -107,13 +107,13 @@ create a 2x3 matrix of ones:
 
     var Ones = Matrix.One(2, 3);
 
-QR decomposition:
+QR decomposition (feature still inefficient and experimental, but uses pure javascript):
 
     var qr = A.qr();
     console.log(qr.Q);
     console.log(qr.R);
 
-SVD:
+SVD decomposition (feature still inefficient and experimental, but uses pure javascript):
 
     var svd = A.svd();
     console.log(svd.U);
