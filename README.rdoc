@@ -47,15 +47,15 @@ return vector with first n nodes:
 
 add all elements into a single scalar:
 
-    sum()
+    a.sum()
         
 multiply all elements into a single scalar:
 
-    product()
+    a.product()
 
 return a vector with the elements parameter on the bottom:
 
-    augment(elements)
+    a.augment(elements)
 
 === Matrix
 
