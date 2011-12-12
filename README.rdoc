@@ -81,11 +81,11 @@ element-wise log:
 
 element-wise multiplication:
 
-    elementMultiply(vector)
+    A.elementMultiply(vector)
 
 add all	elements into a	single scalar:
 
-    sum()
+    A.sum()
 
 returns a vector of the indexes of maximum values ([3 3]):
 
@@ -106,6 +106,19 @@ returns a vector of minimum values ([1 4]):
 create a 2x3 matrix of ones:
 
     var Ones = Matrix.One(2, 3);
+
+QR decomposition:
+
+    var qr = A.qr();
+    console.log(qr.Q);
+    console.log(qr.R);
+
+SVD:
+
+    var svd = A.svd();
+    console.log(svd.U);
+    console.log(svd.S);
+    console.log(svd.V);
 
 == Old Stuff
 
