@@ -24,7 +24,7 @@ describe('matrix', function() {
             var Z = $M([[-2.2120098720461616],
 			[-8.601913944732665]]);
 
-            expect(Z.pcaRecover(1, U).eql($M([
+            expect(Z.pcaRecover(U).eql($M([
 		[1.268041136757554, 1.812473268636061],
 		[4.931072358497068, 7.048223102871564]
             ]))).toBeTruthy();

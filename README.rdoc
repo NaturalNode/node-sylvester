@@ -128,7 +128,7 @@ PCA
             ]);
     var pca = A.pcaProject(1);
     var Z = pca.Z;
-    var A = Z.pcaRecover(2, pca.U);
+    var A = Z.pcaRecover(pca.U);
 
 == Old Stuff
 
