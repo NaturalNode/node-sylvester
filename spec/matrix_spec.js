@@ -4,6 +4,33 @@ Matrix = sylvester.Matrix;
 var A = Matrix.create([[1, 2, 3], [4, 5, 6]]);
 
 describe('matrix', function() {
+    describe('PCA', function() {
+	it('should PCA', function() {
+	    var pca = $M([[1, 2], [5, 7]]).pcaProject(1);	    
+
+	    expect(pca.Z.eql($M([
+		[-2.2120098720461616],
+		[-8.601913944732665]
+            ]))).toBeTruthy();
+
+	    expect(pca.U.eql($M([[-0.5732529283807336, -0.819378471832714],
+				 [-0.819378471832714, 0.5732529283807336]]))).toBeTruthy();
+
+	});	
+
+	it('should recover', function() {
+            var U = $M([[-0.5732529283807336, -0.819378471832714],
+			[-0.819378471832714, 0.5732529283807336]]);
+            var Z = $M([[-2.2120098720461616],
+			[-8.601913944732665]]);
+
+            expect(Z.pcaRecover(1, U).eql($M([
+		[1.268041136757554, 1.812473268636061],
+		[4.931072358497068, 7.048223102871564]
+            ]))).toBeTruthy();
+	});
+    });
+
     it('shoud triu', function () {
 	var A2 = $M([
 	    [ 1, -1,  2,  2],

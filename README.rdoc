@@ -120,6 +120,16 @@ SVD decomposition (feature still inefficient and experimental, but uses pure jav
     console.log(svd.S);
     console.log(svd.V);
 
+PCA
+
+    var A = $M([[1, 2], [5, 7]]).pcaProject(1).eql($M([
+                [-2.2120098720461616],
+                [-8.601913944732665]
+            ]);
+    var pca = A.pcaProject(1);
+    var Z = pca.Z;
+    var A = Z.pcaRecover(2, pca.U);
+
 == Old Stuff
 
 Below is a basic illustration of standard matrix/vector math using the standard
