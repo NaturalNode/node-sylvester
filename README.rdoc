@@ -6,6 +6,10 @@ The original project can be found at http://sylvester.jcoglan.com/
 
 This project is maintained by {Chris Umbel}[http://www.chrisumbel.com] & Rob Ellis
 
+= Documentation
+
+The original documentation for "Sylvester" should help you through basic operations. An intro that contains node-specific features  can also be found {on Chris Umbel's blog}[http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math]. We're looking for someone to help get the documentation situation under control.
+
 = Installation
 
     npm install sylvester
