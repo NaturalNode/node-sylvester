@@ -78,19 +78,28 @@ describe('matrix', function() {
                 [-0.5110308651281579, 0.21320071635561044, 0.7071067811846652, -0.4397646068460757],
                ]);
 
-    it('should svd in JS', function() {
-	var A2 = $M([
-	    [ 1, -1, 2,  2],
-	    [-1,  2, 1, -1],
-	    [ 2,  1, 3,  2],
-	    [ 2, -1, 2,  1]
-	]);
-
-	var svd = A2.svd();
+    var A3 = $M([
+	[ 1, -1, 2,  2],
+	[-1,  2, 1, -1],
+	[ 2,  1, 3,  2],
+	[ 2, -1, 2,  1]
+    ]);
+    
+    it('should svd', function() {
+	var svd = A3.svd();
 	
 	expect(svd.U.eql(U)).toBeTruthy();
 	expect(svd.S.eql(S)).toBeTruthy();
 	expect(svd.V.eql(V)).toBeTruthy();
+    });
+
+    it('should have matching svds for js and lapack', function() {
+	var svdJs = A3.svdJs();	
+	var svdPack = A3.svdPack();
+
+	expect(svdJs.U.eql(svdPack.U)).toBeTruthy();
+	expect(svdJs.S.eql(svdPack.S)).toBeTruthy();
+	expect(svdJs.V.eql(svdPack.V)).toBeTruthy();
     });
 
     it('should qr', function() {
