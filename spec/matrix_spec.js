@@ -39,29 +39,29 @@ describe('matrix', function() {
 	    [ 2, -1,  2,  1]
 	]);
 
-	expect(A2.triu()).toEqual($M([
+	expect(A2.triu().eql($M([
 	    [ 1, -1,  2,  2],
 	    [ 0,  2,  1, -1],
 	    [ 0,  0,  3,  2],
 	    [ 0,  0,  0,  1]
-	]));
+	]))).toBeTruthy();
 
-	expect(A2.triu(1)).toEqual($M([
+	expect(A2.triu(1).eql($M([
 	    [ 0, -1,  2,  2],
 	    [ 0,  0,  1, -1],
 	    [ 0,  0,  0,  2],
 	    [ 0,  0,  0,  0]
-	]));
+	]))).toBeTruthy();
     });
 
     it('should unroll', function() {
-	expect(A.unroll()).toEqual($V([1, 4, 2, 5, 3, 6]));
+	expect(A.unroll().eql($V([1, 4, 2, 5, 3, 6]))).toBeTruthy();
     });
 
     it('should slice', function() {
 	var A2 = $M([[1,2,3], [4,5,6], [7,8,9]]);
 	var A3 = A2.slice(2, 3, 2, 3);
-	expect(A3).toEqual($M([[5, 6], [8, 9]]));
+	expect(A3.eql($M([[5, 6], [8, 9]]))).toBeTruthy();
     });
 
     var U = $M([[-0.5110308651281587, 0.2132007163556105, 0.7071067811881557, 0.4397646068404634],
@@ -84,38 +84,13 @@ describe('matrix', function() {
 	    [-1,  2, 1, -1],
 	    [ 2,  1, 3,  2],
 	    [ 2, -1, 2,  1]
-	], false);
+	]);
 
 	var svd = A2.svd();
 	
 	expect(svd.U.eql(U)).toBeTruthy();
 	expect(svd.S.eql(S)).toBeTruthy();
 	expect(svd.V.eql(V)).toBeTruthy();
-    });
-
-    it('should svd in lapack', function() {
-	var lapack;
-
-	try{
-	    lapack = require('lapack');
-	} catch(e) {}
-	// this is so incredibly optional i'll only bother testing if it's around.
-	// will likely break it out into seperate spec folder later once i get an understanding
-	// of the impact of LAPACK on this project.
-	if(lapack) {
-	    var A2 = $M([
-		[ 1, -1, 2,  2],
-		[-1,  2, 1, -1],
-		[ 2,  1, 3,  2],
-		[ 2, -1, 2,  1]
-	    ], true);
-
-	    var svd = A2.svd();
-	    
-	    expect(svd.U.eql(U)).toBeTruthy();
-	    expect(svd.S.eql(S)).toBeTruthy();
-	    expect(svd.V.eql(V)).toBeTruthy();
-	}
     });
 
     it('should qr', function() {
@@ -127,28 +102,28 @@ describe('matrix', function() {
 	]);
 
 	var qr = A2.qr();
-	expect(qr.Q).toEqual($M([[-0.316227766016838, 0.28342171556262064, 0.8226876614429064, -0.3779644730092273],
-			       [0.31622776601683794, -0.6883098806520787, 0.5323273103454103, 0.3779644730092272],
-			       [-0.6324555320336759, -0.6478210641431328, -0.19357356739833098, -0.37796447300922714],
-				 [-0.6324555320336759, 0.16195526603578317, 0.048393391849582745, 0.7559289460184544]]));
-       expect(qr.R).toEqual($M([[-3.1622776601683795, 0.9486832980505139, -3.478505426185217, -2.8460498941515415],
-				[1.91055907392895e-17, -2.4698178070456938, -1.7410191098846692, 0.1214664495268375],
-				[-2.254600901479451e-16, 2.0686390257580927e-16, 1.6937687147353957, 0.7742942695933234],
-				[3.446764628337833e-17, 8.098938594673387e-17, 2.220446049250313e-16, -1.1338934190276815]]));
+	expect(qr.Q.eql($M([[-0.316227766016838, 0.28342171556262064, 0.8226876614429064, -0.3779644730092273],
+			    [0.31622776601683794, -0.6883098806520787, 0.5323273103454103, 0.3779644730092272],
+			    [-0.6324555320336759, -0.6478210641431328, -0.19357356739833098, -0.37796447300922714],
+			    [-0.6324555320336759, 0.16195526603578317, 0.048393391849582745, 0.7559289460184544]]))).toBeTruthy();
+	expect(qr.R.eql($M([[-3.1622776601683795, 0.9486832980505139, -3.478505426185217, -2.8460498941515415],
+			    [1.91055907392895e-17, -2.4698178070456938, -1.7410191098846692, 0.1214664495268375],
+			    [-2.254600901479451e-16, 2.0686390257580927e-16, 1.6937687147353957, 0.7742942695933234],
+			    [3.446764628337833e-17, 8.098938594673387e-17, 2.220446049250313e-16, -1.1338934190276815]]))).toBeTruthy();
     });
 
     it('should create a 1\'s matrix', function() {
 	var Ones = Matrix.One(2, 3);
-	expect(Ones).toEqual($M([[1,1,1], [1,1,1]]));
+	expect(Ones.eql($M([[1,1,1], [1,1,1]]))).toBeTruthy();
     });
 
     it('columns should be retrievable as vectors', function() {
-	expect(A.column(2)).toEqual($V([2, 5]));;
+	expect(A.column(2).eql($V([2, 5]))).toBeTruthy();
     });
 
     it('should log', function() {
-	expect(A.log()).toEqual($M([[0, 0.6931471805599453, 1.0986122886681098],
-	  [1.3862943611198906, 1.6094379124341003, 1.791759469228055]]));
+	expect(A.log().eql($M([[0, 0.6931471805599453, 1.0986122886681098],
+			       [1.3862943611198906, 1.6094379124341003, 1.791759469228055]]))).toBeTruthy();
     });
 
     it('should sum', function() {
@@ -156,12 +131,12 @@ describe('matrix', function() {
     });
 
     it('should multiply', function() {
-	expect(A.x(Matrix.create([[1, 2], [3, 4], [5, 6]]))).toEqual(Matrix.create([[22, 28], [49, 64]]));
+	expect(A.x(Matrix.create([[1, 2], [3, 4], [5, 6]])).eql(Matrix.create([[22, 28], [49, 64]]))).toBeTruthy();
     });
 
     it('should multiply', function() {
 	var B = $M([[1, 2, 3], [4, 5, 6]]);
-	expect(A).toEqual(B);
+	expect(A.eql(B)).toBeTruthy();
     });
 
     it('should evaluate equal matrices', function() {
