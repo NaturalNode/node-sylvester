@@ -111,6 +111,13 @@ create a 2x3 matrix of ones:
 
     var Ones = Matrix.One(2, 3);
 
+LU decomposition
+
+   var lu = A.lu();
+   console.log(lu.L);
+   console.log(lu.U);
+   console.log(lu.P);
+
 QR decomposition (feature still inefficient and experimental, but uses pure javascript):
 
     var qr = A.qr();
