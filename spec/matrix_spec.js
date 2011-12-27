@@ -85,12 +85,12 @@ describe('matrix', function() {
 	it('should PCA', function() {
 	    var pca = $M([[1, 2], [5, 7]]).pcaProject(1);	    
 	    
-	    expect(pca.Z.eql($M([
+	    expect(pca.Z.approxEql($M([
 		[-2.2120098720461616],
 		[-8.601913944732665]
             ]))).toBeTruthy();
 
-	    expect(pca.U.eql($M([[-0.5732529283807336, -0.819378471832714],
+	    expect(pca.U.approxEql($M([[-0.5732529283807336, -0.819378471832714],
 				 [-0.819378471832714, 0.5732529283807336]]))).toBeTruthy();
 
 	});	
