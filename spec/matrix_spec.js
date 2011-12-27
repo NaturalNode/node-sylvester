@@ -4,13 +4,23 @@ Matrix = sylvester.Matrix;
 var A = Matrix.create([[1, 2, 3], [4, 5, 6]]);
 
 describe('matrix', function() {
+    it('should solve', function() {
+	var M = $M([
+	    [2, 4],
+	    [2, 3]
+	]);
+
+	var b = $V([2, 2]);
+	expect(M.solve(b).eql($V([1, 0])));
+    });
+
     it('should partial pivot', function() {
         var B = $M([
             [3,  6,  -9],
             [-4, 1 , 10],
             [2,  5,  -3]
         ]);
-
+	
 	var P = Matrix.I(3);
 	B.partialPivot(1, 1, P);
 	
