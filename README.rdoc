@@ -20,6 +20,8 @@ The original documentation for "Sylvester" should help you through basic operati
 
 First I'd like to show some examples of features that aren't in the standard (non-node) Sylvester. I'll likely attempt to commit these back to Sylvester at some point soon.
 
+Note that the decompositions are all available in pure JavaScript, but if the {lapack}[https://github.com/NaturalNode/node-lapack] NPM is installed with LAPACK built as a shared library then efficient native code will be used. The LAPACK integration is still *highly* experimental.
+
 === Vector
 
     require('sylvester');
@@ -111,7 +113,7 @@ create a 2x3 matrix of ones:
 
     var Ones = Matrix.One(2, 3);
 
-LU decomposition
+LU decomposition (with partial pivoting)
 
    var lu = A.lu();
    console.log(lu.L);
