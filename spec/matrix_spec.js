@@ -22,7 +22,7 @@ describe('matrix', function() {
         ]);
 	
 	var P = Matrix.I(3);
-	B.partialPivot(1, 1, P);
+	B.partialPivot(1, 1, P, B);
 	
 	expect(B.eql($M([
             [-4,  1 ,  10],
@@ -37,48 +37,62 @@ describe('matrix', function() {
 	]))).toBeTruthy();
     });
 
-    it('should perform LU decomp', function() {
-	var A = $M([
-	    [4,  2, 1,  4],
-	    [-9, 4, 3,  9],
-	    [11, 3, 11, 3],
-	    [-4, 5, 3,  1]
-	]);
-	
-	var lu = A.lu();
-	
-	expect(lu.L.approxEql($M([
-	    [ 1, 0, 0, 0],
-	    [-0.818181818181818 , 1, 0, 0],
-	    [0.363636363636364, 0.140845070422535, 1, 0],
-	    [-0.363636363636364, 0.943661971830986, 0.921921921921922, 1]
-	]))).toBeTruthy();
-	
-	expect(lu.U.approxEql($M([
-	    [11, 3, 11, 3],
-	    [ 0, 6.454545454545455, 12, 11.454545454545455],
-	    [ 0, 0, -4.690140845070422, 1.295774647887324],
-	    [ 0, 0, 0, -9.912912912912912]
-	]))).toBeTruthy();
+    describe('LU decomp', function() {
+	it('should perform LU decomp on rectangular matrices', function() {
+	    var D = $M([
+		[3, 6],
+		[2, 3],
+		[4, 3],
+		[2, 120],
+	    ]);
 
-	expect(lu.P.eql($M([
-	    [0, 0, 1, 0],
-	    [0, 1, 0, 0],
-	    [1, 0, 0, 0],
-	    [0, 0, 0, 1]
-	]))).toBeTruthy();
-    });
+	    var lu = D.luJs();
+	    expect(lu.P.x((lu.L.x(lu.U))).eql(D)).toBeTruthy();
+	});
 
-    it('should match LU JS to LAPACK', function() {
-        var A = $M([
-            [4,  2, 1,  4],
-            [-9, 4, 3,  9],
-            [11, 3, 11, 3],
-            [-4, 5, 3,  1]
-        ]);
-
-	expect(A.luJs().U.approxEql(A.luPack().U)).toBeTruthy();
-	expect(A.luJs().L.approxEql(A.luPack().L)).toBeTruthy();
+	it('should perform LU decomp', function() {
+	    var A = $M([
+		[4,  2, 1,  4],
+		[-9, 4, 3,  9],
+		[11, 3, 11, 3],
+		[-4, 5, 3,  1]
+	    ]);
+	    
+	    var lu = A.lu();
+	    
+	    expect(lu.L.approxEql($M([
+		[ 1, 0, 0, 0],
+		[-0.818181818181818 , 1, 0, 0],
+		[0.363636363636364, 0.140845070422535, 1, 0],
+		[-0.363636363636364, 0.943661971830986, 0.921921921921922, 1]
+	    ]))).toBeTruthy();
+	    
+	    expect(lu.U.approxEql($M([
+		[11, 3, 11, 3],
+		[ 0, 6.454545454545455, 12, 11.454545454545455],
+		[ 0, 0, -4.690140845070422, 1.295774647887324],
+		[ 0, 0, 0, -9.912912912912912]
+	    ]))).toBeTruthy();
+	    
+	    expect(lu.P.eql($M([
+		[0, 0, 1, 0],
+		[0, 1, 0, 0],
+		[1, 0, 0, 0],
+		[0, 0, 0, 1]
+	    ]))).toBeTruthy();
+	});
+	
+	   it('should match LU JS to LAPACK', function() {
+               var A = $M([
+		   [4,  2, 1,  4],
+		   [-9, 4, 3,  9],
+		   [11, 3, 11, 3],
+		   [-4, 5, 3,  1]
+               ]);
+	       
+	       expect(A.luJs().U.approxEql(A.luPack().U)).toBeTruthy();
+	       expect(A.luJs().L.approxEql(A.luPack().L)).toBeTruthy();
+	   });
     });
     
     describe('PCA', function() {
