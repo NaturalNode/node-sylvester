@@ -7,7 +7,7 @@ describe('matrix', function() {
     it('should solve', function() {
 	var M = $M([
 	    [2, 4],
-	    [2, 3]
+	    [2, 3],
 	]);
 
 	var b = $V([2, 2]);

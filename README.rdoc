@@ -143,6 +143,13 @@ PCA
     var Z = pca.Z;
     var A = Z.pcaRecover(pca.U);
 
+Solving systems of equations
+    
+    // sovle Ax = b for x
+    var A = $M([[2, 4], [2, 1]]);
+    var b = $V([1, 0]);
+    console.log(A.solve(b));
+
 == Old Stuff
 
 Below is a basic illustration of standard matrix/vector math using the standard
