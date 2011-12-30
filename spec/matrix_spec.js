@@ -48,6 +48,9 @@ describe('matrix', function() {
 
 	    var lu = D.luJs();
 	    expect(lu.P.x((lu.L.x(lu.U))).eql(D)).toBeTruthy();
+
+	    lu = D.luPack();
+	    expect(lu.P.x((lu.L.x(lu.U))).eql(D)).toBeTruthy();
 	});
 
 	it('should perform LU decomp', function() {
