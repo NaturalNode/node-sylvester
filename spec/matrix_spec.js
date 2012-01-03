@@ -4,14 +4,42 @@ Matrix = sylvester.Matrix;
 var A = Matrix.create([[1, 2, 3], [4, 5, 6]]);
 
 describe('matrix', function() {
-    it('should solve', function() {
-	var M = $M([
-	    [2, 4],
-	    [2, 3],
+    it('should forward substitute', function() {
+	var L = $M([
+	    [1, 0, 0],
+	    [0.5, 1, 0],
+	    [2, 3, 1]
 	]);
 
-	var b = $V([2, 2]);
-	expect(M.solve(b).eql($V([1, 0])));
+	var b = $V([1, 2, 3]);
+
+	expect(L.forwardSubstitute(b).eql($V([1, 1.5, -3.5]))).toBeTruthy();
+    });
+
+    it('should back substitute', function() {
+	var L = $M([
+	    [4, 4],
+	    [0, 1],
+	]);
+
+	var b = $V([1, 1.5]);
+
+	expect(L.backSubstitute(b).eql($V([-1.25, 1.5]))).toBeTruthy();
+    });
+
+    it('should solve', function() {
+	// 2x + 3y = 2
+	// 4x + 4y = 1
+
+	// x = -1.25 
+	// y = 1.5
+	var M = $M([
+	    [2, 3],
+	    [4, 4],
+	]);
+
+	var b = $V([2, 1]);
+	expect(M.solve(b).eql($V([-1.25, 1.5])));
     });
 
     it('should partial pivot', function() {
