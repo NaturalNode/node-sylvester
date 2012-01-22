@@ -76,6 +76,9 @@ describe('matrix', function() {
 
 	    var lu = D.luJs();
 	    expect(lu.P.x((lu.L.x(lu.U))).eql(D)).toBeTruthy();
+
+	    lu = D.luPack();
+	    expect(lu.P.x((lu.L.x(lu.U))).eql(D)).toBeTruthy();
 	});
 
 	it('should perform LU decomp', function() {
@@ -109,6 +112,18 @@ describe('matrix', function() {
 		[0, 0, 0, 1]
 	    ]))).toBeTruthy();
 	});
+	
+	   it('should match LU JS to LAPACK', function() {
+               var A = $M([
+		   [4,  2, 1,  4],
+		   [-9, 4, 3,  9],
+		   [11, 3, 11, 3],
+		   [-4, 5, 3,  1]
+               ]);
+	       
+	       expect(A.luJs().U.approxEql(A.luPack().U)).toBeTruthy();
+	       expect(A.luJs().L.approxEql(A.luPack().L)).toBeTruthy();
+	   });
     });
     
     describe('PCA', function() {
@@ -199,6 +214,15 @@ describe('matrix', function() {
 	expect(svd.V.eql(V)).toBeTruthy();
     });
 
+    it('should have matching svds for js and lapack', function() {
+	var svdJs = ASVD.svdJs();	
+	var svdPack = ASVD.svdPack();
+
+	expect(svdJs.U.eql(svdPack.U)).toBeTruthy();
+	expect(svdJs.S.eql(svdPack.S)).toBeTruthy();
+	expect(svdJs.V.eql(svdPack.V)).toBeTruthy();
+    });
+
     var QRin = $M([
         [1, -1, 2, 2],
         [-1, 2, 1, -1],
@@ -219,6 +243,12 @@ describe('matrix', function() {
 	var qr = QRin.qrJs();
 	expect(qr.Q.eql(Qout)).toBeTruthy();
 	expect(qr.R.eql(Rout)).toBeTruthy();
+    });
+
+    it('should qr from lapack', function() {
+	var qr = QRin.qrPack();
+	//expect(qr.Q.eql(Qout)).toBeTruthy();
+	//expect(qr.R.eql(Rout)).toBeTruthy();
     });
 
     it('should create a 1\'s matrix', function() {
