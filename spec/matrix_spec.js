@@ -162,6 +162,10 @@ describe('matrix', function() {
         expect(A.sum()).toBe(21);
     });
 
+    it('should std', function() {
+        expect(A.std().eql($V([1.5,1.5,1.5]))).toBeTruthy();
+    });
+
     it('should multiply', function() {
         expect(A.x(Matrix.create([[1, 2], [3, 4], [5, 6]])).eql(Matrix.create([[22, 28], [49, 64]]))).toBeTruthy();
     });
