@@ -1,7 +1,8 @@
 // Copyright (c) 2011, Chris Umbel, James Coglan
 // LinkedList class - required for Polygon class.
 
-function LinkedList() {}
+export function LinkedList() {}
+
 LinkedList.prototype = {
   length: 0,
   first: null,
@@ -130,5 +131,3 @@ LinkedList.Circular.fromArray = function(list, useNodes) {
   while (n--) { linked.prepend(useNodes ? new LinkedList.Node(list[n]) : list[n]); }
   return linked;
 };
-
-module.exports = LinkedList;

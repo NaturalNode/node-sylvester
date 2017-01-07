@@ -1,12 +1,10 @@
-// Copyright (c) 2011, Chris Umbel, James Coglan
-// Plane class - depends on Vector. Some methods require Matrix and Line.
-var Vector = require('./vector');
-var Matrix = require('./matrix');
-var Line = require('./line');
+import { Line } from './line';
+import { Matrix } from './matrix';
+import { Sylvester } from './sylvester';
+import { Vector } from './vector';
 
-var Sylvester = require('./sylvester');
+export function Plane() {}
 
-function Plane() {}
 Plane.prototype = {
 
   // Returns true iff the plane occupies the same space as the argument
@@ -270,5 +268,3 @@ Plane.fromPoints = function(points) {
   ]).toUnitVector());
   return Plane.create(list[0], totalN);
 };
-
-module.exports = Plane;

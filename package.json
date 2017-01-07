@@ -1,20 +1,49 @@
 {
   "name": "sylvester",
-  "description": "node.js implementation of James Coglan's \"Sylvester\" matrix math library.",	
+  "description": "node.js implementation of James Coglan's \"Sylvester\" matrix math library.",
   "version": "0.0.21",
   "engines": {
     "node": ">=0.2.6"
   },
-  "author": "Chris Umbel <chris@chrisumbel.com>",
-  "keywords": ["matrix", "vector", "linear", "line", "algebra", "matrices"],
-  "main": "./lib/node-sylvester/index.js",
-  "maintainers": [{
-    "name": "Chris Umbel",
-    "email": "chris@chrisumbel.com",
-    "web": "http://www.chrisumbel.com"
+  "scripts": {
+    "build": "rimraf lib && babel src --out-dir lib",
+    "test": "mocha -r test/_setup.js \"test/*.test.js\" --compilers js:babel-register"
   },
-  {
-    "name": "Rob Ellis",
-    "email": "rob@silentrob.me"
-  }]
+  "author": "Chris Umbel <chris@chrisumbel.com>",
+  "license": "MIT",
+  "keywords": [
+    "matrix",
+    "vector",
+    "linear",
+    "line",
+    "algebra",
+    "matrices"
+  ],
+  "main": "./lib/index.js",
+  "maintainers": [
+    {
+      "name": "Chris Umbel",
+      "email": "chris@chrisumbel.com",
+      "web": "http://www.chrisumbel.com"
+    },
+    {
+      "name": "Rob Ellis",
+      "email": "rob@silentrob.me"
+    },
+    {
+      "name": "Connor Peet",
+      "email": "connor@peet.io"
+    }
+  ],
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-register": "^6.18.0",
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "rimraf": "^2.5.4"
+  },
+  "browser": {
+    "lapack": false
+  }
 }

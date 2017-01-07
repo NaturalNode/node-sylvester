@@ -1,9 +1,6 @@
-// Copyright (c) 2011, Chris Umbel, James Coglan
-// Polygon class - depends on Vector, Plane, Polygon.Vertex and LinkedList.
+import { Sylvester } from './sylvester';
 
-var Sylvester = require('./sylvester');
-
-function Polygon() {}
+export function Polygon() {}
 Polygon.prototype = {
 
   // Returns the vertex at the given position on the vertex list, numbered from 1.
@@ -346,5 +343,3 @@ Polygon.create = function(points, plane) {
   var P = new Polygon();
   return P.setVertices(points, plane);
 };
-
-module.exports = Polygon;

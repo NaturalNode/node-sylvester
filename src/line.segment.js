@@ -1,10 +1,11 @@
 // Copyright (c) 2011, Chris Umbel, James Coglan
 // Line.Segment class - depends on Line and its dependencies.
 
-var Line = require('./line');
-var Vector = require('./vector');
+import { Line } from './line';
+import { Vector } from './vector';
 
 Line.Segment = function() {};
+
 Line.Segment.prototype = {
 
   // Returns true iff the line segment is equal to the argument
@@ -122,5 +123,3 @@ Line.Segment.create = function(v1, v2) {
   var S = new Line.Segment();
   return S.setPoints(v1, v2);
 };
-
-module.exports = Line.Segment;

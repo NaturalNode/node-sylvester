@@ -1,11 +1,8 @@
-// Copyright (c) 2011, Chris Umbel, James Coglan
-// This file is required in order for any other classes to work. Some Vector methods work with the
-// other Sylvester classes and are useless unless they are included. Other classes such as Line and
-// Plane will not function at all without Vector being loaded first.
-var Sylvester = require('./sylvester'),
-Matrix = require('./matrix');
+import { Sylvester } from './sylvester';
+import { Matrix } from './matrix';
 
-function Vector() {}
+export function Vector() {}
+
 Vector.prototype = {
 
     norm: function() {
@@ -506,5 +503,3 @@ Vector.log = function(v) {
         return Math.log(x);
     });
 };
-
-module.exports = Vector;

@@ -1,7 +1,6 @@
-// Copyright (c) 2011, Chris Umbel, James Coglan
-// Polygon.Vertex class - required for Polygon class.
-
-var Sylvester = require('./sylvester');
+import { Sylvester } from './sylvester';
+import { Polygon } from './polygon';
+import { Vector } from './vector';
 
 Polygon.Vertex = function(point) {
   this.setElements(point);

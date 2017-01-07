@@ -1,8 +1,10 @@
-// Copyright (c) 2011, Chris Umbel, James Coglan
-// Matrix class - depends on Vector.
-var fs = require('fs');
-var Sylvester = require('./sylvester');
-var Vector = require('./vector');
+import { Sylvester } from './sylvester';
+import { Vector } from './vector';
+import * as fs from 'fs';
+
+function sign(x) {
+    return x < 0 ? -1: 1;
+}
 
 // augment a matrix M with identity rows/cols
 function identSize(M, m, n, k) {
@@ -23,7 +25,7 @@ function identSize(M, m, n, k) {
             e[i].unshift(0);
     }
 
-    return $M(e);
+    return Matrix.create(e);
 }
 
 function pca(X) {
@@ -80,7 +82,7 @@ function svdJs() {
 
     return {
         U: U,
-        S: $V(s).toDiagonalMatrix(),
+        S: Vector.create(s).toDiagonalMatrix(),
         V: V
     };
 }
@@ -90,9 +92,9 @@ function svdPack() {
     var result = lapack.sgesvd('A', 'A', this.elements);
 
     return {
-        U: $M(result.U),
-        S: $M(result.S).column(1).toDiagonalMatrix(),
-        V: $M(result.VT).transpose()
+        U: Matrix.create(result.U),
+        S: Matrix.create(result.S).column(1).toDiagonalMatrix(),
+        V: Matrix.create(result.VT).transpose()
         };
 }
 
@@ -110,9 +112,9 @@ function qrJs() {
         while (oneZero.length <= m - k)
             oneZero.push(0);
 
-        oneZero = $V(oneZero);
-        var vk = ak.add(oneZero.x(ak.norm() * Math.sign(ak.e(1))));
-        var Vk = $M(vk);
+        oneZero = Vector.create(oneZero);
+        var vk = ak.add(oneZero.x(ak.norm() * sign(ak.e(1))));
+        var Vk = Matrix.create(vk);
         var Hk = Matrix.I(m - k + 1).subtract(Vk.x(2).x(Vk.transpose()).div(Vk.transpose().x(Vk).e(1, 1)));
         var Qk = identSize(Hk, m, n, k);
         A = Qk.x(A);
@@ -131,12 +133,13 @@ function qrPack() {
     var qr = lapack.qr(this.elements);
 
     return {
-        Q: $M(qr.Q),
-        R: $M(qr.R)
+        Q: Matrix.create(qr.Q),
+        R: Matrix.create(qr.R)
         };
 }
 
-function Matrix() {}
+export function Matrix() {}
+
 Matrix.prototype = {
     // solve a system of linear equations (work in progress)
     solve: function(b) {
@@ -185,7 +188,7 @@ Matrix.prototype = {
             }
         }
 
-        return $V(v);
+        return Vector.create(v);
     },
 
     // return a sub-block of the matrix
@@ -198,17 +201,17 @@ Matrix.prototype = {
         if (endCol == 0)
             endCol = this.cols();
 
-        for (i = startRow; i <= endRow; i++) {
+        for (let i = startRow; i <= endRow; i++) {
             var row = [];
 
-            for (j = startCol; j <= endCol; j++) {
+            for (let j = startCol; j <= endCol; j++) {
                 row.push(this.e(i, j));
             }
 
             x.push(row);
         }
 
-        return $M(x);
+        return Matrix.create(x);
     },
 
     // Returns element (i,j) of the matrix
@@ -224,7 +227,7 @@ Matrix.prototype = {
         if (i > this.elements.length) {
             return null;
         }
-        return $V(this.elements[i - 1]);
+        return Vector.create(this.elements[i - 1]);
     },
 
     // Returns column k of the matrix as a vector
@@ -237,7 +240,7 @@ Matrix.prototype = {
         for (var i = 0; i < n; i++) {
             col.push(this.elements[i][j - 1]);
         }
-        return $V(col);
+        return Vector.create(col);
     },
 
     // Returns the number of rows/columns the matrix has
@@ -467,7 +470,7 @@ Matrix.prototype = {
         for (var i = 1; i <= dim.cols; i++) {
             r.push(this.col(i).sum() / dim.rows);
         }
-        return $V(r);
+        return Vector.create(r);
     },
 
     // Returns a Vector of each column's standard deviation
@@ -480,7 +483,7 @@ Matrix.prototype = {
             meanDiff = meanDiff.elementMultiply(meanDiff);
             r.push(Math.sqrt(meanDiff.sum() / dim.rows));
         }
-        return $V(r);
+        return Vector.create(r);
     },
 
     column: function(n) {
@@ -589,7 +592,7 @@ Matrix.prototype = {
         for (var i = 0; i < n; i++) {
             els.push(this.elements[i][i]);
         }
-        return $V(els);
+        return Vector.create(els);
     },
 
     // Make the matrix upper (right) triangular by Gaussian elimination.
@@ -799,7 +802,7 @@ Matrix.prototype = {
         var matrix_rows = [];
         var n = this.elements.length;
         for (var i = 0; i < n; i++) {
-            matrix_rows.push($V(this.elements[i]).inspect());
+            matrix_rows.push(Vector.create(this.elements[i]).inspect());
         }
         return matrix_rows.join('\n');
     },
@@ -859,7 +862,7 @@ Matrix.prototype = {
             maxes.push(maxIndex);
         }
 
-        return $V(maxes);
+        return Vector.create(maxes);
     },
 
     // return the largest values in each row
@@ -878,7 +881,7 @@ Matrix.prototype = {
             maxes.push(max);
         }
 
-        return $V(maxes);
+        return Vector.create(maxes);
     },
 
     // return the indexes of the columns with the smallest values
@@ -900,7 +903,7 @@ Matrix.prototype = {
             mins.push(minIndex);
         }
 
-        return $V(mins);
+        return Vector.create(mins);
     },
 
     // return the smallest values in each row
@@ -919,7 +922,7 @@ Matrix.prototype = {
             mins.push(min);
         }
 
-        return $V(mins);
+        return Vector.create(mins);
     },
 
     // perorm a partial pivot on the matrix. essentially move the largest
@@ -964,7 +967,7 @@ Matrix.prototype = {
             xa.push((b.e(i) - w) / this.e(i, i));
         }
 
-        return $V(xa);
+        return Vector.create(xa);
     },
 
     // solve an upper-triangular matrix * x = b via back substitution
@@ -981,7 +984,7 @@ Matrix.prototype = {
             xa.push((b.e(i) - w) / this.e(i, i));
         }
 
-        return $V(xa.reverse());
+        return Vector.create(xa.reverse());
     },
 
     luPack: luPack,
@@ -996,9 +999,9 @@ Matrix.prototype = {
 function luPack() {
     var lu = lapack.lu(this.elements);
     return {
-        L: $M(lu.L),
-        U: $M(lu.U),
-        P: $M(lu.P)
+        L: Matrix.create(lu.L),
+        U: Matrix.create(lu.U),
+        P: Matrix.create(lu.P)
         // don't pass back IPIV
         };
 }
@@ -1199,5 +1202,3 @@ Matrix.One = function(n, m) {
 Matrix.Ones = function(n, m) {
     return Matrix.One(n, m);
 };
-
-module.exports = Matrix;

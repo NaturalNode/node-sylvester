@@ -1,12 +1,13 @@
 // Copyright (c) 2011, Chris Umbel, James Coglan
-var Vector = require('./vector');
-var Matrix = require('./matrix');
-var Plane = require('./plane');
-var Sylvester = require('./sylvester');
+import { Vector } from './vector';
+import { Matrix } from './matrix';
+import { Plane } from './plane';
+import { Sylvester } from './sylvester';
 
 // Line class - depends on Vector, and some methods require Matrix and Plane.
 
-function Line() {}
+export function Line() {}
+
 Line.prototype = {
 
   // Returns true if the argument occupies the same space as the line
@@ -227,5 +228,3 @@ Line.create = function(anchor, direction) {
 Line.X = Line.create(Vector.Zero(3), Vector.i);
 Line.Y = Line.create(Vector.Zero(3), Vector.j);
 Line.Z = Line.create(Vector.Zero(3), Vector.k);
-
-module.exports = Line;
