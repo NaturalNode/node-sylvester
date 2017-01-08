@@ -7,7 +7,9 @@
   },
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib",
-    "test": "mocha -r test/_setup.js \"test/*.test.js\" --compilers js:babel-register"
+    "test:unit": "mocha -r test/_setup.js \"test/*.test.js\" --compilers js:babel-register",
+    "test:lint": "xo \"test/*.js\" --env=mocha && xo \"src/*.js\"",
+    "test": "npm-run-all --parallel -s test:unit test:lint"
   },
   "author": "Chris Umbel <chris@chrisumbel.com>",
   "license": "MIT",
@@ -41,9 +43,27 @@
     "babel-register": "^6.18.0",
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
-    "rimraf": "^2.5.4"
+    "npm-run-all": "^4.0.0",
+    "rimraf": "^2.5.4",
+    "xo": "^0.17.1"
+  },
+  "optionalDependencies": {
+    "lapack": "^0.1.0"
   },
   "browser": {
     "lapack": false
+  },
+  "xo": {
+    "esnext": true,
+    "space": true,
+    "rules": {
+      "object-curly-spacing": [
+        2,
+        "always"
+      ],
+      "import/prefer-default-export": 0,
+      "no-unused-expressions": 0,
+      "new-cap": 0
+    }
   }
 }

@@ -1,11 +1,11 @@
-import { Matrix, Vector } from '../src';
 import chai from 'chai';
+import { Matrix, Vector } from '../src';
 
-chai.Assertion.addProperty('matrix', function() {
+chai.Assertion.addProperty('matrix', function () {
   new chai.Assertion(this._obj).to.be.instanceOf(Matrix);
 
   return {
-    equal: (other) => {
+    equal: other => {
       if (!(other instanceof Matrix)) {
         other = Matrix.create(other);
       }
@@ -19,14 +19,14 @@ chai.Assertion.addProperty('matrix', function() {
         , true
       );
     }
-  }
+  };
 });
 
-chai.Assertion.addProperty('vector', function() {
+chai.Assertion.addProperty('vector', function () {
   new chai.Assertion(this._obj).to.be.instanceOf(Vector);
 
   return {
-    equal: (other) => {
+    equal: other => {
       if (!(other instanceof Vector)) {
         other = Vector.create(other);
       }
@@ -40,5 +40,5 @@ chai.Assertion.addProperty('vector', function() {
         , true
       );
     }
-  }
+  };
 });
