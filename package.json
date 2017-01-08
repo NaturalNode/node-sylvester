@@ -9,7 +9,7 @@
     "build": "rimraf lib && babel src --out-dir lib",
     "test:unit": "mocha -r test/_setup.js \"test/*.test.js\" --compilers js:babel-register",
     "test:lint": "xo \"test/*.js\" --env=mocha && xo \"src/*.js\"",
-    "test": "npm-run-all --parallel -s test:unit test:lint"
+    "test": "npm-run-all --parallel --silent test:unit test:lint"
   },
   "author": "Chris Umbel <chris@chrisumbel.com>",
   "license": "MIT",

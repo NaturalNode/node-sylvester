@@ -1,5 +1,7 @@
+import { Line } from './line';
 import { LinkedList } from './linkedlist';
 import { Matrix } from './matrix';
+import { Plane } from './plane';
 import { Sylvester } from './sylvester';
 import { Vector } from './vector';
 
@@ -55,9 +57,9 @@ export class Polygon {
     this.vertices.each(node => {
       const E = node.data.elements;
       node.data.setElements([
-        P[0] + k * (E[0] - P[0]),
-        P[1] + k * (E[1] - P[1]),
-        (P[2] || 0) + k * (E[2] - (P[2] || 0))
+        P[0] + (k * (E[0] - P[0])),
+        P[1] + (k * (E[1] - P[1])),
+        (P[2] || 0) + (k * (E[2] - (P[2] || 0)))
       ]);
     });
     const anchor = this.vertices.first.data;
@@ -130,49 +132,57 @@ export class Polygon {
     if (this.isTriangle()) {
       // Area is half the modulus of the cross product of two sides
       let A = this.vertices.first;
-
       let B = A.next;
       let C = B.next;
-      A = A.data.elements; B = B.data.elements; C = C.data.elements;
+      A = A.data.elements;
+      B = B.data.elements;
+      C = C.data.elements;
+
       return 0.5 * Vector.create([
-        (A[1] - B[1]) * (C[2] - B[2]) - (A[2] - B[2]) * (C[1] - B[1]),
-        (A[2] - B[2]) * (C[0] - B[0]) - (A[0] - B[0]) * (C[2] - B[2]),
-        (A[0] - B[0]) * (C[1] - B[1]) - (A[1] - B[1]) * (C[0] - B[0])
+        ((A[1] - B[1]) * (C[2] - B[2])) - ((A[2] - B[2]) * (C[1] - B[1])),
+        ((A[2] - B[2]) * (C[0] - B[0])) - ((A[0] - B[0]) * (C[2] - B[2])),
+        ((A[0] - B[0]) * (C[1] - B[1])) - ((A[1] - B[1]) * (C[0] - B[0]))
       ]).modulus();
-    } else {
-      const trigs = this.trianglesForSurfaceIntegral();
-      let area = 0;
-      let i = trigs.length;
-      while (i--) {
-        area += trigs[i].area() * trigs[i].plane.normal.dot(this.plane.normal);
-      }
-      return area;
     }
+
+    const trigs = this.trianglesForSurfaceIntegral();
+    let area = 0;
+    for (let i = 0; i < trigs.length; i++) {
+      area += trigs[i].area() * trigs[i].plane.normal.dot(this.plane.normal);
+    }
+
+    return area;
   }
 
   // Returns the centroid of the polygon. Requires division into
   // triangles - use with caution
   centroid() {
     if (this.isTriangle()) {
-      var A = this.v(1).elements;
+      const A = this.v(1).elements;
       const B = this.v(2).elements;
-      var C = this.v(3).elements;
-      return Vector.create([(A[0] + B[0] + C[0]) / 3, (A[1] + B[1] + C[1]) / 3, (A[2] + B[2] + C[2]) / 3]);
+      const C = this.v(3).elements;
+      return Vector.create([
+        (A[0] + B[0] + C[0]) / 3,
+        (A[1] + B[1] + C[1]) / 3,
+        (A[2] + B[2] + C[2]) / 3
+      ]);
     }
 
     const V = Vector.Zero(3);
     const trigs = this.trianglesForSurfaceIntegral();
-    let A;
     let M = 0;
-    let P;
-    let C;
     let i = trigs.length;
     while (i--) {
-      A = trigs[i].area() * trigs[i].plane.normal.dot(this.plane.normal);
+      const A = trigs[i].area() * trigs[i].plane.normal.dot(this.plane.normal);
       M += A;
-      P = V.elements;
-      C = trigs[i].centroid().elements;
-      V.setElements([P[0] + C[0] * A, P[1] + C[1] * A, P[2] + C[2] * A]);
+      const P = V.elements;
+      const C = trigs[i].centroid().elements;
+
+      V.setElements([
+        P[0] + (C[0] * A),
+        P[1] + (C[1] * A),
+        P[2] + (C[2] * A)
+      ]);
     }
 
     return V.x(1 / M);
@@ -247,29 +257,27 @@ export class Polygon {
     if (this.hasEdgeContaining(P)) {
       return false;
     }
-    let V;
-    let W;
-    let A;
-    let B;
+
     let theta = 0;
-    let dt;
     let loops = 0;
     const self = this;
     this.vertices.each(node => {
-      V = node.data.elements;
-      W = node.next.data.elements;
-      A = Vector.create([V[0] - P[0], V[1] - P[1], V[2] - (P[2] || 0)]);
-      B = Vector.create([W[0] - P[0], W[1] - P[1], W[2] - (P[2] || 0)]);
-      dt = A.angleFrom(B);
+      const V = node.data.elements;
+      const W = node.next.data.elements;
+      const A = Vector.create([V[0] - P[0], V[1] - P[1], V[2] - (P[2] || 0)]);
+      const B = Vector.create([W[0] - P[0], W[1] - P[1], W[2] - (P[2] || 0)]);
+      const dt = A.angleFrom(B);
       if (dt === null || dt === 0) {
         return;
       }
       theta += (A.cross(B).isParallelTo(self.plane.normal) ? 1 : -1) * dt;
-      if (theta >= 2 * Math.PI - Sylvester.precision) {
-        loops++; theta -= 2 * Math.PI;
+      if (theta >= (2 * Math.PI) - Sylvester.precision) {
+        loops++;
+        theta -= 2 * Math.PI;
       }
-      if (theta <= -2 * Math.PI + Sylvester.precision) {
-        loops--; theta += 2 * Math.PI;
+      if (theta <= (-2 * Math.PI) + Sylvester.precision) {
+        loops--;
+        theta += 2 * Math.PI;
       }
     });
     return loops !== 0;
@@ -281,10 +289,11 @@ export class Polygon {
     const P = (point.elements || point);
     let success = false;
     this.vertices.each(node => {
-      if (Line.Segment.create(node.data, node.next.data).contains(P)) {
+      if (!success && Line.Segment.create(node.data, node.next.data).contains(P)) {
         success = true;
       }
     });
+
     return success;
   }
 
@@ -304,21 +313,20 @@ export class Polygon {
   triangulateByEarClipping() {
     const poly = this.dup();
     const triangles = [];
-    let success;
-    let convexNode;
-    let mainNode;
-    let trig;
+
     while (!poly.isTriangle()) {
-      success = false;
+      let success = false;
+      let trig;
+      let mainNode;
       while (!success) {
         success = true;
         // Ear tips must be convex vertices - let's pick one at random
-        convexNode = poly.convexVertices.randomNode();
-        mainNode = poly.vertices.withData(convexNode.data);
+        const convexNode = poly.convexVertices.randomNode();
+        const mainNode = poly.vertices.withData(convexNode.data);
         // For convex vertices, this order will always be anticlockwise
-        trig = Polygon.create([mainNode.data, mainNode.next.data, mainNode.prev.data], this.plane);
+        const trig = Polygon.create([mainNode.data, mainNode.next.data, mainNode.prev.data], this.plane);
         // Now test whether any reflex vertices lie within the ear
-        poly.reflexVertices.each(node => {
+        poly.reflexVertices.each(node => { // eslint-disable-line no-loop-func
           // Don't test points belonging to this triangle. node won't be
           // equal to convexNode as node is reflex and vertex is convex.
           if (node.data !== mainNode.prev.data && node.data !== mainNode.next.data) {
@@ -348,10 +356,8 @@ export class Polygon {
     // Construct linked list of vertices. If each point is already a polygon
     // vertex, we reference it rather than creating a new vertex.
     let i = pointSet.length;
-
-    let newVertex;
     while (i--) {
-      newVertex = pointSet[i].isConvex ? pointSet[i] : new Polygon.Vertex(pointSet[i]);
+      const newVertex = pointSet[i].isConvex ? pointSet[i] : new Polygon.Vertex(pointSet[i]);
       this.vertices.prepend(new LinkedList.Node(newVertex));
     }
     this.clearCache();
@@ -410,3 +416,63 @@ export class Polygon {
     return P.setVertices(points, plane);
   }
 }
+
+export class Vertex extends Vector {
+  constructor(point) {
+    super();
+
+    this.setElements(point);
+    if (this.elements.length === 2) {
+      this.elements.push(0);
+    }
+    if (this.elements.length !== 3) {
+      return null;
+    }
+  }
+
+  // Returns true iff the vertex's internal angle is 0 <= x < 180
+  // in the context of the given polygon object. Returns null if the
+  // vertex does not exist in the polygon.
+  isConvex(polygon) {
+    const node = polygon.nodeFor(this);
+    if (node === null) {
+      return null;
+    }
+    const prev = node.prev.data;
+    const next = node.next.data;
+    const A = next.subtract(this);
+    const B = prev.subtract(this);
+    const theta = A.angleFrom(B);
+    if (theta <= Sylvester.precision) {
+      return true;
+    }
+    if (Math.abs(theta - Math.PI) <= Sylvester.precision) {
+      return false;
+    }
+    return (A.cross(B).dot(polygon.plane.normal) > 0);
+  }
+
+  // Returns true iff the vertex's internal angle is 180 <= x < 360
+  isReflex(polygon) {
+    const result = this.isConvex(polygon);
+    return (result === null) ? null : !result;
+  }
+
+  type(polygon) {
+    const result = this.isConvex(polygon);
+    return (result === null) ? null : (result ? 'convex' : 'reflex');
+  }
+
+  // Method for converting a set of arrays/vectors/whatever to a set of Vertex objects
+  static convert(points) {
+    const pointSet = points.toArray ? points.toArray() : points;
+    const list = [];
+    const n = pointSet.length;
+    for (let i = 0; i < n; i++) {
+      list.push(new Vertex(pointSet[i]));
+    }
+    return list;
+  }
+}
+
+Polygon.Vertex = Vertex;
