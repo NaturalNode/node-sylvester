@@ -1,26 +1,57 @@
 import { Sylvester } from './sylvester';
 import { Matrix } from './matrix';
 
+/**
+ * The Vector class is designed to model vectors in any number of dimensions.
+ * All the elements of a vector must be real numbers. Depending on what you’re
+ * using them for, it can be helpful to think of a vector either as a point
+ * in n-dimensional space, or as a line connecting
+ * the origin to that same point.
+ */
 export class Vector {
-  norm() {
-    let n = this.elements.length;
-    let sum = 0;
 
-    while (n--) {
-      sum += this.elements[n] * this.elements[n];
+  /**
+   * Creates a new vector, initializing it with the provided elements.
+   * @param  {Number[]} elements
+   */
+  constructor(elements) {
+    this.elements = elements;
+  }
+
+  /**
+   * Returns the magnitude (also: euclidean norm, magnitude) of the vector.
+   *
+   * $example Vector.magnitude
+   * @see https://en.wikipedia.org/wiki/Euclidean_distance
+   * @return {Number}
+   */
+  magnitude() {
+    let sum = 0;
+    for (let i = 0; i < this.elements.length; i++) {
+      sum += this.elements[i] * this.elements[i];
     }
 
     return Math.sqrt(sum);
   }
 
-  // Returns element i of the vector
-
+  /**
+   * Returns the `ith` element if the vector. Returns null if `i` is out
+   * of bounds, indexing starts from 1.
+   *
+   * $example Vector.e
+   * @param  {Number} i
+   * @return {Number}
+   */
   e(i) {
     return (i < 1 || i > this.elements.length) ? null : this.elements[i - 1];
   }
 
-  // Returns the number of rows/columns the vector has
-
+  /**
+   * Returns the number of rows and columns the vector has.
+   *
+   * $example Vector.dimensions
+   * @return {IDimensions} the "rows" will always equal zero
+   */
   dimensions() {
     return {
       rows: 1,
@@ -28,26 +59,33 @@ export class Vector {
     };
   }
 
-  // Returns the number of rows in the vector
-
+  /**
+   * Returns the number of rows the vector has.
+   *
+   * $example Vector.rows
+   * @return {Number} always `1`
+   */
   rows() {
     return 1;
   }
 
-  // Returns the number of columns in the vector
-
+  /**
+   * Returns the number of columns the vector has.
+   *
+   * $example Vector.cols
+   * @return {Number}
+   */
   cols() {
     return this.elements.length;
   }
 
-  // Returns the modulus ('length') of the vector
-
-  modulus() {
-    return Math.sqrt(this.dot(this));
-  }
-
-  // Returns true iff the vector is equal to the argument
-
+  /**
+   * Returns if the Vector is equal to the input vector.
+   *
+   * $example Vector.eql
+   * @param  {Vector} vector
+   * @return {Boolean}
+   */
   eql(vector) {
     let n = this.elements.length;
     const V = vector.elements || vector;
@@ -62,24 +100,25 @@ export class Vector {
     return true;
   }
 
-  // Returns a copy of the vector
-
-  dup() {
-    return Vector.create(this.elements);
-  }
-
-  // Maps the vector to another vector according to the given function
-
+  /**
+   * Returns a new function created by calling the iterator on all values of this vector.
+   * @param  {Function} fn
+   * @return {Vector}
+   */
   map(fn) {
-    const elements = [];
-    this.each((x, i) => {
-      elements.push(fn(x, i));
-    });
-    return Vector.create(elements);
+    const n = this.elements.length;
+    const elements = new Array(n);
+    for (let i = 0; i < n; i++) {
+      elements[i] = fn(this.elements[i], i + 1);
+    }
+
+    return new Vector(elements);
   }
 
-  // Calls the iterator for each element of the vector in turn
-
+  /**
+   * Iterates through the elements of the vector
+   * @param {Function} fn called with the `(element, index)`
+   */
   each(fn) {
     const n = this.elements.length;
     for (let i = 0; i < n; i++) {
@@ -87,30 +126,38 @@ export class Vector {
     }
   }
 
-  // Returns a new vector created by normalizing the receiver
-
+  /**
+   * Returns a new vector created by normalizing this one to a have a
+   * magnitude of `1`. If the vector is the zero vector, it will not be modified.
+   *
+   * $example Vector.toUnitVector
+   * @return {Vector}
+   */
   toUnitVector() {
     const r = this.modulus();
     if (r === 0) {
       return this.dup();
     }
-    return this.map(x => {
-      return x / r;
-    });
+
+    return this.map(x => x / r);
   }
 
-  // Returns the angle between the vector and the argument (also a vector)
-
+  /**
+   * Returns the angle between this vector the argument in radians. If the
+   * vectors are mirrored across their axes this will return `NaN`.
+   * $example Vector.angleFrom
+   * @param  {Vector} vector
+   * @return {Number}
+   */
   angleFrom(vector) {
     const V = vector.elements || vector;
     const n = this.elements.length;
     if (n !== V.length) {
-      return null;
+      throw new Error('Cannot compute the angle between vectors with different dimensionality');
     }
 
-    let dot = 0;
     // Work things out in parallel to save time
-
+    let dot = 0;
     let mod1 = 0;
     let mod2 = 0;
     this.each((x, i) => {
@@ -121,8 +168,9 @@ export class Vector {
     mod1 = Math.sqrt(mod1);
     mod2 = Math.sqrt(mod2);
     if (mod1 * mod2 === 0) {
-      return null;
+      return NaN;
     }
+
     let theta = dot / (mod1 * mod2);
     if (theta < -1) {
       theta = -1;
@@ -250,10 +298,22 @@ export class Vector {
     });
   }
 
+  /**
+   * Returns the product of all elements in the vector.
+   *
+   * $$
+   * \mathrm{product}(\begin{bmatrix}
+   *    3 \\\\
+   *    4
+   * \end{bmatrix}) = 12
+   * $$
+   *
+   * @return {Number}
+   */
   product() {
     let p = 1;
 
-    this.map(v => { // eslint-disable-line array-callback-return
+    this.each(v => {
       p *= v;
     });
 
@@ -263,13 +323,36 @@ export class Vector {
   // Returns the scalar product of the vector with the argument
   // Both vectors must have equal dimensionality
 
+  /**
+   * Returns the scalar (dot) product of the vector with the argument.
+   *
+   * $$
+   * \mathrm{dot}(\begin{bmatrix}
+   *    3 \\\\
+   *    4
+   * \end{bmatrix}) = 25
+   * \\\\
+   * \mathrm{dot}(\begin{bmatrix}
+   *    3 \\\\
+   *    4
+   * \end{bmatrix}, \begin{bmatrix}
+   *    1 \\\\
+   *    1
+   * \end{bmatrix}) = 7 \\\\
+   * $$
+   *
+   * @see https://en.wikipedia.org/wiki/Scalar_product
+   * @param  {Vector|Number[]} vector
+   * @return {Number}
+   */
   dot(vector) {
     const V = vector.elements || vector;
-    let product = 0;
     let n = this.elements.length;
     if (n !== V.length) {
-      return null;
+      throw new Error('Cannot compute the dot product of vectors with different dimensionality');
     }
+
+    let product = 0;
     while (n--) {
       product += this.elements[n] * V[n];
     }
@@ -491,7 +574,7 @@ export class Vector {
   // Returns a string representation of the vector
 
   inspect() {
-    return `[${this.elements.join(', ')}]`;
+    return `Vector<[${this.elements.join(', ')}]>`;
   }
 
   // Set vector's elements from an array
@@ -499,6 +582,10 @@ export class Vector {
   setElements(els) {
     this.elements = (els.elements || els).slice();
     return this;
+  }
+
+  toJSON() {
+    return this.elements;
   }
 
   // Constructor function
@@ -544,3 +631,10 @@ export class Vector {
 Vector.i = Vector.create([1, 0, 0]);
 Vector.j = Vector.create([0, 1, 0]);
 Vector.k = Vector.create([0, 0, 1]);
+
+// The following are shims for deprecated methods removed in 1.0.0
+Vector.prototype.modulus = Vector.prototype.magnitude;
+Vector.prototype.norm = Vector.prototype.magnitude;
+Vector.prototype.dup = function () {
+  return this.map(x => x);
+};

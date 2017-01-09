@@ -1,28 +1,24 @@
+# sylvester
 
-= node-sylvester
+Modern and expanded implementation of James Coglan's "Sylvester" matrix math library. The original project can be found at http://sylvester.jcoglan.com/
 
-node.js implementation of James Coglan's "Sylvester" matrix math library.
-The original project can be found at http://sylvester.jcoglan.com/
-
-This project is maintained by {Chris Umbel}[http://www.chrisumbel.com] & Rob Ellis
-
-= Documentation
+# Documentation
 
 The original documentation for "Sylvester" should help you through basic operations. An intro that contains node-specific features  can also be found {on Chris Umbel's blog}[http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math]. We're looking for someone to help get the documentation situation under control.
 
-= Installation
+# Installation
 
     npm install sylvester
 
-= Usage
+# Usage
 
-== New Stuff
+## New Stuff
 
 First I'd like to show some examples of features that aren't in the standard (non-node) Sylvester. I'll likely attempt to commit these back to Sylvester at some point soon.
 
-Note that the decompositions are all available in pure JavaScript, but if the {lapack}[https://github.com/NaturalNode/node-lapack] NPM is installed with LAPACK built as a shared library then efficient native code will be used. The LAPACK integration is still *highly* experimental.
+Note that the decompositions are all available in pure JavaScript, but if the [lapack](https://github.com/NaturalNode/node-lapack) NPM is installed with LAPACK built as a shared library then efficient native code will be used. The LAPACK integration is still *highly* experimental.
 
-=== Vector
+### Vector
 
     require('sylvester');
     var a = $V([1, 2, 3]);
@@ -54,7 +50,7 @@ return vector with first n nodes:
 add all elements into a single scalar:
 
     a.sum()
-        
+
 multiply all elements into a single scalar:
 
     a.product()
@@ -63,7 +59,7 @@ return a vector with the elements parameter on the bottom:
 
     a.augment(elements)
 
-=== Matrix
+### Matrix
 
     var A = $M([[1, 2, 3], [4, 5, 6]]);
 
@@ -144,7 +140,7 @@ PCA
     var A = Z.pcaRecover(pca.U);
 
 Solving systems of equations
-    
+
     // sovle Ax = b for x
     var A = $M([[2, 4], [2, 1]]);
     var b = $V([1, 0]);
@@ -155,7 +151,7 @@ Solving systems of equations
 Below is a basic illustration of standard matrix/vector math using the standard
 Sylvester API. This documentation is rather incomplete and for further details please consult {the official sylvester API documentation}[http://sylvester.jcoglan.com/docs] at http://sylvester.jcoglan.com/docs.
 
-=== Vectors
+### Vectors
 
     require('sylvester');
 
@@ -176,7 +172,7 @@ multiply by scalar:
 
     var d = a.x(2);
 
-=== Matrices
+### Matrices
 
     require('sylvester');
 
@@ -194,26 +190,3 @@ transpose a matrix:
     var B_T = B.transpose();
     // B is 2x3, B_T is 3x2
 
-= License
-
-This project is released under The MIT License
-
-Copyright (c) 2011, Chris Umbel, Rob Ellis, James Coglan
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.

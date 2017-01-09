@@ -1,5 +1,5 @@
 import chai from 'chai';
-import { Matrix, Vector } from '../src';
+import { Matrix, Vector, Sylvester } from '../src';
 
 chai.Assertion.addProperty('matrix', function () {
   new chai.Assertion(this._obj).to.be.instanceOf(Matrix);
@@ -11,12 +11,12 @@ chai.Assertion.addProperty('matrix', function () {
       }
 
       this.assert(
-          this._obj.eql(other)
-        , 'expected #{this} to equal #{exp}'
-        , 'expected #{this} to not equal #{exp}'
-        , this._obj
-        , other
-        , true
+        this._obj.eql(other),
+        'expected #{this} to equal #{exp}',
+        'expected #{this} to not equal #{exp}',
+        this._obj,
+        other,
+        true
       );
     }
   };
@@ -32,12 +32,27 @@ chai.Assertion.addProperty('vector', function () {
       }
 
       this.assert(
-          this._obj.eql(other)
-        , 'expected #{this} to equal #{exp}'
-        , 'expected #{this} to not equal #{exp}'
-        , this._obj
-        , other
-        , true
+        this._obj.eql(other),
+        'expected #{this} to equal #{exp}',
+        'expected #{this} to not equal #{exp}',
+        this._obj,
+        other,
+        true
+      );
+    }
+  };
+});
+
+chai.Assertion.addProperty('approx', function () {
+  return {
+    equal: other => {
+      this.assert(
+        Math.abs(this._obj - other) < Sylvester.precision,
+        'expected #{this} to about equal #{exp}',
+        'expected #{this} to not equal #{exp}',
+        this._obj,
+        other,
+        true
       );
     }
   };
