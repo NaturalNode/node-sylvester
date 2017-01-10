@@ -1,4 +1,4 @@
-import { Sylvester } from './sylvester';
+import { DimensionalityMismatchError, Sylvester } from './sylvester';
 import { Matrix } from './matrix';
 
 /**
@@ -81,7 +81,6 @@ export class Vector {
 
   /**
    * Returns if the Vector is equal to the input vector.
-   *
    * $example Vector.eql
    * @param  {Vector} vector
    * @return {Boolean}
@@ -146,6 +145,8 @@ export class Vector {
    * Returns the angle between this vector the argument in radians. If the
    * vectors are mirrored across their axes this will return `NaN`.
    * $example Vector.angleFrom
+   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   *     different dimensions
    * @param  {Vector} vector
    * @return {Number}
    */
@@ -153,7 +154,9 @@ export class Vector {
     const V = vector.elements || vector;
     const n = this.elements.length;
     if (n !== V.length) {
-      throw new Error('Cannot compute the angle between vectors with different dimensionality');
+      throw new DimensionalityMismatchError(
+        'Cannot compute the angle between vectors with different dimensionality'
+      );
     }
 
     // Work things out in parallel to save time
@@ -181,82 +184,109 @@ export class Vector {
     return Math.acos(theta);
   }
 
-  // Returns true iff the vector is parallel to the argument
-
+  /**
+   * Returns whether the vectors are parallel to each other.
+   * $example Vector.isParallelTo
+   * @return {Boolean}
+   */
   isParallelTo(vector) {
     const angle = this.angleFrom(vector);
-    return (angle === null) ? null : (angle <= Sylvester.precision);
+    return angle === null ? false : (angle <= Sylvester.precision);
   }
 
-  // Returns true iff the vector is antiparallel to the argument
-
+  /**
+   * Returns whether the vectors are antiparallel to each other.
+   * $example Vector.isAntiparallelTo
+   * @return {Boolean}
+   */
   isAntiparallelTo(vector) {
     const angle = this.angleFrom(vector);
-    return (angle === null) ? null : (Math.abs(angle - Math.PI) <= Sylvester.precision);
+    return angle === null ? false : (Math.abs(angle - Math.PI) <= Sylvester.precision);
   }
 
-  // Returns true iff the vector is perpendicular to the argument
-
+  /**
+   * Returns whether the vectors are perpendicular to each other.
+   * $example Vector.isPerpendicularTo
+   * @return {Boolean}
+   */
   isPerpendicularTo(vector) {
-    const dot = this.dot(vector);
-    return (dot === null) ? null : (Math.abs(dot) <= Sylvester.precision);
+    return Math.abs(this.dot(vector)) <= Sylvester.precision;
   }
 
-  // Returns the result of adding the argument to the vector
+  _runBinaryOp(value, operator) {
+    if (typeof value === 'number') {
+      return this.map(v => operator(v, value));
+    }
 
+    const values = value.elements || value;
+    if (this.elements.length !== values.length) {
+      throw new DimensionalityMismatchError('Cannot add vectors with different dimensions.');
+    }
+
+    return this.map((x, i) => operator(x, values[i - 1]));
+  }
+
+  /**
+   * When the input is a constant, this returns the result of adding it to
+   * all cevtor elements. When it's a vector, the vectors will be added.
+   * $example Vector.add
+   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   *     different dimensions
+   * @param {Number|Number[]|Vector} value
+   * @return {Vector}
+   */
   add(value) {
-    const V = value.elements || value;
-
-    if (this.elements.length !== V.length) {
-      return this.map(v => v + value);
-    }
-
-    return this.map((x, i) => x + V[i - 1]);
+    return this._runBinaryOp(value, (a, b) => a + b);
   }
 
-  // Returns the result of subtracting the argument from the vector
-
-  subtract(v) {
-    if (typeof (v) === 'number') {
-      return this.map(k => {
-        return k - v;
-      });
-    }
-
-    const V = v.elements || v;
-    if (this.elements.length !== V.length) {
-      return null;
-    }
-    return this.map((x, i) => {
-      return x - V[i - 1];
-    });
+  /**
+   * When the input is a constant, this returns the result of subtracting it
+   * from all vector elements. When it's a vector, the vectors will be subtracted.
+   * $example Vector.subtract
+   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   *     different dimensions
+   * @param {Number|Number[]|Vector} value
+   * @return {Vector}
+   */
+  subtract(value) {
+    return this._runBinaryOp(value, (a, b) => a - b);
   }
 
-  // Returns the result of multiplying the elements of the vector by the argument
-
-  multiply(k) {
-    return this.map(x => {
-      return x * k;
-    });
+  /**
+   * When the input is a constant, this returns the result of multiplying it
+   * with all vector elements. When it's a vector, the vectors will be
+   * element-wise multiplied.
+   * $example Vector.multiply
+   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   *     different dimensions
+   * @param {Number|Number[]|Vector} value
+   * @return {Vector}
+   */
+  multiply(value) {
+    return this._runBinaryOp(value, (a, b) => a * b);
   }
 
-  elementMultiply(v) {
-    return this.map((k, i) => { // eslint-disable-line array-callback-return
-      return v.e(i) * k;
-    });
-  }
-
+  /**
+   * Returns the sum of all elements in the Vector.
+   * $example Vector.sum
+   * @return {Number}
+   */
   sum() {
     let sum = 0;
-    this.map(x => { // eslint-disable-line array-callback-return
+    this.each(x => {
       sum += x;
     });
     return sum;
   }
 
+  /**
+   * Returns a new vector with the first `n` elements removed from the beginning.
+   * $example Vector.chomp
+   * @param  {Number} n
+   * @return {Vector}
+   */
   chomp(n) {
     const elements = [];
-
     for (let i = n; i < this.elements.length; i++) {
       elements.push(this.elements[i]);
     }
@@ -264,9 +294,14 @@ export class Vector {
     return Vector.create(elements);
   }
 
+  /**
+   * Returns a new vector consisting only of the first `n` elements.
+   * $example Vector.chomp
+   * @param  {Number} n
+   * @return {Vector}
+   */
   top(n) {
     const elements = [];
-
     for (let i = 0; i < n; i++) {
       elements.push(this.elements[i]);
     }
@@ -274,16 +309,19 @@ export class Vector {
     return Vector.create(elements);
   }
 
+  /**
+   * Returns a new vector with the provided `elements` concatenated on the end.
+   * $example Vector.augment
+   * @param  {Number[]|Vector} elements
+   * @return {Vector}
+   */
   augment(elements) {
-    const newElements = this.elements;
-
-    for (let i = 0; i < elements.length; i++) {
-      newElements.push(elements[i]);
-    }
-
-    return Vector.create(newElements);
+    return Vector.create(this.elements.concat(elements.elements || elements));
   }
 
+  /**
+   * @alias Vector#multiply
+   */
   x(k) {
     return this.multiply(k);
   }
@@ -292,27 +330,13 @@ export class Vector {
     return Vector.log(this);
   }
 
-  elementDivide(vector) {
-    return this.map((v, i) => {
-      return v / vector.e(i);
-    });
-  }
-
   /**
    * Returns the product of all elements in the vector.
-   *
-   * $$
-   * \mathrm{product}(\begin{bmatrix}
-   *    3 \\\\
-   *    4
-   * \end{bmatrix}) = 12
-   * $$
-   *
+   * $example Vector.product
    * @return {Number}
    */
   product() {
     let p = 1;
-
     this.each(v => {
       p *= v;
     });
@@ -320,28 +344,13 @@ export class Vector {
     return p;
   }
 
-  // Returns the scalar product of the vector with the argument
-  // Both vectors must have equal dimensionality
-
   /**
    * Returns the scalar (dot) product of the vector with the argument.
    *
-   * $$
-   * \mathrm{dot}(\begin{bmatrix}
-   *    3 \\\\
-   *    4
-   * \end{bmatrix}) = 25
-   * \\\\
-   * \mathrm{dot}(\begin{bmatrix}
-   *    3 \\\\
-   *    4
-   * \end{bmatrix}, \begin{bmatrix}
-   *    1 \\\\
-   *    1
-   * \end{bmatrix}) = 7 \\\\
-   * $$
-   *
+   * $example Vector.dot
    * @see https://en.wikipedia.org/wiki/Scalar_product
+   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   *     different dimensions
    * @param  {Vector|Number[]} vector
    * @return {Number}
    */
@@ -349,7 +358,9 @@ export class Vector {
     const V = vector.elements || vector;
     let n = this.elements.length;
     if (n !== V.length) {
-      throw new Error('Cannot compute the dot product of vectors with different dimensionality');
+      throw new DimensionalityMismatchError(
+        'Cannot compute the dot product of vectors with different dimensionality'
+      );
     }
 
     let product = 0;

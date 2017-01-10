@@ -405,7 +405,7 @@ export class Matrix {
     const r = [];
     for (let i = 1; i <= dim.cols; i++) {
       let meanDiff = this.col(i).subtract(mMean.e(i));
-      meanDiff = meanDiff.elementMultiply(meanDiff);
+      meanDiff = meanDiff.multiply(meanDiff);
       r.push(Math.sqrt(meanDiff.sum() / dim.rows));
     }
     return Vector.create(r);
