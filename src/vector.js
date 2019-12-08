@@ -82,17 +82,18 @@ export class Vector {
   /**
    * Returns if the Vector is equal to the input vector.
    * $example Vector.eql
-   * @param  {Vector} vector
+   * @param {Vector} vector
+   * @param {Number} epsilon The precision to compare each number.
    * @return {Boolean}
    */
-  eql(vector) {
+  eql(vector, precision = Sylvester.approxPrecision) {
     let n = this.elements.length;
     const V = vector.elements || vector;
     if (n !== V.length) {
       return false;
     }
     while (n--) {
-      if (Math.abs(this.elements[n] - V[n]) > Sylvester.precision) {
+      if (Math.abs(this.elements[n] - V[n]) > precision) {
         return false;
       }
     }
@@ -325,11 +326,6 @@ export class Vector {
   x(k) {
     return this.multiply(k);
   }
-
-  log() {
-    return Vector.log(this);
-  }
-
   /**
    * Returns the product of all elements in the vector.
    * $example Vector.product
@@ -370,14 +366,21 @@ export class Vector {
     return product;
   }
 
-  // Returns the vector product of the vector with the argument
-  // Both vectors must have dimensionality 3
-
+  /**
+   * Returns the vector product of the vector with the argument.
+   * @param {Vector|number[]} vector
+   * @throws {DimensionalityMismatchError} if either this or the other vector
+   * is not three-dimensional.
+   * @returns {Vector}
+   */
   cross(vector) {
     const B = vector.elements || vector;
     if (this.elements.length !== 3 || B.length !== 3) {
-      return null;
+      throw new DimensionalityMismatchError(
+        `A cross-product can only be calculated between 3-dimensional vectors (got ${B.length} and ${this.elements.length})`
+      );
     }
+
     const A = this.elements;
     return Vector.create([
       (A[1] * B[2]) - (A[2] * B[1]),
@@ -386,8 +389,10 @@ export class Vector {
     ]);
   }
 
-  // Returns the (absolute) largest element of the vector
-
+  /**
+   * Returns the (absolute) largest element of the vector
+   * @returns {Number}
+   */
   max() {
     let m = 0;
     let i = this.elements.length;
@@ -399,8 +404,12 @@ export class Vector {
     return m;
   }
 
+  /**
+   * Returns the index of the absolute largest element of the vector.
+   * @returns {Number} Will be -1 if the vector is empty
+   */
   maxIndex() {
-    let m = 0;
+    let m = -1;
     let i = this.elements.length;
     let maxIndex = -1;
 
@@ -414,35 +423,40 @@ export class Vector {
     return maxIndex;
   }
 
-  // Returns the index of the first match found
-
+  /**
+   * Returns the index of the first instance of the value in the vector, or -1.
+   * @param {Number} x
+   * @returns {Number}
+   */
   indexOf(x) {
-    let index = null;
-    const n = this.elements.length;
-    for (let i = 0; i < n; i++) {
-      if (index === null && this.elements[i] === x) {
-        index = i + 1;
+    for (let i = 0; this.elements.length; i++) {
+      if (this.elements[i] === x) {
+        return i + 1;
       }
     }
-    return index;
+
+    return -1;
   }
 
-  // Returns a diagonal matrix with the vector's elements as its diagonal elements
-
+  /**
+   * Returns a diagonal matrix with the vector's elements as its diagonal elements
+   * @returns {Matrix}
+   */
   toDiagonalMatrix() {
     return Matrix.Diagonal(this.elements);
   }
 
-  // Returns the result of rounding the elements of the vector
-
+  /**
+   * Returns the result of rounding the elements of the vector
+   * @returns {Vector}
+   */
   round() {
-    return this.map(x => {
-      return Math.round(x);
-    });
+    return this.map(x => Math.round(x));
   }
 
-  // Transpose a Vector, return a 1xn Matrix
-
+  /**
+   * Transpose a Vector, return a 1xn Matrix.
+   */
   transpose() {
     const rows = this.elements.length;
     const elements = [];
@@ -456,46 +470,68 @@ export class Vector {
   // Returns a copy of the vector with elements set to the given value if they
   // differ from it by less than Sylvester.precision
 
-  snapTo(x) {
-    return this.map(y => {
-      return (Math.abs(y - x) <= Sylvester.precision) ? x : y;
-    });
+  /**
+   * Returns a copy of the vector with elements set to the given value if they
+   * differ from it by less than the epislon.
+   * @param {Number} target
+   * @param {Number} epsilon
+   * @return {Matrix}
+   */
+  snapTo(target, epsilon = Sylvester.precision) {
+    return this.map(p => Math.abs(p - target) <= epsilon ? target : p);
   }
 
-  // Returns the vector's distance from the argument, when considered as a point in space
-
+  /**
+   * Returns the vector's distance from the argument, when considered as a point in space
+   * @param {Vector|Line|Plane} obj
+   */
   distanceFrom(obj) {
     if (obj.anchor || (obj.start && obj.end)) {
       return obj.distanceFrom(this);
     }
+
     const V = obj.elements || obj;
     if (V.length !== this.elements.length) {
-      return null;
+      throw new DimensionalityMismatchError(
+        `Cannot get a ${this.elements.length}D distance from a ${V.length}D object`,
+      );
     }
+
     let sum = 0;
     let part;
     this.each((x, i) => {
       part = x - V[i - 1];
       sum += part * part;
     });
+
     return Math.sqrt(sum);
   }
 
-  // Returns true if the vector is point on the given line
-
+  /**
+   * Returns true if the vector is point on the given line
+   * @param {Line} line
+   * @returns {Boolean}
+   */
   liesOn(line) {
     return line.contains(this);
   }
 
-  // Return true iff the vector is a point in the given plane
-
+  /**
+   * Returns true if the vector is point on the given plane
+   * @param {Plane} plane
+   * @returns {Boolean}
+   */
   liesIn(plane) {
     return plane.contains(this);
   }
 
-  // Rotates the vector about the given object. The object should be a
-  // point if the vector is 2D, and a line if it is 3D. Be careful with line directions!
-
+  /**
+   * Rotates the vector about the given object. The object should be a point
+   * if the vector is 2D, and a line if it is 3D. Be careful
+   * with line directions!
+   * @param {Number|Vector} t
+   * @param {Vector|Line} obj
+   */
   rotate(t, obj) {
     let V;
     let R = null;
@@ -510,7 +546,7 @@ export class Vector {
       case 2:
         V = obj.elements || obj;
         if (V.length !== 2) {
-          return null;
+          throw new DimensionalityMismatchError(`Cannot rotate a 2D vector around a ${V.length}D object`);
         }
         if (!R) {
           R = Matrix.Rotation(t).elements;
@@ -523,7 +559,7 @@ export class Vector {
         ]);
       case 3:
         if (!obj.direction) {
-          return null;
+          throw new DimensionalityMismatchError('A line must be provided to rotate a 3D vector');
         }
         C = obj.pointClosestTo(this).elements;
         if (!R) {
@@ -538,12 +574,14 @@ export class Vector {
           C[2] + (R[2][0] * x) + (R[2][1] * y) + (R[2][2] * z)
         ]);
       default:
-        return null;
+        throw new DimensionalityMismatchError(`Cannot rotate a ${this.elements.length}D vector`);
     }
   }
 
-  // Returns the result of reflecting the point in the given point, line or plane
-
+  /**
+   * Returns the result of reflecting the point in the given point, line or plane.
+   * @param {Vector|Line|Plane} obj
+   */
   reflectionIn(obj) {
     if (obj.anchor) {
       // obj is a plane or line
@@ -566,35 +604,54 @@ export class Vector {
     });
   }
 
-  // Utility to make sure vectors are 3D. If they are 2D, a zero z-component is added
-
-  to3D() {
-    const V = this.dup();
-    switch (V.elements.length) {
-      case 3:
-        break;
-      case 2:
-        V.elements.push(0);
-        break;
-      default:
-        return null;
-    }
-    return V;
+  /**
+   * Runs an element-wise logarithm on the vector.
+   * @param {Number} Log base
+   * @return {Matrix}
+   */
+  log(base = Math.E) {
+    const logBase = Math.log(base); // change of base
+    return this.map(x => Math.log(x) / logBase);
   }
 
-  // Returns a string representation of the vector
+  /**
+   * Utility to make sure vectors are 3D. If they are 1/2D, a zero component is added.
+   * @returns {Vector}
+   */
+  to3D() {
+    switch (this.elements.length) {
+      case 0:
+        return Vector.Zero(3);
+      case 1:
+        return new Vector([this.elements[0], 0, 0]);
+      case 2:
+        return new Vector([this.elements[0], this.elements[1], 0]);
+      case 3:
+        return this;
+      default:
+        throw new DimensionalityMismatchError(`Cannot convert a ${this.elements.length}D vector to a 3D one`);
+    }
+  }
 
+  /**
+   * Returns a string representation of the vector
+   * @returns {String}
+   */
   inspect() {
     return `Vector<[${this.elements.join(', ')}]>`;
   }
 
-  // Set vector's elements from an array
-
+  /**
+   * @private
+   */
   setElements(els) {
     this.elements = (els.elements || els).slice();
     return this;
   }
 
+  /**
+   * @inheritdoc
+   */
   toJSON() {
     return this.elements;
   }
@@ -605,36 +662,49 @@ export class Vector {
     return V.setElements(elements);
   }
 
-  // Random vector of size n
-  static Random(n) {
+  /**
+   * Creates vector of the given size filled with random values in the range `[0, 1)`.
+   * @param {Number} size
+   * @returns {Vector}
+   */
+  static Random(size) {
     const elements = [];
-    while (n--) {
+    while (size--) {
       elements.push(Math.random());
     }
     return Vector.create(elements);
   }
 
-  static Fill(n, v) {
+  /**
+   * Creates a vector filled with the given value.
+   * @param {Number} size
+   * @param {Number} value
+   * @returns {Vector}
+   */
+  static Fill(size, value) {
     const elements = [];
-    while (n--) {
-      elements.push(v);
+    while (size--) {
+      elements.push(value);
     }
     return Vector.create(elements);
   }
 
-  // Vector filled with zeros
+  /**
+   * Creates an n-length vector filled with zeroes.
+   * @param {Number} size
+   * @returns {Vector}
+   */
   static Zero(n) {
     return Vector.Fill(n, 0);
   }
 
+  /**
+   * Creates an n-length vector filled with ones.
+   * @param {Number} size
+   * @returns {Vector}
+   */
   static One(n) {
     return Vector.Fill(n, 1);
-  }
-
-  static log(v) {
-    return v.map(x => {
-      return Math.log(x);
-    });
   }
 }
 

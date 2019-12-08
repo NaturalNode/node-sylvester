@@ -230,7 +230,7 @@ export class Matrix {
    * @return {Boolean} True if the matrices are equal, false if they are not
    * or a different size.
    */
-  eql(matrix, precision = Sylvester.approxPrecision) {
+  eql(matrix, epsilon = Sylvester.approxPrecision) {
     let M = matrix.elements || matrix;
     if (typeof (M[0][0]) === 'undefined') {
       M = Matrix.create(M).elements;
@@ -244,7 +244,7 @@ export class Matrix {
     while (i--) {
       j = nj;
       while (j--) {
-        if (Math.abs(this.elements[i][j] - M[i][j]) > precision) {
+        if (Math.abs(this.elements[i][j] - M[i][j]) > epsilon) {
           return false;
         }
       }
