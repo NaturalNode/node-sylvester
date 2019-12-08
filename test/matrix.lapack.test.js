@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { Matrix } from '../src';
 
-describe('matrix', () => {
+describe.skip('matrix', () => {
   describe('LU decomp', () => {
     it('should perform LU decomp on rectangular matrices', () => {
       const D = Matrix.create([

@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { Sylvester } from './sylvester';
+import { Sylvester, OutOfRangeError, DimensionalityMismatchError } from './sylvester';
 import { Vector } from './vector';
 
 const lapack = (() => {
@@ -46,6 +46,8 @@ function pca(X) {
     S: svd.S
   };
 }
+
+const sizeStr = matrix => `${matrix.rows()}x${matrix.cols()} matrix`;
 
 export class Matrix {
   // solve a system of linear equations (work in progress)
@@ -102,8 +104,14 @@ export class Matrix {
     return Vector.create(v);
   }
 
-  // return a sub-block of the matrix
-
+  /**
+   * Returns a sub-block of the matrix.
+   * @param {Number} startRow Top-most starting row.
+   * @param {Number} endRow Bottom-most ending row. If 0, takes the whole matrix.
+   * @param {Number} startCol Left-most starting column.
+   * @param {Number} endCol Right-most ending column. If 0, takes the whole matrix.
+   * @return {Matrix}
+   */
   slice(startRow, endRow, startCol, endCol) {
     const x = [];
 
@@ -115,10 +123,10 @@ export class Matrix {
       endCol = this.cols();
     }
 
-    for (let i = startRow; i <= endRow; i++) {
+    for (let i = Math.max(1, startRow); i <= endRow; i++) {
       const row = [];
 
-      for (let j = startCol; j <= endCol; j++) {
+      for (let j = Math.max(1, startCol); j <= endCol; j++) {
         row.push(this.e(i, j));
       }
 
@@ -128,29 +136,45 @@ export class Matrix {
     return Matrix.create(x);
   }
 
-  // Returns element (i,j) of the matrix
-
+  /**
+   * Returns th element at (i, j) in the matrix.
+   * @param {Number} i Matrix row
+   * @param {Number} j Matrix column
+   * @throws {OutOfRangeError} if (i, j) is out of range.
+   * @return {Number}
+   */
   e(i, j) {
     if (i < 1 || i > this.elements.length || j < 1 || j > this.elements[0].length) {
-      return null;
+      throw new OutOfRangeError(
+        `The location (${i}, ${j}) is outside the bounds of this ${sizeStr(this)}`,
+      );
     }
+
     return this.elements[i - 1][j - 1];
   }
 
-  // Returns row k of the matrix as a vector
-
+  /**
+   * Returns a vector containing the values in row o.
+   * @param {Number} i
+   * @throws {OutOfRangeError} if o is out of range
+   * @return {Vector}
+   */
   row(i) {
-    if (i > this.elements.length) {
-      return null;
+    if (i < 1 || i > this.elements.length) {
+      throw new OutOfRangeError(`Row ${i} is outside the bounds of this ${sizeStr(this)}`)
     }
     return Vector.create(this.elements[i - 1]);
   }
 
-  // Returns column k of the matrix as a vector
-
+  /**
+   * Returns a vector containing the values in column j.
+   * @param {Number} j
+   * @throws {OutOfRangeError} if j is out of range
+   * @return {Vector}
+   */
   col(j) {
-    if (j > this.elements[0].length) {
-      return null;
+    if (j < 1 || j > this.elements[0].length) {
+      throw new OutOfRangeError(`Column ${j} is outside the bounds of this ${sizeStr(this)}`)
     }
     const col = [];
     const n = this.elements.length;
@@ -160,8 +184,10 @@ export class Matrix {
     return Vector.create(col);
   }
 
-  // Returns the number of rows/columns the matrix has
-
+  /**
+   * Returns the dimensions of the matrix.
+   * @return {{ rows: Number, columns: number }}
+   */
   dimensions() {
     return {
       rows: this.elements.length,
@@ -169,27 +195,42 @@ export class Matrix {
     };
   }
 
-  // Returns the number of rows in the matrix
-
+  /**
+   * Returns the number of rows in the matrix.
+   * @return {Number}
+   */
   rows() {
     return this.elements.length;
   }
-
-  // Returns the number of columns in the matrix
-
+  /**
+   * Returns the number of columns in the matrix.
+   * @return {Number}
+   */
   cols() {
     return this.elements[0].length;
   }
 
-  approxEql(matrix) {
-    return this.eql(matrix, Sylvester.approxPrecision);
+  /**
+   * Returns whether this matrix is approximately equal to the other one,
+   * within the given precision.
+   * @param {Matrix} matrix Matrix to compare
+   * @param {Number} epsilon The precision to compare each number.
+   * @return {Boolean} True if the matrices are equal, false if they are not
+   * or a different size.
+   */
+  approxEql(matrix, epsilon = Sylvester.approxPrecision) {
+    return this.eql(matrix, epsilon);
   }
 
-  // Returns true iff the matrix is equal to the argument. You can supply
-  // a vector as the argument, in which case the receiver must be a
-  // one-column matrix equal to the vector.
-
-  eql(matrix, precision) {
+  /**
+   * Returns whether this matrix is approximately equal to the other one,
+   * within the given precision.
+   * @param {Matrix|Number[]} matrix Matrix or matrix values to compare
+   * @param {Number} epsilon The precision to compare each number.
+   * @return {Boolean} True if the matrices are equal, false if they are not
+   * or a different size.
+   */
+  eql(matrix, precision = Sylvester.approxPrecision) {
     let M = matrix.elements || matrix;
     if (typeof (M[0][0]) === 'undefined') {
       M = Matrix.create(M).elements;
@@ -203,7 +244,7 @@ export class Matrix {
     while (i--) {
       j = nj;
       while (j--) {
-        if (Math.abs(this.elements[i][j] - M[i][j]) > (precision || Sylvester.precision)) {
+        if (Math.abs(this.elements[i][j] - M[i][j]) > precision) {
           return false;
         }
       }
@@ -211,14 +252,20 @@ export class Matrix {
     return true;
   }
 
-  // Returns a copy of the matrix
-
+  /**
+   * Creates a copy of the matrix.
+   * @return {Matrix}
+   */
   dup() {
     return Matrix.create(this.elements);
   }
 
-  // Maps the matrix to another matrix (of the same dimensions) according to the given function
-
+  /**
+   * Creates a new matrix by applying the mapping function
+   * on all values in this one.
+   * @param {function(value: Number, row: Number, column: Number): Number} fn
+   * @return {Matrix}
+   */
   map(fn) {
     const els = [];
     let i = this.elements.length;
@@ -234,18 +281,26 @@ export class Matrix {
     return Matrix.create(els);
   }
 
-  // Returns true iff the argument has the same dimensions as the matrix
-
+  /**
+   * Returns whether this matrix is the same size as the other one.
+   * @param {Matrix} matrix
+   * @returns {Boolean}
+   */
   isSameSizeAs(matrix) {
     let M = matrix.elements || matrix;
     if (typeof (M[0][0]) === 'undefined') {
       M = Matrix.create(M).elements;
     }
+
     return (this.elements.length === M.length && this.elements[0].length === M[0].length);
   }
 
-  // Returns the result of adding the argument to the matrix
-
+  /**
+   * Adds the number or matrix to this matrix.
+   * @param {Number|Matrix} matrix
+   * @throws {DimensionalityMismatchError} If the matrix is a different size than this one
+   * @returns {Matrix}
+   */
   add(matrix) {
     if (typeof (matrix) === 'number') {
       return this.map(x => x + matrix);
@@ -255,14 +310,19 @@ export class Matrix {
     if (typeof (M[0][0]) === 'undefined') {
       M = Matrix.create(M).elements;
     }
+
     if (!this.isSameSizeAs(M)) {
-      return null;
+      throw new DimensionalityMismatchError(`Cannot add a ${sizeStr(matrix)} to this (sizeStr(matrix))`);
     }
     return this.map((x, i, j) => x + M[i - 1][j - 1]);
   }
 
-  // Returns the result of subtracting the argument from the matrix
-
+  /**
+   * Subtracts the number or matrix to this matrix.
+   * @param {Number|Matrix} matrix
+   * @throws {DimensionalityMismatchError} If the matrix is a different size than this one
+   * @returns {Matrix}
+   */
   subtract(matrix) {
     if (typeof (matrix) === 'number') {
       return this.map(x => x - matrix);
@@ -273,19 +333,22 @@ export class Matrix {
       M = Matrix.create(M).elements;
     }
     if (!this.isSameSizeAs(M)) {
-      return null;
+      throw new DimensionalityMismatchError(`Cannot add a ${sizeStr(matrix)} to this (sizeStr(matrix))`);
     }
     return this.map((x, i, j) => x - M[i - 1][j - 1]);
   }
 
-  // Returns true iff the matrix can multiply the argument from the left
-
+  /**
+   * Returns true if the give matrix can multiply this one from the left.
+   * @param {Matrix} matrix
+   * @return {Boolean}
+   */
   canMultiplyFromLeft(matrix) {
     let M = matrix.elements || matrix;
     if (typeof (M[0][0]) === 'undefined') {
       M = Matrix.create(M).elements;
     }
-        // this.columns should equal matrix.rows
+    // this.columns should equal matrix.rows
     return (this.elements[0].length === M.length);
   }
 
@@ -294,8 +357,23 @@ export class Matrix {
   // a vector, a vector is returned, which saves you having to remember calling
   // col(1) on the result.
 
+  /**
+   * Returns the result of a multiplication-style operation the matrix from the
+   * right by the argument.
+   *
+   * If the argument is a scalar then just operate on  all the elements. If
+   * the argument is a vector, a vector is returned, which saves you having
+   * to remember calling col(1) on the result.
+   *
+   * @private
+   * @param {Matrix|Vector|number} matrix
+   * @param {function(left: number, right: number): number} op Operation to run,
+   * taking the matrix value on the 'left' side and the provided multiplicand
+   * on the right.
+   * @return {Matrix|Vector}
+   */
   mulOp(matrix, op) {
-    if (!matrix.elements) {
+    if (typeof matrix === 'number') {
       return this.map(x => {
         return op(x, matrix);
       });
@@ -307,8 +385,11 @@ export class Matrix {
       M = Matrix.create(M).elements;
     }
     if (!this.canMultiplyFromLeft(M)) {
-      return null;
+      throw new DimensionalityMismatchError(
+        `Cannot multiply a ${sizeStr(this)} by a ${sizeStr(matrix)}, expected an ${this.cols()}xN matrix`
+      );
     }
+
     const e = this.elements;
     let rowThis;
     let rowElem;
@@ -344,40 +425,66 @@ export class Matrix {
     return returnVector ? output.col(1) : output;
   }
 
-  // Returns the result of dividing the matrix from the right by the argument.
-  // If the argument is a scalar then just divide all the elements. If the argument is
-  // a vector, a vector is returned, which saves you having to remember calling
-  // col(1) on the result.
-
-  div(matrix) {
-    return this.mulOp(matrix, (x, y) => {
-      return x / y;
-    });
+  /**
+   * Returns the result of dividing the matrix from the  right by the argument.
+   *
+   * If the argument is a scalar then just operate on  all the elements. If
+   * the argument is a vector, a vector is returned, which saves you having
+   * to remember calling col(1) on the result.
+   *
+   * @param {Matrix|Vector|number} divisor
+   * @throws {DimensionalityMismatchError} If the divisor is an
+   * inappropriately sized matrix
+   * @return {Matrix|Vector}
+   */
+  div(divisor) {
+    return this.mulOp(divisor, (x, y) => x / y);
   }
 
-  // Returns the result of multiplying the matrix from the right by the argument.
-  // If the argument is a scalar then just multiply all the elements. If the argument is
-  // a vector, a vector is returned, which saves you having to remember calling
-  // col(1) on the result.
-
-  multiply(matrix) {
-    return this.mulOp(matrix, (x, y) => {
-      return x * y;
-    });
+  /**
+   * Returns the result of multiplying the matrix from the right by the argument.
+   *
+   * If the argument is a scalar then just operate on  all the elements. If
+   * the argument is a vector, a vector is returned, which saves you having
+   * to remember calling col(1) on the result.
+   *
+   * @param {Matrix|Vector|number} multiplicand
+   * @throws {DimensionalityMismatchError} If the multiplicand is an
+   * inappropriately sized matrix
+   * @return {Matrix|Vector}
+   */
+  multiply(multiplicand) {
+    return this.mulOp(multiplicand, (x, y) => x * y);
   }
 
+  /**
+   * Alias to {@link Matrix.multiply}
+   */
   x(matrix) {
     return this.multiply(matrix);
   }
 
+  /**
+   * Multiplies matrix elements individually.
+   * @param {Matrix} v
+   * @throws {DimensionalityMismatchError} If v is not the same size as this matrix
+   * @returns {Matrix}
+   */
   elementMultiply(v) {
+    if (!this.isSameSizeAs(v)) {
+      throw new DimensionalityMismatchError(
+        `Cannot element multiple a ${sizeStr(this)} by a ${sizeStr(v)}, expected the same size`
+      );
+    }
     return this.map((k, i, j) => {
       return v.e(i, j) * k;
     });
   }
 
-  // sum all elements in the matrix
-
+  /**
+   * Sums all the elements of the matrix.
+   * @returns {Number}
+   */
   sum() {
     let sum = 0;
     this.map(x => { // eslint-disable-line array-callback-return
@@ -386,8 +493,10 @@ export class Matrix {
     return sum;
   }
 
-  // Returns a Vector of each colum averaged.
-
+  /**
+   * Returns the arithmetic mean of each column.
+   * @return {Vector}
+   */
   mean() {
     const dim = this.dimensions();
     const r = [];
@@ -397,8 +506,10 @@ export class Matrix {
     return Vector.create(r);
   }
 
-  // Returns a Vector of each column's standard deviation
-
+  /**
+   * Returns a Vector of each column's standard deviation
+   * @return {Vector}
+   */
   std() {
     const dim = this.dimensions();
     const mMean = this.mean();
@@ -411,45 +522,58 @@ export class Matrix {
     return Vector.create(r);
   }
 
+  /**
+   * Alias for {@link Matrix.col}
+   * @return {Vector}
+   */
   column(n) {
     return this.col(n);
   }
 
-  // element-wise log
-
-  log() {
-    return this.map(x => {
-      return Math.log(x);
-    });
+  /**
+   * Runs an element-wise logarithm on the matrix.
+   * @param {Number} Log base
+   * @return {Matrix}
+   */
+  log(base = Math.E) {
+    const logBase = Math.log(base); // change of base
+    return this.map(x => Math.log(x) / logBase);
   }
 
-  // Returns a submatrix taken from the matrix
-  // Argument order is: start row, start col, nrows, ncols
-  // Element selection wraps if the required index is outside the matrix's bounds, so you could
-  // use this to perform row/column cycling or copy-augmenting.
-
-  minor(a, b, c, d) {
+  /**
+   * Returns a submatrix taken from the matrix. Element selection wraps if the
+   * required index is outside the matrix's bounds, so you could use this to
+   * perform row/column cycling or copy-augmenting.
+   * @param {Number} startRow
+   * @param {Number} startCol Columns to copy
+   * @param {Number} nrows Rows to copy
+   * @param {Number} ncols Columns to copy
+   * @param {Matrix}
+   */
+  minor(startRow, startCol, nrows, ncols) {
     const elements = [];
-    let ni = c;
+    let ni = nrows;
     let i;
     let nj;
     let j;
     const rows = this.elements.length;
     const cols = this.elements[0].length;
     while (ni--) {
-      i = c - ni - 1;
+      i = nrows - ni - 1;
       elements[i] = [];
-      nj = d;
+      nj = ncols;
       while (nj--) {
-        j = d - nj - 1;
-        elements[i][j] = this.elements[(a + i - 1) % rows][(b + j - 1) % cols];
+        j = ncols - nj - 1;
+        elements[i][j] = this.elements[(startRow + i - 1) % rows][(startCol + j - 1) % cols];
       }
     }
     return Matrix.create(elements);
   }
 
-  // Returns the transpose of the matrix
-
+  /**
+   * Returns the transposition of the matrix.
+   * @return {Matrix}
+   */
   transpose() {
     const rows = this.elements.length;
     const cols = this.elements[0].length;
@@ -466,14 +590,18 @@ export class Matrix {
     return Matrix.create(elements);
   }
 
-  // Returns true iff the matrix is square
-
+  /**
+   * Returns whether this is a square matrix.
+   * @returns {Boolean}
+   */
   isSquare() {
     return (this.elements.length === this.elements[0].length);
   }
 
-  // Returns the (absolute) largest element of the matrix
-
+  /**
+   * Returns the absolute largest element of the matrix
+   * @returns {Number}
+   */
   max() {
     let m = 0;
     let i = this.elements.length;
@@ -487,11 +615,16 @@ export class Matrix {
         }
       }
     }
+
     return m;
   }
 
-  // Returns the indeces of the first match found by reading row-by-row from left to right
-
+  /**
+   * Returns the index of the first occurence of x found
+   * by reading row-by-row from left to right, or null.
+   * @param {Number} x
+   * @returns {?({ i: number, j: number })}
+   */
   indexOf(x) {
     const ni = this.elements.length;
     let i;
@@ -507,15 +640,20 @@ export class Matrix {
         }
       }
     }
+
     return null;
   }
 
-  // If the matrix is square, returns the diagonal elements as a vector.
-  // Otherwise, returns null.
-
+  /**
+   * If the matrix is square, returns the diagonal elements as a vector.
+   * @throws {DimensionalityMismatchError} if the matrix is not square
+   * @return {Vector}
+   */
   diagonal() {
-    if (!this.isSquare) {
-      return null;
+    if (!this.isSquare()) {
+      throw new DimensionalityMismatchError(
+        `Cannot get the diagonal of a ${sizeStr(this)} matrix, matrix must be square`
+      );
     }
     const els = [];
     const n = this.elements.length;
@@ -525,10 +663,12 @@ export class Matrix {
     return Vector.create(els);
   }
 
-  // Make the matrix upper (right) triangular by Gaussian elimination.
-  // This method only adds multiples of rows to other rows. No rows are
-  // scaled up or switched, and the determinant is preserved.
-
+  /**
+   * Make the matrix upper (right) triangular by Gaussian elimination.
+   * This method only adds multiples of rows to other rows. No rows are
+   * scaled up or switched, and the determinant is preserved.
+   * @return {Matrix}
+   */
   toRightTriangular() {
     const M = this.dup();
     let els;
@@ -568,18 +708,24 @@ export class Matrix {
     return M;
   }
 
+  /**
+   * Alias for {@link Matrix.toRightTriangular}
+   * @returns {Matrix}
+   */
   toUpperTriangular() {
     return this.toRightTriangular();
   }
 
-  // Returns the determinant for square matrices
-
+  /**
+   * Returns the determinant of a square matrix.
+   * @throws {DimensionalityMismatchError} If the matrix is not square
+   * @returns {Number}
+   */
   determinant() {
     if (!this.isSquare()) {
-      return null;
-    }
-    if (this.cols === 1 && this.rows === 1) {
-      return this.row(1);
+      throw new DimensionalityMismatchError(
+        `A matrix must be square to have a determinant, this is a ${sizeStr(this)}`,
+      );
     }
     if (this.cols === 0 && this.rows === 0) {
       return 1;
@@ -593,22 +739,35 @@ export class Matrix {
     return det;
   }
 
+  /**
+   * Alias for {@link determinant}
+   * @throws {DimensionalityMismatchError} If the matrix is not square
+   * @returns {Number}
+   */
   det() {
     return this.determinant();
   }
 
-  // Returns true iff the matrix is singular
-
+  /**
+   * Returns true if the matrix is singular
+   * @returns {Boolean}
+   */
   isSingular() {
     return (this.isSquare() && this.determinant() === 0);
   }
 
-  // Returns the trace for square matrices
-
+  /**
+   * Returns the trace for square matrices
+   * @throws {DimensionalityMismatchError} if the matrix is not square
+   * @return {Number}
+   */
   trace() {
     if (!this.isSquare()) {
-      return null;
+      throw new DimensionalityMismatchError(
+        `Can only get the trace of square matrices, got a ${sizeStr(this)}`,
+      );
     }
+
     let tr = this.elements[0][0];
     const n = this.elements.length;
     for (let i = 1; i < n; i++) {
@@ -617,13 +776,21 @@ export class Matrix {
     return tr;
   }
 
+  /**
+   * Alias for {@link Matrix.trace}.
+   * @throws {DimensionalityMismatchError} if the matrix is not square
+   * @return {Number}
+   */
   tr() {
     return this.trace();
   }
 
-  // Returns the rank of the matrix
-
-  rank() {
+  /**
+   * Returns the rank of the matrix.
+   * @param {Number} epsilon for comparison against 0
+   * @returns {Number}
+   */
+  rank(epsilon = Sylvester.precision) {
     const M = this.toRightTriangular();
     let rank = 0;
     let i = this.elements.length;
@@ -632,7 +799,7 @@ export class Matrix {
     while (i--) {
       j = nj;
       while (j--) {
-        if (Math.abs(M.elements[i][j]) > Sylvester.precision) {
+        if (Math.abs(M.elements[i][j]) > epsilon) {
           rank++;
           break;
         }
@@ -641,12 +808,19 @@ export class Matrix {
     return rank;
   }
 
-  rk() {
-    return this.rank();
+  /**
+   * Alias for {@link Matrix.rank}
+   * @param {Number} epsilon for comparison against 0
+   * @returns {Number}
+   */
+  rk(epsilon = Sylvester.precision) {
+    return this.rank(epsilon);
   }
 
-  // Returns the result of attaching the given argument to the right-hand side of the matrix
-
+  /**
+   * Returns the result of attaching the given argument to the right-hand side of the matrix
+   * @param {Matrix|number[][]} matrix
+   */
   augment(matrix) {
     let M = matrix.elements || matrix;
     if (typeof (M[0][0]) === 'undefined') {
@@ -658,7 +832,7 @@ export class Matrix {
     const nj = M[0].length;
     let j;
     if (i !== M.length) {
-      return null;
+      throw new DimensionalityMismatchError(`Attached matrix must have ${i} rows, got ${M.length}`);
     }
     while (i--) {
       j = nj;
@@ -669,12 +843,19 @@ export class Matrix {
     return T;
   }
 
-  // Returns the inverse (if one exists) using Gauss-Jordan
-
+  /**
+   * Returns the inverse of the matrix.
+   * @throws {DimensionalityMismatchError} if the matrix is not invertible
+   * @return {Matrix}
+   */
   inverse() {
-    if (!this.isSquare() || this.isSingular()) {
-      return null;
+    if (!this.isSquare()) {
+      throw new DimensionalityMismatchError(`A matrix must be square to be inverted, provided a ${sizeStr(this)}`)
     }
+    if (this.isSingular()) {
+      throw new DimensionalityMismatchError(`Cannot invert the current matrix (determinant=0)`)
+    }
+
     const n = this.elements.length;
     let i = n;
     let j;
@@ -690,22 +871,22 @@ export class Matrix {
 
     let newElement;
     while (i--) {
-            // First, normalise diagonal elements to 1
+      // First, normalise diagonal elements to 1
       els = [];
       inverseElements[i] = [];
       divisor = M.elements[i][i];
       for (p = 0; p < np; p++) {
         newElement = M.elements[i][p] / divisor;
         els.push(newElement);
-                // Shuffle off the current row of the right hand side into the results
-                // array as it will not be modified by later runs through this loop
+        // Shuffle off the current row of the right hand side into the results
+        // array as it will not be modified by later runs through this loop
         if (p >= n) {
           inverseElements[i].push(newElement);
         }
       }
       M.elements[i] = els;
-            // Then, subtract this row from those above it to
-            // give the identity matrix on the left hand side
+      // Then, subtract this row from those above it to
+      // give the identity matrix on the left hand side
       j = i;
       while (j--) {
         els = [];
@@ -718,40 +899,51 @@ export class Matrix {
     return Matrix.create(inverseElements);
   }
 
+  /**
+   * Alias of {@link Matrix.inverse}
+   * @throws {DimensionalityMismatchError} if the matrix is not invertible
+   * @return {Matrix}
+   */
   inv() {
     return this.inverse();
   }
 
-  // Returns the result of rounding all the elements
-
+  /**
+   * Rounds all values in the matrix.
+   * @return {Matrix}
+   */
   round() {
-    return this.map(x => {
-      return Math.round(x);
-    });
+    return this.map(x => Math.round(x));
   }
 
-  // Returns a copy of the matrix with elements set to the given value if they
-  // differ from it by less than Sylvester.precision
-
-  snapTo(x) {
-    return this.map(p => {
-      return (Math.abs(p - x) <= Sylvester.precision) ? x : p;
-    });
+  /**
+   * Returns a copy of the matrix with elements set to the given value if they
+   * differ from it by less than the epislon.
+   * @param {Number} target
+   * @param {Number} epsilon
+   * @return {Matrix}
+   */
+  snapTo(target, epsilon = Sylvester.precision) {
+    return this.map(p => Math.abs(p - target) <= epsilon ? target : p);
   }
 
-  // Returns a string representation of the matrix
-
+  /**
+   * Returns a string representation of the matrix.
+   * @return {String}
+   */
   inspect() {
-    const matrixRows = [];
-    const n = this.elements.length;
-    for (let i = 0; i < n; i++) {
-      matrixRows.push(Vector.create(this.elements[i]).inspect());
+    const matrixRows = ['Matrix<'];
+    for (let i = 0; i < this.elements.length; i++) {
+      matrixRows.push(`  [${this.elements[i].join(', ')}]`);
     }
+    matrixRows.push('>');
     return matrixRows.join('\n');
   }
 
-  // Returns a array representation of the matrix
-
+  /**
+   * Returns a array representation of the matrix
+   * @return {Number[]}
+   */
   toArray() {
     const matrixRows = [];
     const n = this.elements.length;
@@ -761,9 +953,9 @@ export class Matrix {
     return matrixRows;
   }
 
-  // Set the matrix's elements from an array. If the argument passed
-  // is a vector, the resulting matrix will be a single column.
-
+  /**
+   * @private
+   */
   setElements(els) {
     let i;
     let j;
@@ -788,9 +980,10 @@ export class Matrix {
     return this;
   }
 
-  // return the indexes of the columns with the largest value
-  // for each row
-
+  /**
+   * Return the indexes of the columns with the largest value for each row.
+   * @returns {Vector}
+   */
   maxColumnIndexes() {
     const maxes = [];
 
@@ -811,8 +1004,10 @@ export class Matrix {
     return Vector.create(maxes);
   }
 
-  // return the largest values in each row
-
+  /**
+   * Return the largest values in each row.
+   * @returns {Vector}
+   */
   maxColumns() {
     const maxes = [];
 
@@ -831,9 +1026,10 @@ export class Matrix {
     return Vector.create(maxes);
   }
 
-  // return the indexes of the columns with the smallest values
-  // for each row
-
+  /**
+   * Return the indexes of the columns with the smallest values for each row.
+   * @returns {Vector}
+   */
   minColumnIndexes() {
     const mins = [];
 
@@ -856,6 +1052,10 @@ export class Matrix {
 
   // return the smallest values in each row
 
+  /**
+   * Return the smallest values in each row.
+   * @returns {Vector}
+   */
   minColumns() {
     const mins = [];
 
@@ -877,6 +1077,11 @@ export class Matrix {
   // perorm a partial pivot on the matrix. essentially move the largest
   // row below-or-including the pivot and replace the pivot's row with it.
   // a pivot matrix is returned so multiplication can perform the transform.
+  /**
+   * Perform a partial pivot on the matrix. essentially move the largest
+   * row below-or-including the pivot and replace the pivot's row with it.
+   * a pivot matrix is returned so multiplication can perform the transform.
+   */
   partialPivot(k, j, P, A) {
     let maxIndex = 0;
     let maxValue = 0;
@@ -902,8 +1107,11 @@ export class Matrix {
     return P;
   }
 
-  // solve lower-triangular matrix * x = b via forward substitution
-
+  /**
+   * Solve lower-triangular matrix * x = b via forward substitution
+   * @param {Number} b
+   * @returns {Vector}
+   */
   forwardSubstitute(b) {
     const xa = [];
 
@@ -920,8 +1128,11 @@ export class Matrix {
     return Vector.create(xa);
   }
 
-  // solve an upper-triangular matrix * x = b via back substitution
-
+  /**
+   * solve an upper-triangular matrix * x = b via back substitution
+   * @param {Number} b
+   * @return {Vector}
+   */
   backSubstitute(b) {
     const xa = [];
 
@@ -1093,56 +1304,59 @@ export class Matrix {
     return M;
   }
 
-  // Identity matrix of size n
-  static I(n) {
-    const els = [];
-    let i = n;
-    let j;
-    while (i--) {
-      j = n;
-      els[i] = [];
-      while (j--) {
-        els[i][j] = (i === j) ? 1 : 0;
+  /**
+   * Creates am identity matrix of the given size.
+   * @param {Number} size
+   */
+  static I(size) {
+    const elements = [];
+    for (let y = 0; y < size; y++) {
+      const row = [];
+      for (let x = 0; x < size; x++) {
+        row.push(x === y ? 1 : 0);
       }
-    }
-    return Matrix.create(els);
-  }
 
-  static loadFile(file) {
-    const contents = fs.readFileSync(file, 'utf-8');
-    const matrix = [];
-
-    const rowArray = contents.split('\n');
-    for (let i = 0; i < rowArray.length; i++) {
-      const d = rowArray[i].split(',');
-      if (d.length > 1) {
-        matrix.push(d);
-      }
+      elements.push(row);
     }
 
-    const M = new Matrix();
-    return M.setElements(matrix);
+    return Matrix.create(elements);
   }
 
-  // Diagonal matrix - all off-diagonal elements are zero
+  /**
+   * Creates a diagonal matrix from the given elements.
+   * @param {Number[]} elements
+   * @returns {Matrix}}
+   */
   static Diagonal(elements) {
-    let i = elements.length;
-    const M = Matrix.I(i);
-    while (i--) {
-      M.elements[i][i] = elements[i];
+    const rows = [];
+    for (let y = 0; y < elements.length; y++) {
+      const row = [];
+      for (let x = 0; x < elements.length; x++) {
+        row.push(x === y ? elements[x] : 0);
+      }
+
+      rows.push(row);
     }
-    return M;
+
+    return Matrix.create(rows);
   }
 
-  // Rotation matrix about some axis. If no axis is
-  // supplied, assume we're after a 2D transform
-  static Rotation(theta, a) {
-    if (!a) {
+  /**
+   * Creates a rotation matrix around the given axis.
+   * @param {Number} theta angle in radians
+   * @param {?Vector} axis 3-element vector describing the axis to rotate
+   * around. If not provided, creates a 2D rotation.
+   * @return {Matrix}
+   */
+  static Rotation(theta, axis) {
+    if (!axis) {
       return Matrix.create([[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]]);
     }
-    const axis = a.dup();
+
     if (axis.elements.length !== 3) {
-      return null;
+      throw new DimensionalityMismatchError(
+        `A 3-element vector must be provided to Rotation, got ${axis.elements.length} elements`
+      );
     }
     const mod = axis.modulus();
     const x = axis.elements[0] / mod;
@@ -1150,7 +1364,7 @@ export class Matrix {
     const z = axis.elements[2] / mod;
 
     const s = Math.sin(theta);
-    // Formula derived here: http://www.gamedev.net/reference/articles/article1199.asp
+    // Formula derived here: https://web.archive.org/web/20060315070756/http://www.gamedev.net/reference/articles/article1199.asp
     // That proof rotates the co-ordinate system so theta
     // becomes -theta and sin becomes -sin here.
 
@@ -1175,26 +1389,45 @@ export class Matrix {
     ]);
   }
 
-  // Special case rotations
+  /**
+   * Creates a three-dimensional rotation matrix that rotates around the x axis.
+   * @param {Number} t angle in radians
+   * @return {Matrix}
+   */
   static RotationX(t) {
     const c = Math.cos(t);
     const s = Math.sin(t);
     return Matrix.create([[1, 0, 0], [0, c, -s], [0, s, c]]);
   }
 
+  /**
+   * Creates a three-dimensional rotation matrix that rotates around the y axis.
+   * @param {Number} t angle in radians
+   * @return {Matrix}
+   */
   static RotationY(t) {
     const c = Math.cos(t);
     const s = Math.sin(t);
     return Matrix.create([[c, 0, s], [0, 1, 0], [-s, 0, c]]);
   }
 
+  /**
+   * Creates a three-dimensional rotation matrix that rotates around the z axis.
+   * @param {Number} t angle in radians
+   * @return {Matrix}
+   */
   static RotationZ(t) {
     const c = Math.cos(t);
     const s = Math.sin(t);
     return Matrix.create([[c, -s, 0], [s, c, 0], [0, 0, 1]]);
   }
 
-  // Random matrix of n rows, m columns
+  /**
+   * Creates an `n` by `m` matrix filled with random values between 0 and 1.
+   * @param {Number} n rows
+   * @param {Number} m columns
+   * @returns {Matrix}
+   */
   static Random(n, m) {
     if (arguments.length === 1) {
       m = n;
@@ -1204,9 +1437,16 @@ export class Matrix {
     });
   }
 
-  static Fill(n, m, v) {
+  /**
+   * Creates an `n` by `m` matrix filled with the given value.
+   * @param {Number} n rows
+   * @param {Number} m columns
+   * @param {Number} value
+   * @returns {Matrix}
+   */
+  static Fill(n, m, value) {
     if (arguments.length === 2) {
-      v = m;
+      value = m;
       m = n;
     }
 
@@ -1219,29 +1459,49 @@ export class Matrix {
       els[i] = [];
 
       while (j--) {
-        els[i][j] = v;
+        els[i][j] = value;
       }
     }
 
     return Matrix.create(els);
   }
 
-  // Matrix filled with zeros
+  /**
+   * Creates an `n` by `m` matrix filled with 0's.
+   * @param {Number} n rows
+   * @param {Number} m columns
+   * @returns {Matrix}
+   */
   static Zero(n, m) {
     return Matrix.Fill(n, m, 0);
   }
 
-  // Matrix filled with zeros
+  /**
+   * Creates an `n` by `m` matrix filled with 0's.
+   * @param {Number} n rows
+   * @param {Number} m columns
+   * @returns {Matrix}
+   */
   static Zeros(n, m) {
     return Matrix.Zero(n, m);
   }
 
-  // Matrix filled with ones
+  /**
+   * Creates an `n` by `m` matrix filled with 1's.
+   * @param {Number} n rows
+   * @param {Number} m columns
+   * @returns {Matrix}
+   */
   static One(n, m) {
     return Matrix.Fill(n, m, 1);
   }
 
-  // Matrix filled with ones
+  /**
+   * Creates an `n` by `m` matrix filled with 1's.
+   * @param {Number} n rows
+   * @param {Number} m columns
+   * @returns {Matrix}
+   */
   static Ones(n, m) {
     return Matrix.One(n, m);
   }
