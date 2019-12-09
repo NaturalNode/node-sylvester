@@ -53,7 +53,7 @@ describe('vector', () => {
 
     expect(new Vector([1, 1]).angleFrom([1, 0])).to.approx.equal(Math.PI / 4);
     expect(new Vector([0, 0]).angleFrom(new Vector([-1, -0]))).to.be.nan;
-    expect(() => new Vector([1, 2]).angleFrom(new Vector(2))).to.throw(DimensionalityMismatchError);
+    expect(() => new Vector([1, 2]).angleFrom(new Vector([2]))).to.throw(DimensionalityMismatchError);
   });
 
   it('Vector.map', () => {
@@ -195,27 +195,39 @@ describe('vector', () => {
     expect(() => Vector.Zero(4).rotate(0, Vector.Zero(4))).to.throw(DimensionalityMismatchError);
   });
 
-  it('chomp', () => {
-    expect(x.chomp(1)).to.vector.equal([4]);
+  asDiagram('Vector.reflectionIn').it(expectCall => {
+    expectCall(x).reflectionIn(Vector.One(2)).to.vector.equal([-1, -2]);
+    expectCall(x).reflectionIn(Line.create(Vector.Zero(2), new Vector([1, 2]))).to.vector.equal([1.4, 4.8]);
+    expect(() => x.reflectionIn(Vector.Zero(0))).to.throw(DimensionalityMismatchError);
   });
 
-  it('sum', () => {
-    expect(x.sum()).to.equal(7);
+  asDiagram('Vector.chomp').it(expectCall => {
+    expectCall(x).chomp(1).to.vector.equal([4]);
   });
 
-  it('augment', () => {
-    expect(x.augment([4, 5])).to.vector.equal([3, 4, 4, 5]);
+  asDiagram('Vector.sum').it(expectCall => {
+    expectCall(x).sum().to.equal(7);
   });
 
-  it('show allow for scalar addition', () => {
-    const a = new Vector([2, 3, 4]);
-    const b = a.add(1);
-    expect(b).to.vector.equal([3, 4, 5]);
+  asDiagram('Vector.augment').it(expectCall => {
+    expectCall(x).augment([4, 5]).to.vector.equal([3, 4, 4, 5]);
   });
 
-  it('show add', () => {
-    const a = new Vector([2, 3, 4]);
-    const b = a.add(new Vector([2, 4, 8]));
-    expect(b).to.vector.equal([undefined, 7, 12]);
+  it('inspect', () => {
+    expect(x.inspect()).to.equal('Vector<[3, 4]>');
+  });
+
+  it('random', () => {
+    const v = Vector.Random(3);
+    expect(v.elements.length).to.equal(3);
+    v.elements.forEach(e => expect(e).to.be.within(0, 1));
+  });
+
+  it('to3D', () => {
+    expect(Vector.One(0).to3D()).to.vector.equal([0, 0, 0]);
+    expect(Vector.One(1).to3D()).to.vector.equal([1, 0, 0]);
+    expect(Vector.One(2).to3D()).to.vector.equal([1, 1, 0]);
+    expect(Vector.One(3).to3D()).to.vector.equal([1, 1, 1]);
+    expect(() => Vector.One(4).to3D()).to.throw(DimensionalityMismatchError);
   });
 });

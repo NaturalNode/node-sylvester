@@ -101,7 +101,7 @@ export class Matrix {
       }
     }
 
-    return Vector.create(v);
+    return new Vector(v);
   }
 
   /**
@@ -163,7 +163,7 @@ export class Matrix {
     if (i < 1 || i > this.elements.length) {
       throw new OutOfRangeError(`Row ${i} is outside the bounds of this ${sizeStr(this)}`)
     }
-    return Vector.create(this.elements[i - 1]);
+    return new Vector(this.elements[i - 1]);
   }
 
   /**
@@ -181,7 +181,7 @@ export class Matrix {
     for (let i = 0; i < n; i++) {
       col.push(this.elements[i][j - 1]);
     }
-    return Vector.create(col);
+    return new Vector(col);
   }
 
   /**
@@ -503,7 +503,7 @@ export class Matrix {
     for (let i = 1; i <= dim.cols; i++) {
       r.push(this.col(i).sum() / dim.rows);
     }
-    return Vector.create(r);
+    return new Vector(r);
   }
 
   /**
@@ -519,7 +519,7 @@ export class Matrix {
       meanDiff = meanDiff.multiply(meanDiff);
       r.push(Math.sqrt(meanDiff.sum() / dim.rows));
     }
-    return Vector.create(r);
+    return new Vector(r);
   }
 
   /**
@@ -660,7 +660,7 @@ export class Matrix {
     for (let i = 0; i < n; i++) {
       els.push(this.elements[i][i]);
     }
-    return Vector.create(els);
+    return new Vector(els);
   }
 
   /**
@@ -1001,7 +1001,7 @@ export class Matrix {
       maxes.push(maxIndex);
     }
 
-    return Vector.create(maxes);
+    return new Vector(maxes);
   }
 
   /**
@@ -1023,7 +1023,7 @@ export class Matrix {
       maxes.push(max);
     }
 
-    return Vector.create(maxes);
+    return new Vector(maxes);
   }
 
   /**
@@ -1047,7 +1047,7 @@ export class Matrix {
       mins.push(minIndex);
     }
 
-    return Vector.create(mins);
+    return new Vector(mins);
   }
 
   // return the smallest values in each row
@@ -1071,7 +1071,7 @@ export class Matrix {
       mins.push(min);
     }
 
-    return Vector.create(mins);
+    return new Vector(mins);
   }
 
   // perorm a partial pivot on the matrix. essentially move the largest
@@ -1125,7 +1125,7 @@ export class Matrix {
       xa.push((b.e(i) - w) / this.e(i, i));
     }
 
-    return Vector.create(xa);
+    return new Vector(xa);
   }
 
   /**
@@ -1146,7 +1146,7 @@ export class Matrix {
       xa.push((b.e(i) - w) / this.e(i, i));
     }
 
-    return Vector.create(xa.reverse());
+    return new Vector(xa.reverse());
   }
 
   svdJs() {
@@ -1194,7 +1194,7 @@ export class Matrix {
 
     return {
       U,
-      S: Vector.create(s).toDiagonalMatrix(),
+      S: new Vector(s).toDiagonalMatrix(),
       V
     };
   }
@@ -1225,7 +1225,7 @@ export class Matrix {
         oneZero.push(0);
       }
 
-      oneZero = Vector.create(oneZero);
+      oneZero = new Vector(oneZero);
       const vk = ak.add(oneZero.x(ak.norm() * sign(ak.e(1))));
       const Vk = Matrix.create(vk);
       const Hk = Matrix.I(m - k + 1).subtract(Vk.x(2).x(Vk.transpose()).div(Vk.transpose().x(Vk).e(1, 1)));

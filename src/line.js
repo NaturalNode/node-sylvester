@@ -143,7 +143,7 @@ export class Line {
     const XdotY = (X1 * Y1) + (X2 * Y2) + (X3 * Y3);
     const k = ((XdotQsubP * YdotY / XdotX) + (XdotY * YdotPsubQ)) / (YdotY - (XdotY * XdotY));
 
-    return Vector.create([P[0] + (k * X1), P[1] + (k * X2), P[2] + (k * X3)]);
+    return new Vector([P[0] + (k * X1), P[1] + (k * X2), P[2] + (k * X3)]);
   }
 
   // Returns the point on the line that is closest to the given point or line/line segment
@@ -183,7 +183,7 @@ export class Line {
     // obj is a point
     const P = obj.elements || obj;
     if (this.contains(P)) {
-      return Vector.create(P);
+      return new Vector(P);
     }
     const A = this.anchor.elements;
     const D = this.direction.elements;
@@ -196,9 +196,9 @@ export class Line {
     const x = (D1 * (P[1] - A2)) - (D2 * (P[0] - A1));
     const y = (D2 * ((P[2] || 0) - A3)) - (D3 * (P[1] - A2));
     const z = (D3 * (P[0] - A1)) - (D1 * ((P[2] || 0) - A3));
-    const V = Vector.create([(D2 * x) - (D3 * z), (D3 * y) - (D1 * x), (D1 * z) - (D2 * y)]);
+    const V = new Vector([(D2 * x) - (D3 * z), (D3 * y) - (D1 * x), (D1 * z) - (D2 * y)]);
     const k = this.distanceFrom(P) / V.modulus();
-    return Vector.create([
+    return new Vector([
       P[0] + (V.elements[0] * k),
       P[1] + (V.elements[1] * k),
       (P[2] || 0) + (V.elements[2] * k)
@@ -286,8 +286,8 @@ export class Line {
   setVectors(anchor, direction) {
     // Need to do this so that line's properties are not
     // references to the arguments passed in
-    anchor = Vector.create(anchor);
-    direction = Vector.create(direction);
+    anchor = new Vector(anchor);
+    direction = new Vector(direction);
     if (anchor.elements.length === 2) {
       anchor.elements.push(0);
     }
@@ -302,7 +302,7 @@ export class Line {
       return null;
     }
     this.anchor = anchor;
-    this.direction = Vector.create([
+    this.direction = new Vector([
       direction.elements[0] / mod,
       direction.elements[1] / mod,
       direction.elements[2] / mod
@@ -344,14 +344,14 @@ export class Segment {
   toVector() {
     const A = this.start.elements;
     const B = this.end.elements;
-    return Vector.create([B[0] - A[0], B[1] - A[1], B[2] - A[2]]);
+    return new Vector([B[0] - A[0], B[1] - A[1], B[2] - A[2]]);
   }
 
   // Returns the segment's midpoint as a vector
   midpoint() {
     const A = this.start.elements;
     const B = this.end.elements;
-    return Vector.create([(B[0] + A[0]) / 2, (B[1] + A[1]) / 2, (B[2] + A[2]) / 2]);
+    return new Vector([(B[0] + A[0]) / 2, (B[1] + A[1]) / 2, (B[2] + A[2]) / 2]);
   }
 
   // Returns the plane that bisects the segment
@@ -395,7 +395,7 @@ export class Segment {
       return true;
     }
     const S = this.start.elements;
-    const V = Vector.create([S[0] - P[0], S[1] - P[1], S[2] - (P[2] || 0)]);
+    const V = new Vector([S[0] - P[0], S[1] - P[1], S[2] - (P[2] || 0)]);
     const vect = this.toVector();
     return V.isAntiparallelTo(vect) && V.modulus() <= vect.modulus();
   }
@@ -439,8 +439,8 @@ export class Segment {
 
   // Set the start and end-points of the segment
   setPoints(startPoint, endPoint) {
-    startPoint = Vector.create(startPoint).to3D();
-    endPoint = Vector.create(endPoint).to3D();
+    startPoint = new Vector(startPoint).to3D();
+    endPoint = new Vector(endPoint).to3D();
     if (startPoint === null || endPoint === null) {
       return null;
     }

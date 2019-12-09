@@ -138,7 +138,7 @@ export class Polygon {
       B = B.data.elements;
       C = C.data.elements;
 
-      return 0.5 * Vector.create([
+      return 0.5 * new Vector([
         ((A[1] - B[1]) * (C[2] - B[2])) - ((A[2] - B[2]) * (C[1] - B[1])),
         ((A[2] - B[2]) * (C[0] - B[0])) - ((A[0] - B[0]) * (C[2] - B[2])),
         ((A[0] - B[0]) * (C[1] - B[1])) - ((A[1] - B[1]) * (C[0] - B[0]))
@@ -161,7 +161,7 @@ export class Polygon {
       const A = this.v(1).elements;
       const B = this.v(2).elements;
       const C = this.v(3).elements;
-      return Vector.create([
+      return new Vector([
         (A[0] + B[0] + C[0]) / 3,
         (A[1] + B[1] + C[1]) / 3,
         (A[2] + B[2] + C[2]) / 3
@@ -264,8 +264,8 @@ export class Polygon {
     this.vertices.each(node => {
       const V = node.data.elements;
       const W = node.next.data.elements;
-      const A = Vector.create([V[0] - P[0], V[1] - P[1], V[2] - (P[2] || 0)]);
-      const B = Vector.create([W[0] - P[0], W[1] - P[1], W[2] - (P[2] || 0)]);
+      const A = new Vector([V[0] - P[0], V[1] - P[1], V[2] - (P[2] || 0)]);
+      const B = new Vector([W[0] - P[0], W[1] - P[1], W[2] - (P[2] || 0)]);
       const dt = A.angleFrom(B);
       if (dt === null || dt === 0) {
         return;

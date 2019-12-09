@@ -113,7 +113,7 @@ export class Plane {
         (N[2] * D[2])
       );
 
-      return Vector.create([
+      return new Vector([
         A[0] + (D[0] * multiplier),
         A[1] + (D[1] * multiplier),
         A[2] + (D[2] * multiplier)
@@ -166,7 +166,7 @@ export class Plane {
     const A = this.anchor.elements;
     const N = this.normal.elements;
     const dot = ((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - (P[2] || 0)) * N[2]);
-    return Vector.create([P[0] + (N[0] * dot), P[1] + (N[1] * dot), (P[2] || 0) + (N[2] * dot)]);
+    return new Vector([P[0] + (N[0] * dot), P[1] + (N[1] * dot), (P[2] || 0) + (N[2] * dot)]);
   }
 
   // Returns a copy of the plane, rotated by t radians about the given line
@@ -235,12 +235,12 @@ export class Plane {
   // If only two are sepcified, the second is taken to be the normal. Normal vector is
   // normalised before storage.
   setVectors(anchor, v1, v2) {
-    anchor = Vector.create(anchor);
+    anchor = new Vector(anchor);
     anchor = anchor.to3D();
     if (anchor === null) {
       return null;
     }
-    v1 = Vector.create(v1);
+    v1 = new Vector(v1);
     v1 = v1.to3D();
     if (v1 === null) {
       return null;
@@ -248,7 +248,7 @@ export class Plane {
     if (typeof (v2) === 'undefined') {
       v2 = null;
     } else {
-      v2 = Vector.create(v2);
+      v2 = new Vector(v2);
       v2 = v2.to3D();
       if (v2 === null) {
         return null;
@@ -267,7 +267,7 @@ export class Plane {
       if (mod === 0) {
         return null;
       }
-      normal = Vector.create([
+      normal = new Vector([
         v1.elements[0] / mod,
         v1.elements[1] / mod,
         v1.elements[2] / mod
@@ -276,7 +276,7 @@ export class Plane {
       const v21 = v2.elements[0];
       const v22 = v2.elements[1];
       const v23 = v2.elements[2];
-      normal = Vector.create([
+      normal = new Vector([
         ((v12 - A2) * (v23 - A3)) - ((v13 - A3) * (v22 - A2)),
         ((v13 - A3) * (v21 - A1)) - ((v11 - A1) * (v23 - A3)),
         ((v11 - A1) * (v22 - A2)) - ((v12 - A2) * (v21 - A1))
@@ -285,7 +285,7 @@ export class Plane {
       if (mod === 0) {
         return null;
       }
-      normal = Vector.create([
+      normal = new Vector([
         normal.elements[0] / mod,
         normal.elements[1] / mod,
         normal.elements[2] / mod
@@ -319,7 +319,7 @@ export class Plane {
     let prevN;
     let totalN = Vector.Zero(3);
     for (i = 0; i < np; i++) {
-      P = Vector.create(points[i]).to3D();
+      P = new Vector(points[i]).to3D();
       if (P === null) {
         return null;
       }
@@ -330,7 +330,7 @@ export class Plane {
         A = list[n - 1].elements;
         B = list[n - 2].elements;
         C = list[n - 3].elements;
-        N = Vector.create([
+        N = new Vector([
           ((A[1] - B[1]) * (C[2] - B[2])) - ((A[2] - B[2]) * (C[1] - B[1])),
           ((A[2] - B[2]) * (C[0] - B[0])) - ((A[0] - B[0]) * (C[2] - B[2])),
           ((A[0] - B[0]) * (C[1] - B[1])) - ((A[1] - B[1]) * (C[0] - B[0]))
@@ -356,11 +356,11 @@ export class Plane {
     B = list[0].elements;
     C = list[n - 1].elements;
     const D = list[n - 2].elements;
-    totalN = totalN.add(Vector.create([
+    totalN = totalN.add(new Vector([
       ((A[1] - B[1]) * (C[2] - B[2])) - ((A[2] - B[2]) * (C[1] - B[1])),
       ((A[2] - B[2]) * (C[0] - B[0])) - ((A[0] - B[0]) * (C[2] - B[2])),
       ((A[0] - B[0]) * (C[1] - B[1])) - ((A[1] - B[1]) * (C[0] - B[0]))
-    ]).toUnitVector()).add(Vector.create([
+    ]).toUnitVector()).add(new Vector([
       ((B[1] - C[1]) * (D[2] - C[2])) - ((B[2] - C[2]) * (D[1] - C[1])),
       ((B[2] - C[2]) * (D[0] - C[0])) - ((B[0] - C[0]) * (D[2] - C[2])),
       ((B[0] - C[0]) * (D[1] - C[1])) - ((B[1] - C[1]) * (D[0] - C[0]))

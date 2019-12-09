@@ -6,14 +6,14 @@ const A = Matrix.create([[1, 2, 3], [4, 5, 6]]);
 describe('matrix', () => {
   it('forwardSubstitute', () => {
     const L = Matrix.create([[1, 0, 0], [0.5, 1, 0], [2, 3, 1]]);
-    const b = Vector.create([1, 2, 3]);
+    const b = new Vector([1, 2, 3]);
 
     expect(L.forwardSubstitute(b)).to.vector.equal([1, 1.5, -3.5]);
   });
 
   it('backSubstitute', () => {
     const L = Matrix.create([[4, 4], [0, 1]]);
-    const b = Vector.create([1, 1.5]);
+    const b = new Vector([1, 1.5]);
 
     expect(L.backSubstitute(b)).to.vector.equal([-1.25, 1.5]);
   });
@@ -25,8 +25,8 @@ describe('matrix', () => {
     // y = 1.5
     const M = Matrix.create([[2, 3], [4, 4]]);
 
-    const b = Vector.create([2, 1]);
-    expect(M.solve(b)).to.vector.equal(Vector.create([1.5, -1.25]));
+    const b = new Vector([2, 1]);
+    expect(M.solve(b)).to.vector.equal(new Vector([1.5, -1.25]));
   });
 
   it('partialPivot', () => {
@@ -352,12 +352,12 @@ describe('matrix', () => {
 
   it('Rotation', () => {
     expect(Matrix.Rotation(Math.PI / 5)).to.matrix.equal([[0.80902, -0.58779], [0.58779, 0.80902]]);
-    expect(Matrix.Rotation(Math.PI / 5, Vector.create([1, 2, 3]))).to.matrix.equal([
+    expect(Matrix.Rotation(Math.PI / 5, new Vector([1, 2, 3]))).to.matrix.equal([
       [0.82265, -0.44399, 0.35510],
       [0.49855, 0.86358, -0.07524],
       [-0.27325, 0.23894, 0.93179],
     ]);
-    expect(() => Matrix.Rotation(0, Vector.create([1]))).to.throw(DimensionalityMismatchError);
+    expect(() => Matrix.Rotation(0, new Vector([1]))).to.throw(DimensionalityMismatchError);
   });
 
   it('RotationX', () => {

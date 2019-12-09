@@ -2,6 +2,13 @@ import { DimensionalityMismatchError, Sylvester } from './sylvester';
 import { Matrix } from './matrix';
 
 /**
+ * Returns the elements from the given vector or number array.
+ * @param {Vector|Number[]} vectorOrList
+ * @returns {Number[]}
+ */
+const getElements = (vectorOrList) => vectorOrList.elements || vectorOrList;
+
+/**
  * The Vector class is designed to model vectors in any number of dimensions.
  * All the elements of a vector must be real numbers. Depending on what you’re
  * using them for, it can be helpful to think of a vector either as a point
@@ -9,13 +16,12 @@ import { Matrix } from './matrix';
  * the origin to that same point.
  */
 export class Vector {
-
   /**
    * Creates a new vector, initializing it with the provided elements.
    * @param  {Number[]} elements
    */
   constructor(elements) {
-    this.elements = elements;
+    this.elements = elements instanceof Vector ? elements.elements : elements.slice();
   }
 
   /**
@@ -88,12 +94,12 @@ export class Vector {
    */
   eql(vector, precision = Sylvester.approxPrecision) {
     let n = this.elements.length;
-    const V = vector.elements || vector;
-    if (n !== V.length) {
+    const elements = getElements(vector);
+    if (n !== elements.length) {
       return false;
     }
     while (n--) {
-      if (Math.abs(this.elements[n] - V[n]) > precision) {
+      if (Math.abs(this.elements[n] - elements[n]) > precision) {
         return false;
       }
     }
@@ -148,11 +154,11 @@ export class Vector {
    * $example Vector.angleFrom
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
-   * @param  {Vector} vector
+   * @param  {Vector|number[]} vector
    * @return {Number}
    */
   angleFrom(vector) {
-    const V = vector.elements || vector;
+    const V = getElements(vector);
     const n = this.elements.length;
     if (n !== V.length) {
       throw new DimensionalityMismatchError(
@@ -292,7 +298,7 @@ export class Vector {
       elements.push(this.elements[i]);
     }
 
-    return Vector.create(elements);
+    return new Vector(elements);
   }
 
   /**
@@ -307,7 +313,7 @@ export class Vector {
       elements.push(this.elements[i]);
     }
 
-    return Vector.create(elements);
+    return new Vector(elements);
   }
 
   /**
@@ -317,7 +323,7 @@ export class Vector {
    * @return {Vector}
    */
   augment(elements) {
-    return Vector.create(this.elements.concat(elements.elements || elements));
+    return new Vector(this.elements.concat(elements.elements || elements));
   }
 
   /**
@@ -351,7 +357,7 @@ export class Vector {
    * @return {Number}
    */
   dot(vector) {
-    const V = vector.elements || vector;
+    const V = getElements(vector);
     let n = this.elements.length;
     if (n !== V.length) {
       throw new DimensionalityMismatchError(
@@ -374,7 +380,7 @@ export class Vector {
    * @returns {Vector}
    */
   cross(vector) {
-    const B = vector.elements || vector;
+    const B = getElements(vector);
     if (this.elements.length !== 3 || B.length !== 3) {
       throw new DimensionalityMismatchError(
         `A cross-product can only be calculated between 3-dimensional vectors (got ${B.length} and ${this.elements.length})`
@@ -382,7 +388,7 @@ export class Vector {
     }
 
     const A = this.elements;
-    return Vector.create([
+    return new Vector([
       (A[1] * B[2]) - (A[2] * B[1]),
       (A[2] * B[0]) - (A[0] * B[2]),
       (A[0] * B[1]) - (A[1] * B[0])
@@ -456,6 +462,7 @@ export class Vector {
 
   /**
    * Transpose a Vector, return a 1xn Matrix.
+   * @returns {Matrix}
    */
   transpose() {
     const rows = this.elements.length;
@@ -466,9 +473,6 @@ export class Vector {
     }
     return Matrix.create(elements);
   }
-
-  // Returns a copy of the vector with elements set to the given value if they
-  // differ from it by less than Sylvester.precision
 
   /**
    * Returns a copy of the vector with elements set to the given value if they
@@ -553,7 +557,7 @@ export class Vector {
         }
         x = this.elements[0] - V[0];
         y = this.elements[1] - V[1];
-        return Vector.create([
+        return new Vector([
           V[0] + (R[0][0] * x) + (R[0][1] * y),
           V[1] + (R[1][0] * x) + (R[1][1] * y)
         ]);
@@ -568,7 +572,7 @@ export class Vector {
         x = this.elements[0] - C[0];
         y = this.elements[1] - C[1];
         z = this.elements[2] - C[2];
-        return Vector.create([
+        return new Vector([
           C[0] + (R[0][0] * x) + (R[0][1] * y) + (R[0][2] * z),
           C[1] + (R[1][0] * x) + (R[1][1] * y) + (R[1][2] * z),
           C[2] + (R[2][0] * x) + (R[2][1] * y) + (R[2][2] * z)
@@ -587,17 +591,15 @@ export class Vector {
       // obj is a plane or line
       const P = this.elements.slice();
       const C = obj.pointClosestTo(P).elements;
-      return Vector.create([
-        C[0] + (C[0] - P[0]),
-        C[1] + (C[1] - P[1]),
-        C[2] + (C[2] - (P[2] || 0))
-      ]);
+      return new Vector(P.map((p, i) => C[i] + (C[i] - p)));
     }
 
     // obj is a point
-    const Q = obj.elements || obj;
+    const Q = getElements(obj);
     if (this.elements.length !== Q.length) {
-      return null;
+      throw new DimensionalityMismatchError(
+        `Cannot rotate a ${this.elements.dimensions}D point around the given ${Q.length}D point`
+      );
     }
     return this.map((x, i) => {
       return Q[i - 1] + (Q[i - 1] - x);
@@ -616,6 +618,7 @@ export class Vector {
 
   /**
    * Utility to make sure vectors are 3D. If they are 1/2D, a zero component is added.
+   * @throws {DimensionalityMismatchError} if the vector has greater than three elements
    * @returns {Vector}
    */
   to3D() {
@@ -642,24 +645,10 @@ export class Vector {
   }
 
   /**
-   * @private
-   */
-  setElements(els) {
-    this.elements = (els.elements || els).slice();
-    return this;
-  }
-
-  /**
    * @inheritdoc
    */
   toJSON() {
     return this.elements;
-  }
-
-  // Constructor function
-  static create(elements) {
-    const V = new Vector();
-    return V.setElements(elements);
   }
 
   /**
@@ -672,7 +661,7 @@ export class Vector {
     while (size--) {
       elements.push(Math.random());
     }
-    return Vector.create(elements);
+    return new Vector(elements);
   }
 
   /**
@@ -686,7 +675,7 @@ export class Vector {
     while (size--) {
       elements.push(value);
     }
-    return Vector.create(elements);
+    return new Vector(elements);
   }
 
   /**
@@ -709,9 +698,9 @@ export class Vector {
 }
 
 // i, j, k unit vectors
-Vector.i = Vector.create([1, 0, 0]);
-Vector.j = Vector.create([0, 1, 0]);
-Vector.k = Vector.create([0, 0, 1]);
+Vector.i = new Vector([1, 0, 0]);
+Vector.j = new Vector([0, 1, 0]);
+Vector.k = new Vector([0, 0, 1]);
 
 // The following are shims for deprecated methods removed in 1.0.0
 Vector.prototype.modulus = Vector.prototype.magnitude;

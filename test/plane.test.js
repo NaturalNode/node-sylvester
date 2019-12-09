@@ -4,7 +4,7 @@ import { Vector, Plane } from '../src';
 describe('plane', () => {
   it('should create', () => {
     const plane = Plane.create([1, 2, 3], [5, 5, 5]);
-    expect(plane.anchor).to.deep.equal(Vector.create([1, 2, 3]));
+    expect(plane.anchor).to.deep.equal(new Vector([1, 2, 3]));
   });
 
   it('should create with P$', () => {

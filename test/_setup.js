@@ -28,7 +28,7 @@ chai.Assertion.addProperty('vector', function () {
   return {
     equal: other => {
       if (!(other instanceof Vector)) {
-        other = Vector.create(other);
+        other = new Vector(other);
       }
 
       this.assert(

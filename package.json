@@ -6,6 +6,7 @@
     "node": ">=0.2.6"
   },
   "scripts": {
+    "prepublishOnly": "npm run build:dist",
     "build:dist": "babel src -d dist",
     "build:doc": "rimraf doc-output && esdoc -c esdoc.json",
     "test:cover": "nyc mocha --opts mocha.opts",
