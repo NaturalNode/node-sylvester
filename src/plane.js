@@ -1,6 +1,6 @@
 import { Line } from './line';
 import { Matrix } from './matrix';
-import { Sylvester } from './sylvester';
+import { Sylvester, OutOfRangeError } from './sylvester';
 import { Vector } from './vector';
 
 export class Plane {
@@ -154,7 +154,7 @@ export class Plane {
         // cycling depending on which element we set to zero above
         anchor.push((i === j) ? 0 : intersection[(j + ((5 - i) % 3)) % 3]);
       }
-      return Line.create(anchor, direction);
+      return new Line(anchor, direction);
     }
 
     return null; // todo(connor4312): is this a case that needs to be handled?
@@ -234,26 +234,20 @@ export class Plane {
   // the normal is calculated by assuming the three points should lie in the same plane.
   // If only two are sepcified, the second is taken to be the normal. Normal vector is
   // normalised before storage.
-  setVectors(anchor, v1, v2) {
-    anchor = new Vector(anchor);
-    anchor = anchor.to3D();
-    if (anchor === null) {
-      return null;
-    }
-    v1 = new Vector(v1);
-    v1 = v1.to3D();
-    if (v1 === null) {
-      return null;
-    }
-    if (typeof (v2) === 'undefined') {
-      v2 = null;
-    } else {
-      v2 = new Vector(v2);
-      v2 = v2.to3D();
-      if (v2 === null) {
-        return null;
-      }
-    }
+  /**
+   * Sets the anchor point and normal to the plane. If three arguments are
+   * specified, the normal is calculated by assuming the three points should
+   * lie in the same plane. If only two are sepcified, the second is taken to
+   * be the normal. Normal vector is normalised before storage.
+   * @param {Vector|number[]} anchor
+   * @param {Vector|number[]} v1
+   * @param {?(Vector|number[])} v2
+   * @returns {Plane}
+   */
+  setVectors(anchor, v1, v2 = null) {
+    anchor = new Vector(anchor).to3D();
+    v1 = new Vector(v1).to3D();
+    v2 = v2 && new Vector(v2).to3D();
     const A1 = anchor.elements[0];
     const A2 = anchor.elements[1];
     const A3 = anchor.elements[2];
@@ -265,8 +259,9 @@ export class Plane {
     if (v2 === null) {
       mod = Math.sqrt((v11 * v11) + (v12 * v12) + (v13 * v13));
       if (mod === 0) {
-        return null;
+        throw new OutOfRangeError('Vectors provided to the plane must refer to unique points');
       }
+
       normal = new Vector([
         v1.elements[0] / mod,
         v1.elements[1] / mod,
@@ -283,8 +278,9 @@ export class Plane {
       ]);
       mod = normal.modulus();
       if (mod === 0) {
-        return null;
+        throw new OutOfRangeError('Vectors provided to the plane must refer to unique, non-colinear points');
       }
+
       normal = new Vector([
         normal.elements[0] / mod,
         normal.elements[1] / mod,

@@ -166,13 +166,13 @@ describe('vector', () => {
 
   asDiagram('Vector.distanceFrom').it(expectCall => {
     expectCall(x).distanceFrom(Vector.Zero(2)).to.equal(5);
-    expectCall(x).distanceFrom(Line.create(Vector.Zero(2), new Vector([-4, 3]))).to.equal(5);
+    expectCall(x).distanceFrom(new Line(Vector.Zero(2), new Vector([-4, 3]))).to.equal(5);
     expect(() => x.distanceFrom(Vector.Zero(1))).to.throw(DimensionalityMismatchError);
   });
 
   asDiagram('Vector.liesOn').it(expectCall => {
-    expectCall(x).liesOn(Line.create(Vector.Zero(2), new Vector([-1, 0]))).to.be.false;
-    expectCall(x).liesOn(Line.create(new Vector([7, 0]), new Vector([-1, 1]))).to.be.true;
+    expectCall(x).liesOn(new Line(Vector.Zero(2), new Vector([-1, 0]))).to.be.false;
+    expectCall(x).liesOn(new Line(new Vector([7, 0]), new Vector([-1, 1]))).to.be.true;
   });
 
   asDiagram('Vector.liesIn').it(expectCall => {
@@ -188,7 +188,7 @@ describe('vector', () => {
   asDiagram('Vector.rotate').it(expectCall => {
     expectCall(x).rotate(Math.PI / 2, Vector.One(2)).to.vector.equal([-2, 3]);
 
-    const rotationLine = Line.create(Vector.Zero(3), new Vector([1, 1, -1]));
+    const rotationLine = new Line(Vector.Zero(3), new Vector([1, 1, -1]));
     expectCall(new Vector([1, 2, 3])).rotate(Math.PI / 2, rotationLine).to.vector.equal([2.88675, -2.30940, 0.57735]);
     expect(() => x.rotate(0, Vector.Zero(1))).to.throw(DimensionalityMismatchError);
     expect(() => Vector.Zero(3).rotate(0, Vector.Zero(1))).to.throw(DimensionalityMismatchError);
@@ -197,7 +197,7 @@ describe('vector', () => {
 
   asDiagram('Vector.reflectionIn').it(expectCall => {
     expectCall(x).reflectionIn(Vector.One(2)).to.vector.equal([-1, -2]);
-    expectCall(x).reflectionIn(Line.create(Vector.Zero(2), new Vector([1, 2]))).to.vector.equal([1.4, 4.8]);
+    expectCall(x).reflectionIn(new Line(Vector.Zero(2), new Vector([1, 2]))).to.vector.equal([1.4, 4.8]);
     expect(() => x.reflectionIn(Vector.Zero(0))).to.throw(DimensionalityMismatchError);
   });
 
