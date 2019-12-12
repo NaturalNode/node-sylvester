@@ -16,11 +16,11 @@ export class Plane {
 
   // Returns the result of translating the plane by the given vector
   translate(vector) {
-    const V = vector.elements || vector;
+    const V = Vector.toElements(vector, 3);
     return Plane.create([
       this.anchor.elements[0] + V[0],
       this.anchor.elements[1] + V[1],
-      this.anchor.elements[2] + (V[2] || 0)
+      this.anchor.elements[2] + V[2]
     ], this.normal);
   }
 
@@ -59,10 +59,10 @@ export class Plane {
     }
 
     // obj is a point
-    const P = obj.elements || obj;
+    const P = Vector.toElements(obj, 3);
     const A = this.anchor.elements;
     const N = this.normal.elements;
-    return Math.abs(((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - (P[2] || 0)) * N[2]));
+    return Math.abs(((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - P[2]) * N[2]));
   }
 
   // Returns true iff the plane contains the given point or line
@@ -74,10 +74,10 @@ export class Plane {
       return (this.contains(obj.anchor) && this.contains(obj.anchor.add(obj.direction)));
     }
 
-    const P = obj.elements || obj;
+    const P = Vector.toElements(obj, 3);
     const A = this.anchor.elements;
     const N = this.normal.elements;
-    const diff = Math.abs((N[0] * (A[0] - P[0])) + (N[1] * (A[1] - P[1])) + (N[2] * (A[2] - (P[2] || 0))));
+    const diff = Math.abs((N[0] * (A[0] - P[0])) + (N[1] * (A[1] - P[1])) + (N[2] * (A[2] - P[2])));
     return (diff <= Sylvester.precision);
   }
 
@@ -162,17 +162,17 @@ export class Plane {
 
   // Returns the point in the plane closest to the given point
   pointClosestTo(point) {
-    const P = point.elements || point;
+    const P = Vector.toElements(point, 3);
     const A = this.anchor.elements;
     const N = this.normal.elements;
-    const dot = ((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - (P[2] || 0)) * N[2]);
-    return new Vector([P[0] + (N[0] * dot), P[1] + (N[1] * dot), (P[2] || 0) + (N[2] * dot)]);
+    const dot = ((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - P[2]) * N[2]);
+    return new Vector([P[0] + (N[0] * dot), P[1] + (N[1] * dot), P[2] + (N[2] * dot)]);
   }
 
   // Returns a copy of the plane, rotated by t radians about the given line
   // See notes on Line#rotate.
   rotate(t, line) {
-    const R = t.determinant ? t.elements : Matrix.Rotation(t, line.direction).elements;
+    const R = t instanceof Matrix ? t.elements : Matrix.Rotation(t, line.direction).elements;
     const C = line.pointClosestTo(this.anchor).elements;
     const A = this.anchor.elements;
     const N = this.normal.elements;
@@ -226,8 +226,8 @@ export class Plane {
     }
 
     // obj is a point
-    const P = obj.elements || obj;
-    return Plane.create(this.anchor.reflectionIn([P[0], P[1], (P[2] || 0)]), this.normal);
+    const P = Vector.toElements(vector, 3);
+    return Plane.create(this.anchor.reflectionIn([P[0], P[1], P[2]]), this.normal);
   }
 
   // Sets the anchor point and normal to the plane. If three arguments are specified,

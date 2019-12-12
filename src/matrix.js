@@ -49,6 +49,15 @@ function pca(X) {
 
 const sizeStr = matrix => `${matrix.rows()}x${matrix.cols()} matrix`;
 
+const extractElements = (matrixOrRows) => {
+  const rows = matrixOrRows.elements || matrixOrRows;
+  if (typeof rows[0][0] === 'undefined') {
+    return Matrix.create(rows).elements;
+  }
+
+  return rows;
+};
+
 export class Matrix {
   // solve a system of linear equations (work in progress)
   solve(b) {
@@ -231,10 +240,7 @@ export class Matrix {
    * or a different size.
    */
   eql(matrix, epsilon = Sylvester.approxPrecision) {
-    let M = matrix.elements || matrix;
-    if (typeof (M[0][0]) === 'undefined') {
-      M = Matrix.create(M).elements;
-    }
+    const M = extractElements(matrix);
     if (this.elements.length !== M.length || this.elements[0].length !== M[0].length) {
       return false;
     }
@@ -287,10 +293,7 @@ export class Matrix {
    * @returns {Boolean}
    */
   isSameSizeAs(matrix) {
-    let M = matrix.elements || matrix;
-    if (typeof (M[0][0]) === 'undefined') {
-      M = Matrix.create(M).elements;
-    }
+    const M = extractElements(matrix);
 
     return (this.elements.length === M.length && this.elements[0].length === M[0].length);
   }
@@ -306,10 +309,7 @@ export class Matrix {
       return this.map(x => x + matrix);
     }
 
-    let M = matrix.elements || matrix;
-    if (typeof (M[0][0]) === 'undefined') {
-      M = Matrix.create(M).elements;
-    }
+    const M = extractElements(matrix);
 
     if (!this.isSameSizeAs(M)) {
       throw new DimensionalityMismatchError(`Cannot add a ${sizeStr(matrix)} to this (sizeStr(matrix))`);
@@ -328,10 +328,7 @@ export class Matrix {
       return this.map(x => x - matrix);
     }
 
-    let M = matrix.elements || matrix;
-    if (typeof (M[0][0]) === 'undefined') {
-      M = Matrix.create(M).elements;
-    }
+    const M = extractElements(matrix);
     if (!this.isSameSizeAs(M)) {
       throw new DimensionalityMismatchError(`Cannot add a ${sizeStr(matrix)} to this (sizeStr(matrix))`);
     }
@@ -344,18 +341,10 @@ export class Matrix {
    * @return {Boolean}
    */
   canMultiplyFromLeft(matrix) {
-    let M = matrix.elements || matrix;
-    if (typeof (M[0][0]) === 'undefined') {
-      M = Matrix.create(M).elements;
-    }
+    const M = extractElements(matrix);
     // this.columns should equal matrix.rows
     return (this.elements[0].length === M.length);
   }
-
-  // Returns the result of a multiplication-style operation the matrix from the right by the argument.
-  // If the argument is a scalar then just operate on all the elements. If the argument is
-  // a vector, a vector is returned, which saves you having to remember calling
-  // col(1) on the result.
 
   /**
    * Returns the result of a multiplication-style operation the matrix from the
@@ -380,10 +369,7 @@ export class Matrix {
     }
 
     const returnVector = Boolean(matrix.modulus);
-    let M = matrix.elements || matrix;
-    if (typeof (M[0][0]) === 'undefined') {
-      M = Matrix.create(M).elements;
-    }
+    const M = extractElements(matrix);
     if (!this.canMultiplyFromLeft(M)) {
       throw new DimensionalityMismatchError(
         `Cannot multiply a ${sizeStr(this)} by a ${sizeStr(matrix)}, expected an ${this.cols()}xN matrix`
@@ -822,10 +808,7 @@ export class Matrix {
    * @param {Matrix|number[][]} matrix
    */
   augment(matrix) {
-    let M = matrix.elements || matrix;
-    if (typeof (M[0][0]) === 'undefined') {
-      M = Matrix.create(M).elements;
-    }
+    const M = extractElements(matrix);
     const T = this.dup();
     const cols = T.elements[0].length;
     let i = T.elements.length;

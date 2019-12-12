@@ -1,5 +1,6 @@
 import { DimensionalityMismatchError, Sylvester } from './sylvester';
 import { Matrix } from './matrix';
+import { Line } from './line';
 
 /**
  * Returns the elements from the given vector or number array.
@@ -17,11 +18,38 @@ const getElements = (vectorOrList) => vectorOrList.elements || vectorOrList;
  */
 export class Vector {
   /**
+   * Gets the elements of the vector or list of numbers.
+   * @param {Vector|number} vectorOrElements
+   * @param {number} Desired dimension of elements
+   * @private
+   */
+  static toElements(vectorOrElements, requireDimension = undefined) {
+    let elements = vectorOrElements.elements || vectorOrElements;
+
+    if (!requireDimension || requireDimension === elements.length) {
+      return elements;
+    }
+
+    if (elements.length > requireDimension) {
+      throw new DimensionalityMismatchError(
+        `Cannot convert a ${elements.length}D vector to a ${requireDimension}D one`,
+      );
+    }
+
+    elements = elements.slice();
+    while (elements.length < requireDimension) {
+      elements.push(0)
+    }
+
+    return elements;
+  }
+
+  /**
    * Creates a new vector, initializing it with the provided elements.
-   * @param  {Number[]} elements
+   * @param  {Vector|Number[]} elements
    */
   constructor(elements) {
-    this.elements = elements instanceof Vector ? elements.elements : elements.slice();
+    this.elements = Vector.toElements(elements);
   }
 
   /**
@@ -194,21 +222,25 @@ export class Vector {
   /**
    * Returns whether the vectors are parallel to each other.
    * $example Vector.isParallelTo
+   * @param {Vector} vector
+   * @param {Number} epsilon precision used for comparing angles
    * @return {Boolean}
    */
-  isParallelTo(vector) {
+  isParallelTo(vector, epsilon = Sylvester.precision) {
     const angle = this.angleFrom(vector);
-    return angle === null ? false : (angle <= Sylvester.precision);
+    return angle <= epsilon;
   }
 
   /**
    * Returns whether the vectors are antiparallel to each other.
    * $example Vector.isAntiparallelTo
+   * @param {Vector} vector
+   * @param {Number} epsilon precision used for comparing angles
    * @return {Boolean}
    */
-  isAntiparallelTo(vector) {
+  isAntiparallelTo(vector, epsilon = Sylvester.precision) {
     const angle = this.angleFrom(vector);
-    return angle === null ? false : (Math.abs(angle - Math.PI) <= Sylvester.precision);
+    return Math.abs(angle - Math.PI) <= epsilon;
   }
 
   /**
@@ -490,17 +522,11 @@ export class Vector {
    * @param {Vector|Line|Plane} obj
    */
   distanceFrom(obj) {
-    if (obj.anchor || (obj.start && obj.end)) {
+    if ('distanceFrom' in obj && !(obj instanceof Vector)) {
       return obj.distanceFrom(this);
     }
 
-    const V = obj.elements || obj;
-    if (V.length !== this.elements.length) {
-      throw new DimensionalityMismatchError(
-        `Cannot get a ${this.elements.length}D distance from a ${V.length}D object`,
-      );
-    }
-
+    const V = Vector.toElements(obj, this.elements.length);
     let sum = 0;
     let part;
     this.each((x, i) => {
@@ -533,7 +559,7 @@ export class Vector {
    * Rotates the vector about the given object. The object should be a point
    * if the vector is 2D, and a line if it is 3D. Be careful
    * with line directions!
-   * @param {Number|Vector} t
+   * @param {Number|Vector|Matrix} t
    * @param {Vector|Line} obj
    */
   rotate(t, obj) {
@@ -543,15 +569,12 @@ export class Vector {
     let y;
     let z;
     let C;
-    if (t.determinant) {
+    if (t instanceof Matrix) {
       R = t.elements;
     }
     switch (this.elements.length) {
       case 2:
-        V = obj.elements || obj;
-        if (V.length !== 2) {
-          throw new DimensionalityMismatchError(`Cannot rotate a 2D vector around a ${V.length}D object`);
-        }
+        V = Vector.toElements(obj, 2);
         if (!R) {
           R = Matrix.Rotation(t).elements;
         }
@@ -562,7 +585,7 @@ export class Vector {
           V[1] + (R[1][0] * x) + (R[1][1] * y)
         ]);
       case 3:
-        if (!obj.direction) {
+        if (!(obj instanceof Line)) {
           throw new DimensionalityMismatchError('A line must be provided to rotate a 3D vector');
         }
         C = obj.pointClosestTo(this).elements;
@@ -622,18 +645,26 @@ export class Vector {
    * @returns {Vector}
    */
   to3D() {
-    switch (this.elements.length) {
-      case 0:
-        return Vector.Zero(3);
-      case 1:
-        return new Vector([this.elements[0], 0, 0]);
-      case 2:
-        return new Vector([this.elements[0], this.elements[1], 0]);
-      case 3:
-        return this;
-      default:
-        throw new DimensionalityMismatchError(`Cannot convert a ${this.elements.length}D vector to a 3D one`);
+    return this.toDimension(3);
+  }
+
+  /**
+   * Pads the vector with zero's until it reaches the given dimension.
+   * @throws {DimensionalityMismatchError} if the vector has greater than n elements
+   * @param {Number} n
+   * @returns {Vector}
+   */
+  toDimension(n) {
+    if (this.elements.length > n) {
+      throw new DimensionalityMismatchError(`Cannot convert a ${this.elements.length}D vector to a ${n}D one`);
     }
+
+    const next = new Array(n);
+    for (let i = 0; i < n; i++) {
+      next[i] = this.elements[i] || 0;
+    }
+
+    return new Vector(next);
   }
 
   /**

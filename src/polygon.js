@@ -289,7 +289,7 @@ export class Polygon {
     const P = (point.elements || point);
     let success = false;
     this.vertices.each(node => {
-      if (!success && Line.Segment.create(node.data, node.next.data).contains(P)) {
+      if (!success && new Line.Segment(node.data, node.next.data).contains(P)) {
         success = true;
       }
     });

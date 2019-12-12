@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Vector, DimensionalityMismatchError, Line, Plane } from '../src';
+import { Vector, DimensionalityMismatchError, Line, Plane, Matrix } from '../src';
 import { asDiagram } from './_as-diagram';
 
 describe('vector', () => {
@@ -157,6 +157,7 @@ describe('vector', () => {
   });
 
   asDiagram('Vector.snapTo').it(expectCall => {
+    expectCall(new Vector([0.4000000000001, 0.5])).snapTo(0.4).to.vector.equal([0.4, 0.5]);
     expectCall(new Vector([-1, 0.25, 0.5, 0.75, 1])).snapTo(0.3, 0.5).to.vector.equal([-1, 0.3, 0.3, 0.3, 1]);
   });
 
@@ -167,7 +168,7 @@ describe('vector', () => {
   asDiagram('Vector.distanceFrom').it(expectCall => {
     expectCall(x).distanceFrom(Vector.Zero(2)).to.equal(5);
     expectCall(x).distanceFrom(new Line(Vector.Zero(2), new Vector([-4, 3]))).to.equal(5);
-    expect(() => x.distanceFrom(Vector.Zero(1))).to.throw(DimensionalityMismatchError);
+    expect(() => x.distanceFrom(Vector.Zero(3))).to.throw(DimensionalityMismatchError);
   });
 
   asDiagram('Vector.liesOn').it(expectCall => {
@@ -187,10 +188,12 @@ describe('vector', () => {
 
   asDiagram('Vector.rotate').it(expectCall => {
     expectCall(x).rotate(Math.PI / 2, Vector.One(2)).to.vector.equal([-2, 3]);
+    expectCall(x).rotate(Matrix.Rotation(Math.PI / 2), Vector.One(2)).to.vector.equal([-2, 3]);
 
     const rotationLine = new Line(Vector.Zero(3), new Vector([1, 1, -1]));
     expectCall(new Vector([1, 2, 3])).rotate(Math.PI / 2, rotationLine).to.vector.equal([2.88675, -2.30940, 0.57735]);
-    expect(() => x.rotate(0, Vector.Zero(1))).to.throw(DimensionalityMismatchError);
+    expectCall(new Vector([1, 2, 3])).rotate(Matrix.RotationZ(Math.PI / 2), Line.Z).to.vector.equal([-2, 1, 3]);
+    expect(() => x.rotate(0, Vector.Zero(4))).to.throw(DimensionalityMismatchError);
     expect(() => Vector.Zero(3).rotate(0, Vector.Zero(1))).to.throw(DimensionalityMismatchError);
     expect(() => Vector.Zero(4).rotate(0, Vector.Zero(4))).to.throw(DimensionalityMismatchError);
   });

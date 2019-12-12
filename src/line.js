@@ -45,11 +45,11 @@ export class Line {
    * @returns {Line}
    */
   translate(vector) {
-    const V = vector.elements || vector;
+    const V = Vector.toElements(vector, 3);
     return new Line([
       this.anchor.elements[0] + V[0],
       this.anchor.elements[1] + V[1],
-      this.anchor.elements[2] + (V[2] || 0)
+      this.anchor.elements[2] + V[2]
     ], this.direction);
   }
 
@@ -63,7 +63,7 @@ export class Line {
    * @returns {Boolean}
    */
   isParallelTo(obj, epsilon = Sylvester.precision) {
-    if (obj.normal || (obj instanceof Segment)) {
+    if (obj instanceof Plane || obj instanceof Segment) {
       return obj.isParallelTo(this, epsilon);
     }
     const theta = this.direction.angleFrom(obj.direction);
@@ -104,12 +104,12 @@ export class Line {
     // return aSubP.subtract(this.direction.multiply(aSubP.dot(this.direction))).modulus();
 
     // obj is a point
-    const P = obj.elements || obj;
+    const P = Vector.toElements(obj, 3);
     const A = this.anchor.elements;
     const D = this.direction.elements;
     const PA1 = P[0] - A[0];
     const PA2 = P[1] - A[1];
-    const PA3 = (P[2] || 0) - A[2];
+    const PA3 = P[2] - A[2];
     const modPA = Math.sqrt((PA1 * PA1) + (PA2 * PA2) + (PA3 * PA3));
     if (modPA === 0) {
       return 0;
@@ -148,12 +148,12 @@ export class Line {
     if (!this.contains(point)) {
       return null;
     }
-    const P = point.elements || point;
+    const P = Vector.toElements(point, 3);
     const A = this.anchor.elements;
     const D = this.direction.elements;
     return ((P[0] - A[0]) * D[0]) +
       ((P[1] - A[1]) * D[1]) +
-      (((P[2] || 0) - A[2]) * D[2]);
+      ((P[2] - A[2]) * D[2]);
   }
 
   /**
@@ -172,7 +172,7 @@ export class Line {
    * @returns {Boolean}
    */
   intersects(obj, epsilon = Sylvester.precision) {
-    if (obj.normal) {
+    if (obj instanceof Plane) {
       return obj.intersects(this);
     }
     return (!this.isParallelTo(obj) && this.distanceFrom(obj) <= epsilon);
@@ -181,11 +181,11 @@ export class Line {
   /**
    * Returns the unique intersection point with the argument, if one exists,
    * or null.
-   * @param {Plane|Line} obj
+   * @param {Plane|Line|Segment} obj
    * @returns {?Vector}
    */
   intersectionWith(obj) {
-    if (obj.normal || (obj instanceof Segment)) {
+    if (obj instanceof Plane || obj instanceof Segment) {
       return obj.intersectionWith(this);
     }
     if (!this.intersects(obj)) {
@@ -217,7 +217,7 @@ export class Line {
   /**
    * Returns the point on the line that is closest to the given
    * point or line/line segment.
-   * @param {Line|LineSegment|Vector} obj
+   * @param {Line|Plane|Segment|Vector} obj
    * @returns {?Vector} a vector, or null if this is parallel to the object
    */
   pointClosestTo(obj) {
@@ -258,9 +258,10 @@ export class Line {
     }
 
     // obj is a point
-    const P = obj.elements || obj;
-    if (this.contains(P)) {
-      return new Vector(P);
+    obj = new Vector(obj).to3D();
+    const P = obj.elements;
+    if (this.contains(obj)) {
+      return obj;
     }
     const A = this.anchor.elements;
     const D = this.direction.elements;
@@ -289,13 +290,13 @@ export class Line {
    * direction about the argument's. Be careful with this - the rotation
    * axis' direction affects the outcome!
    * @param {Number} theta rotation in radians
-   * @param {Line} line line to rotate
+   * @param {Line} line axis to rotate around or point (for 2D rotation)
    * @returns {Line}
    */
   rotate(theta, line) {
     // If we're working in 2D
-    if (typeof (line.direction) === 'undefined') {
-      line = new Line(line.to3D(), Vector.k);
+    if (!(line instanceof Line)) {
+      line = new Line(line, Vector.k);
     }
     const R = Matrix.Rotation(theta, line.direction).elements;
     const C = line.pointClosestTo(this.anchor).elements;
@@ -336,7 +337,7 @@ export class Line {
    * @returns {Line}
    */
   reflectionIn(obj) {
-    if (obj.normal) {
+    if (obj instanceof Plane) {
       // obj is a plane
       const A = this.anchor.elements;
 
@@ -368,24 +369,42 @@ export class Line {
     }
 
     // obj is a point - just reflect the line's anchor in it
-    const P = obj.elements || obj;
-    return new Line(this.anchor.reflectionIn([P[0], P[1], (P[2] || 0)]), this.direction);
+    const P = Vector.toElements(obj, 3);
+    return new Line(this.anchor.reflectionIn([P[0], P[1], P[2]]), this.direction);
   }
 }
 
+/**
+ * Represents a line in 3D (or 2D) space between two points.
+ */
 export class Segment {
-  // Returns true iff the line segment is equal to the argument
+  /**
+   * Creates a new line segment.
+   * @param {Vector} startPoint
+   * @param {Vector} endPoint
+   */
+  constructor(startPoint, endPoint) {
+    startPoint = new Vector(startPoint).to3D();
+    endPoint = new Vector(endPoint).to3D();
+    this.line = new Line(startPoint, endPoint.subtract(startPoint));
+    this.start = startPoint;
+    this.end = endPoint;
+  }
+
+  /**
+   * Returns true iff the line segment is equal to the argument
+   * @param {Segment} segment
+   * @returns {Boolean}
+   */
   eql(segment) {
     return (this.start.eql(segment.start) && this.end.eql(segment.end)) ||
         (this.start.eql(segment.end) && this.end.eql(segment.start));
   }
 
-  // Returns a copy of the line segment
-  dup() {
-    return Segment.create(this.start, this.end);
-  }
-
-  // Returns the length of the line segment
+  /**
+   * Returns the length of the line segment.
+   * @returns {Number}
+   */
   length() {
     const A = this.start.elements;
     const B = this.end.elements;
@@ -395,73 +414,104 @@ export class Segment {
     return Math.sqrt((C1 * C1) + (C2 * C2) + (C3 * C3));
   }
 
-  // Returns the line segment as a vector equal to its
-  // end point relative to its endpoint
+  /**
+   * Returns the line segment as a vector equal to its
+   * end point relative to its endpoint.
+   * @returns {Vector}
+   */
   toVector() {
     const A = this.start.elements;
     const B = this.end.elements;
     return new Vector([B[0] - A[0], B[1] - A[1], B[2] - A[2]]);
   }
 
-  // Returns the segment's midpoint as a vector
+  /**
+   * Returns the segment's midpoint as a vector
+   * @returns {Vector}
+   */
   midpoint() {
     const A = this.start.elements;
     const B = this.end.elements;
     return new Vector([(B[0] + A[0]) / 2, (B[1] + A[1]) / 2, (B[2] + A[2]) / 2]);
   }
 
-  // Returns the plane that bisects the segment
+  /**
+   * Returns the plane that bisects the segment
+   * @returns {Plane}
+   */
   bisectingPlane() {
     return Plane.create(this.midpoint(), this.toVector());
   }
 
-  // Returns the result of translating the line by the given vector/array
+  /**
+   * Returns the result of translating the line by the given vector/array.
+   * @param {Vector|number[]} vector
+   */
   translate(vector) {
-    const V = vector.elements || vector;
+    const V = Vector.toElements(vector, 3);
     const S = this.start.elements;
     const E = this.end.elements;
-    return Segment.create(
-      [S[0] + V[0], S[1] + V[1], S[2] + (V[2] || 0)],
-      [E[0] + V[0], E[1] + V[1], E[2] + (V[2] || 0)]
+    return new Segment(
+      [S[0] + V[0], S[1] + V[1], S[2] + V[2]],
+      [E[0] + V[0], E[1] + V[1], E[2] + V[2]]
     );
   }
 
-  // Returns true iff the line segment is parallel to the argument. It simply forwards
-  // the method call onto its line property.
-  isParallelTo(obj) {
-    return this.line.isParallelTo(obj);
+  /**
+   * Returns true iff the line segment is parallel to the argument. It simply forwards
+   * @param {Line|Plane} obj
+   * @param {?Number} epsilon Precision at which to calculate angle equality
+   * @returns {Boolean}
+   */
+  isParallelTo(obj, epsilon = Sylvester.precision) {
+    return this.line.isParallelTo(obj, epsilon);
   }
 
-  // Returns the distance between the argument and the line segment's closest point to the argument
+  /**
+   * Returns the distance between the argument and the line segment's closest point to the argument
+   * @param {Vector|Line|Plane} obj
+   */
   distanceFrom(obj) {
+    if (obj instanceof Vector) {
+      obj = obj.to3D();
+    }
     const P = this.pointClosestTo(obj);
     return (P === null) ? null : P.distanceFrom(obj);
   }
 
-  // Returns true iff the given point lies on the segment
+  /**
+   * Returns true iff the given point lies on the segment
+   * @param {Segment|Vector} obj
+   */
   contains(obj) {
     if (obj instanceof Segment) {
       return this.contains(obj.start) && this.contains(obj.end);
     }
-    const P = (obj.elements || obj).slice();
-    if (P.length === 2) {
-      P.push(0);
-    }
+
+    const P = Vector.toElements(obj, 3);
     if (this.start.eql(P)) {
       return true;
     }
     const S = this.start.elements;
-    const V = new Vector([S[0] - P[0], S[1] - P[1], S[2] - (P[2] || 0)]);
+    const V = new Vector([S[0] - P[0], S[1] - P[1], S[2] - P[2]]);
     const vect = this.toVector();
     return V.isAntiparallelTo(vect) && V.modulus() <= vect.modulus();
   }
 
-  // Returns true iff the line segment intersects the argument
+  /**
+   * Returns true iff the line segment intersects the argument
+   * @param {Line|Segment|Plane} obj
+   * @returns {Boolean}
+   */
   intersects(obj) {
     return (this.intersectionWith(obj) !== null);
   }
 
-  // Returns the unique point of intersection with the argument
+  /**
+   * Returns true iff the line segment intersects the argument
+   * @param {Line|Segment|Plane} obj
+   * @returns {Vector|null} the point, or null if there is no intersection
+   */
   intersectionWith(obj) {
     if (!this.line.intersects(obj)) {
       return null;
@@ -470,9 +520,13 @@ export class Segment {
     return (this.contains(P) ? P : null);
   }
 
-  // Returns the point on the line segment closest to the given object
+  /**
+   * Returns the point on the line segment closest to the given object
+   * @param {Plane|Segment|Vector} obj
+   * @returns {Vector|null} The vector, or null if the object is parallel to the segment.
+   */
   pointClosestTo(obj) {
-    if (obj.normal) {
+    if (obj instanceof Plane) {
       // obj is a plane
       const V = this.line.intersectionWith(obj);
       if (V === null) {
@@ -486,30 +540,12 @@ export class Segment {
     if (P === null) {
       return null;
     }
+
     if (this.contains(P)) {
       return P;
     }
 
-    return (this.line.positionOf(P) < 0 ? this.start : this.end).dup();
-  }
-
-  // Set the start and end-points of the segment
-  setPoints(startPoint, endPoint) {
-    startPoint = new Vector(startPoint).to3D();
-    endPoint = new Vector(endPoint).to3D();
-    if (startPoint === null || endPoint === null) {
-      return null;
-    }
-    this.line = new Line(startPoint, endPoint.subtract(startPoint));
-    this.start = startPoint;
-    this.end = endPoint;
-    return this;
-  }
-
-  // Constructor function
-  static create(v1, v2) {
-    const S = new Segment();
-    return S.setPoints(v1, v2);
+    return this.line.positionOf(P) < 0 ? this.start : this.end;
   }
 }
 

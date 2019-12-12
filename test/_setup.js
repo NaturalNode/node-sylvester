@@ -1,5 +1,6 @@
 import chai from 'chai';
-import { Matrix, Vector, Sylvester, Line } from '../src';
+import { Matrix, Vector, Sylvester, Line, Plane } from '../src';
+import { Segment } from '../src/line';
 
 chai.Assertion.addProperty('matrix', function () {
   new chai.Assertion(this._obj).to.be.instanceOf(Matrix);
@@ -58,6 +59,44 @@ chai.Assertion.addProperty('line', function () {
         'expected #{this} to not equal #{exp}',
         this._obj,
         lineOrOrigin,
+        true
+      );
+    }
+  };
+});
+
+chai.Assertion.addProperty('segment', function () {
+  new chai.Assertion(this._obj).to.be.instanceOf(Segment);
+
+  return {
+    equal: (startOrSegment, end) => {
+      if (!(startOrSegment instanceof Segment)) {
+        startOrSegment = new Line.Segment(startOrSegment, end);
+      }
+
+      this.assert(
+        this._obj.eql(startOrSegment, 0.001),
+        'expected #{this} to equal #{exp}',
+        'expected #{this} to not equal #{exp}',
+        this._obj,
+        startOrSegment,
+        true
+      );
+    }
+  };
+});
+
+chai.Assertion.addProperty('plane', function () {
+  new chai.Assertion(this._obj).to.be.instanceOf(Plane);
+
+  return {
+    equal: (expectedPlane) => {
+      this.assert(
+        this._obj.eql(expectedPlane, 0.001),
+        'expected #{this} to equal #{exp}',
+        'expected #{this} to not equal #{exp}',
+        this._obj,
+        expectedPlane,
         true
       );
     }
