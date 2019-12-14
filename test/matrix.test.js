@@ -306,7 +306,6 @@ describe('matrix', () => {
   });
 
   it('determinant', () => {
-    expect(Matrix.create([[]]).det()).to.equal(1);
     expect(Matrix.create([[42]]).det()).to.equal(42);
     expect(Matrix.create([[1]]).det()).to.equal(1);
     expect(Matrix.create([[1, 2], [3, 4]]).det()).to.equal(-2);

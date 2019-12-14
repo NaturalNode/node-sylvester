@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { Vector, DimensionalityMismatchError, Line, Plane, Matrix } from '../src';
 import { asDiagram } from './_as-diagram';
+import { testParallelTo, testPerpendicularTo, testDistanceFrom } from './_common-cases';
 
 describe('vector', () => {
   const x = new Vector([3, 4]);
@@ -70,9 +71,7 @@ describe('vector', () => {
   });
 
   asDiagram('Vector.isParallelTo').it(expectCall => {
-    expectCall(x).isParallelTo(new Vector([6, 8])).to.be.true;
-    expectCall(x).isParallelTo(new Vector([1, 1])).to.be.false;
-    expect(x.isParallelTo(Vector.Zero(2))).to.be.false;
+    testParallelTo(Vector, expectCall);
   });
 
   asDiagram('Vector.isAntiparallelTo').it(expectCall => {
@@ -82,8 +81,7 @@ describe('vector', () => {
   });
 
   asDiagram('Vector.isPerpendicularTo').it(expectCall => {
-    expectCall(x).isPerpendicularTo(new Vector([-4, 3])).to.be.true;
-    expectCall(x).isPerpendicularTo(x).to.be.false;
+    testPerpendicularTo(Vector, expectCall);
   });
 
   asDiagram('Vector.dot').it(expectCall => {
@@ -166,9 +164,7 @@ describe('vector', () => {
   });
 
   asDiagram('Vector.distanceFrom').it(expectCall => {
-    expectCall(x).distanceFrom(Vector.Zero(2)).to.equal(5);
-    expectCall(x).distanceFrom(new Line(Vector.Zero(2), new Vector([-4, 3]))).to.equal(5);
-    expect(() => x.distanceFrom(Vector.Zero(3))).to.throw(DimensionalityMismatchError);
+    testDistanceFrom(Vector, expectCall);
   });
 
   asDiagram('Vector.liesOn').it(expectCall => {
@@ -177,7 +173,7 @@ describe('vector', () => {
   });
 
   asDiagram('Vector.liesIn').it(expectCall => {
-    const plane = Plane.create(
+    const plane = new Plane(
       new Vector([1, -2, 0]),
       new Vector([3, 1, 4]),
       new Vector([0, -1, 2]),

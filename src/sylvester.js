@@ -22,3 +22,8 @@ export class OutOfRangeError extends SylvesterError {}
  * units which should share a certain dimensional relationship, but fail it.
  */
 export class DimensionalityMismatchError extends SylvesterError {}
+
+/**
+ * Thrown on an invalid Sylvester operation.
+ */
+export class InvalidOperationError extends SylvesterError {}

@@ -1,4 +1,5 @@
-import { DimensionalityMismatchError, Sylvester } from './sylvester';
+import { DimensionalityMismatchError, Sylvester, InvalidOperationError } from './sylvester';
+import { isSegmentLike, isPlaneLike, isVectorLike, isLineLike, isVectorOrListLike, isGeometry } from './likeness';
 import { Matrix } from './matrix';
 import { Line } from './line';
 
@@ -121,6 +122,10 @@ export class Vector {
    * @return {Boolean}
    */
   eql(vector, precision = Sylvester.approxPrecision) {
+    if (!isVectorOrListLike(vector)) {
+      return false;
+    }
+
     let n = this.elements.length;
     const elements = getElements(vector);
     if (n !== elements.length) {
@@ -222,13 +227,18 @@ export class Vector {
   /**
    * Returns whether the vectors are parallel to each other.
    * $example Vector.isParallelTo
-   * @param {Vector} vector
+   * @param {Vector|Plane|Segment|Line} obj
    * @param {Number} epsilon precision used for comparing angles
    * @return {Boolean}
    */
-  isParallelTo(vector, epsilon = Sylvester.precision) {
-    const angle = this.angleFrom(vector);
-    return angle <= epsilon;
+  isParallelTo(obj, epsilon = Sylvester.precision) {
+    if (isVectorOrListLike(obj)) {
+      return this.angleFrom(obj) <= epsilon;
+    } else if (isGeometry(obj)) {
+      return obj.isParallelTo(this, epsilon);
+    } else {
+      throw new InvalidOperationError(`Cannot compare the angle of ${obj} to a vector`);
+    }
   }
 
   /**
@@ -246,10 +256,18 @@ export class Vector {
   /**
    * Returns whether the vectors are perpendicular to each other.
    * $example Vector.isPerpendicularTo
+   * @param {Vector|Plane|Segment|Line|number[]} obj
+   * @param {Number} epsilon precision used for comparing angles
    * @return {Boolean}
    */
-  isPerpendicularTo(vector) {
-    return Math.abs(this.dot(vector)) <= Sylvester.precision;
+  isPerpendicularTo(obj, epsilon = Sylvester.precision) {
+    if (isVectorOrListLike(obj)) {
+      return Math.abs(this.dot(obj)) <= epsilon;
+    } else if (isGeometry(obj)) {
+      return obj.isPerpendicularTo(this, epsilon);
+    } else {
+      throw new InvalidOperationError(`Cannot compare the angle of ${obj} to a vector`);
+    }
   }
 
   _runBinaryOp(value, operator) {
@@ -522,7 +540,10 @@ export class Vector {
    * @param {Vector|Line|Plane} obj
    */
   distanceFrom(obj) {
-    if ('distanceFrom' in obj && !(obj instanceof Vector)) {
+    if (!isGeometry(obj)) {
+      throw new InvalidOperationError(`Cannot get the distance from ${obj}`);
+    }
+    if (!isVectorOrListLike(obj)) {
       return obj.distanceFrom(this);
     }
 
@@ -585,7 +606,7 @@ export class Vector {
           V[1] + (R[1][0] * x) + (R[1][1] * y)
         ]);
       case 3:
-        if (!(obj instanceof Line)) {
+        if (!(isLineLike(obj))) {
           throw new DimensionalityMismatchError('A line must be provided to rotate a 3D vector');
         }
         C = obj.pointClosestTo(this).elements;

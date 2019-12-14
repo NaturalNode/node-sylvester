@@ -1,16 +1,48 @@
 import { expect } from 'chai';
-import { Vector, Plane } from '../src';
+import { Plane, Line, Matrix, OutOfRangeError } from '../src';
+import { asDiagram } from './_as-diagram';
+import { testParallelTo, testPerpendicularTo, testIntersectionWith, testDistanceFrom } from './_common-cases';
 
 describe('plane', () => {
-  it('should create', () => {
-    const plane = Plane.create([1, 2, 3], [5, 5, 5]);
-    expect(plane.anchor).to.deep.equal(new Vector([1, 2, 3]));
+  asDiagram('Plane.isPerpendicularTo').it(expectCall => {
+    testPerpendicularTo(Plane, expectCall);
   });
 
-  it('should create with P$', () => {
-    const A = Plane.create([1, 2, 3], [5, 5, 5]);
-    const B = Plane.create([1, 2, 3], [5, 5, 5]);
+  asDiagram('Plane.isParallelTo').it(expectCall => {
+    testParallelTo(Plane, expectCall);
+  });
 
-    expect(A).to.deep.equal(B);
+  asDiagram('Plane.intersectionWith').it(expectCall => {
+    testIntersectionWith(Plane, expectCall);
+  });
+
+  asDiagram('Plane.distanceFrom').it(expectCall => {
+    testDistanceFrom(Plane, expectCall);
+  });
+
+  asDiagram('Plane.translate').it(expectCall => {
+    expectCall(new Plane([1, 2, 3], [1, 0, 1])).translate([3, 4, 5]).to.plane.equal(new Plane([4, 6, 8], [1, 0, 1]));
+  });
+
+  asDiagram('Plane.rotate').it(expectCall => {
+    expectCall(new Plane([1, 2, 3], [1, 0, 1])).rotate(Math.PI / 2, Line.Z).to.plane.equal(new Plane([-1, 1, 3], [0, 1, 1]));
+    expectCall(new Plane([1, 2, 3], [1, 0, 1])).rotate(Matrix.RotationZ(Math.PI / 2), Line.Z).to.plane.equal(new Plane([-1, 1, 3], [0, 1, 1]));
+  });
+
+  asDiagram('Plane.reflectionIn').it(expectCall => {
+    expectCall(new Plane([1, 2, 3], [1, 0, 1])).reflectionIn([0, 0, 0]).to.plane.equal(new Plane([-1, -2, -3], [1, 0, 1]));
+    expectCall(new Plane([1, 2, 3], [1, 0, 1])).reflectionIn(Line.Z).to.plane.equal(new Plane([-1, -2, 3], [-1, 0, 1]));
+    expectCall(new Plane([1, 2, 3], [1, 0, 1])).reflectionIn(new Plane([1, 1, 1], [1, 1, 0])).to.plane.equal(new Plane([0, 1, 3], [0, -1, 1]));
+  });
+
+  asDiagram('Plane.fromPoints').it(expectCall => {
+    expectCall(Plane).fromPoints([0, 0, 0], [1, 1, 1], [1, 0, 1]).to.plane.equal(new Plane([0, 0, 0], [1, 0, -1]));
+    expectCall(Plane).fromPoints([0, 0, 0], [1, 1, 1], [1, 0, 1], [2, 0, 2]).to.plane.equal(new Plane([0, 0, 0], [1, 0, -1]));
+    expect(() => Plane.fromPoints([0, 0, 0], [1, 1, 1], [1, 0, 1], [0, 0, 1])).to.throw(OutOfRangeError);
+  });
+
+  it('throws if built from invalid arguments', () => {
+    expect(() => new Plane([0, 0, 0], [0, 1, 0], [0, 2, 0])).to.throw(OutOfRangeError, /colinear/);
+    expect(() => new Plane([0, 0, 0], [0, 0, 0])).to.throw(OutOfRangeError, /unique points/);
   });
 });

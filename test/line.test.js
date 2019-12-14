@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { Line, Plane, Vector, DimensionalityMismatchError } from '../src';
 import { asDiagram } from './_as-diagram';
 import { Segment } from '../src/line';
+import { testParallelTo, testPerpendicularTo, testIntersectionWith, testDistanceFrom } from './_common-cases';
 
 describe('line', () => {
   const lineA = new Line([0, 0], [1, 1]);
@@ -24,19 +25,15 @@ describe('line', () => {
   });
 
   asDiagram('Line.isParallelTo').it(expectCall => {
-    expectCall(lineA).isParallelTo(new Line([1, 0], [1, 1])).to.be.true;
-    expectCall(lineA).isParallelTo(lineB).to.be.false;
-    expectCall(lineA).isParallelTo(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.true;
-    expectCall(lineA).isParallelTo(Plane.create([1, 1, 1], [0, 0, 0], [2, 1, 1])).to.be.false;
+    testParallelTo(Line, expectCall);
+  });
+
+  asDiagram('Line.isPerpendicularTo').it(expectCall => {
+    testPerpendicularTo(Vector, expectCall);
   });
 
   asDiagram('Line.distanceFrom').it(expectCall => {
-    expectCall(lineA).distanceFrom(new Vector([1, 2])).to.approx.equal(0.707107);
-    expectCall(lineA).distanceFrom(lineB).to.equal(0);
-    expectCall(lineA).distanceFrom(lineA.translate([-1, 1])).to.approx.equal(1.414214);
-
-    expectCall(lineA).distanceFrom(Plane.create([1, 1, 1], [0, 0, 0], [2, 1, 1])).to.equal(0);
-    expect(lineA.distanceFrom(Plane.create([0, 1, 1], [0, 0, 1], [1, 0, 1]))).to.equal(1);
+    testDistanceFrom(Line, expectCall);
   });
 
   asDiagram('Line.contains').it(expectCall => {
@@ -53,24 +50,19 @@ describe('line', () => {
   });
 
   asDiagram('Line.liesIn').it(expectCall => {
-    expectCall(lineA).liesIn(Plane.create([-1, -1, 0], [1, 1, 0], [2, 0, 1])).to.be.true;
-    expectCall(lineA).liesIn(Plane.create([-1, -1, -1], [1, 1, 3], [2, 0, 1])).to.be.false;
+    expectCall(lineA).liesIn(new Plane([-1, -1, 0], [1, 1, 0], [2, 0, 1])).to.be.true;
+    expectCall(lineA).liesIn(new Plane([-1, -1, -1], [1, 1, 3], [2, 0, 1])).to.be.false;
   });
 
   asDiagram('Line.intersects').it(expectCall => {
     expectCall(lineA).intersects(new Line([1, 0], [1, 1])).to.be.false;
     expectCall(lineA).intersects(lineB).to.be.true;
-    expectCall(lineA).intersects(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.false;
-    expectCall(lineA).intersects(Plane.create([1, 1, 1], [0, 0, 0], [2, 1, 1])).to.be.true;
+    expectCall(lineA).intersects(new Plane([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.false;
+    expectCall(lineA).intersects(new Plane([1, 1, 1], [0, 0, 0], [2, 1, 1])).to.be.true;
   });
 
   asDiagram('Line.intersectionWith').it(expectCall => {
-    expectCall(lineA).intersectionWith(lineB.translate([0, 1])).to.vector.equal([0.5, 0.5, 0]);
-    expectCall(lineA).intersectionWith(lineA.translate([0, 1])).to.be.null;
-    expectCall(lineA).intersectionWith(lineA).to.be.null;
-
-    expectCall(lineA).intersectionWith(Plane.create([-1, -1, -1], [1, 1, 3], [2, 0, 1])).to.vector.equal([-0.5, -0.5, 0]);
-    expectCall(lineA).intersectionWith(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.null;
+    testIntersectionWith(Line, expectCall);
   });
 
   asDiagram('Line.pointClosestTo').it(expectCall => {
@@ -84,8 +76,8 @@ describe('line', () => {
     expectCall(lineA).pointClosestTo(lineA.translate([0, 1])).to.be.null;
     expectCall(lineA).pointClosestTo(new Line([0, 1, 1], [1, 1, 3])).to.vector.equal([0.166666, 0.166666, 0]);
 
-    expectCall(lineA).pointClosestTo(Plane.create([-1, -1, -1], [1, 1, 3], [2, 0, 1])).to.vector.equal([-0.5, -0.5, 0]);
-    expectCall(lineA).pointClosestTo(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.null;
+    expectCall(lineA).pointClosestTo(new Plane([-1, -1, -1], [1, 1, 3], [2, 0, 1])).to.vector.equal([-0.5, -0.5, 0]);
+    expectCall(lineA).pointClosestTo(new Plane([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.null;
   });
 
   asDiagram('Line.rotate').it(expectCall => {
@@ -110,7 +102,7 @@ describe('line', () => {
   asDiagram('Line.reflectionIn').it(expectCall => {
     expectCall(lineA).reflectionIn([-1, 1]).to.line.equal([-2, 2], [1, 1]);
     expectCall(lineA).reflectionIn(Line.Y).to.line.equal([0, 0], [-1, 1]);
-    expectCall(lineA).reflectionIn(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.line.equal([0, 0, 2], [1, 1, 0]);
+    expectCall(lineA).reflectionIn(new Plane([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.line.equal([0, 0, 2], [1, 1, 0]);
   });
 
   describe('segment', () => {
@@ -136,7 +128,7 @@ describe('line', () => {
     });
 
     asDiagram('Segment.bisectingPlane').it(expectCall => {
-      expectCall(segA).bisectingPlane().to.plane.equal(Plane.create([2.5, 4], [3, 4]));
+      expectCall(segA).bisectingPlane().to.plane.equal(new Plane([2.5, 4], [3, 4]));
     });
 
     asDiagram('Segment.translate').it(expectCall => {
@@ -144,24 +136,15 @@ describe('line', () => {
     });
 
     asDiagram('Segment.isParallelTo').it(expectCall => {
-      expectCall(segA).isParallelTo(new Line([0, 0], [3, 4])).to.be.true;
-      expectCall(segA).isParallelTo(new Line([0, 0], [1, 1])).to.be.false;
-      expectCall(lineA).isParallelTo(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.true;
-      expectCall(lineA).isParallelTo(Plane.create([1, 1, 1], [1, 0, 0], [2, 2, 2])).to.be.false;
+      testParallelTo(Segment, expectCall);
+    });
+
+    asDiagram('Segment.isPerpendicularTo').it(expectCall => {
+      testPerpendicularTo(Segment, expectCall);
     });
 
     asDiagram('Segment.distanceFrom').it(expectCall => {
-      expectCall(segA).distanceFrom(new Vector([0, 0])).to.equal(Math.sqrt(5));
-      expect(segA.distanceFrom(new Vector([2, 2 + 4 / 3]))).to.approx.equal(0);
-      expect(segA.distanceFrom(new Vector([2, 2]))).to.equal(0.8);
-
-      expectCall(segA).distanceFrom(new Line([3, 0], [0, 1])).to.equal(0);
-      expect(segA.distanceFrom(new Line([0, 1, 1], [1, 1, 0]))).to.equal(1);
-
-      expectCall(segA).distanceFrom(new Line([0, 0], [3, 4])).to.be.null;
-
-      expectCall(segA).distanceFrom(Plane.create([1, 1, 1], [0, 0, 0], [2, 1, 1])).to.approx.equal(1.414214);
-      expect(segA.distanceFrom(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1]))).to.be.null;
+      testDistanceFrom(Segment, expectCall);
     });
 
     asDiagram('Segment.contains').it(expectCall => {
@@ -175,15 +158,12 @@ describe('line', () => {
     asDiagram('Segment.intersects').it(expectCall => {
       expectCall(segA).intersects(new Line([0, 0], [1, 1])).to.be.false;
       expectCall(segA).intersects(new Line([3, 0], [0, 1])).to.be.true;
-      expectCall(segA).intersects(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.false;
-      expectCall(segA).intersects(Plane.create([1, 1, 1], [0, 3, 0], [2, 1, 1])).to.be.true;
+      expectCall(segA).intersects(new Plane([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.false;
+      expectCall(segA).intersects(new Plane([1, 1, 1], [0, 3, 0], [2, 1, 1])).to.be.true;
     });
 
     asDiagram('Segment.intersectionWith').it(expectCall => {
-      expectCall(segA).intersectionWith(new Line([0, 0], [1, 1])).to.be.null;
-      expectCall(segA).intersectionWith(new Line([3, 0], [0, 1])).to.vector.equal([3, 4 + 2 / 3, 0]);
-      expectCall(segA).intersectionWith(Plane.create([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.null;
-      expectCall(segA).intersectionWith(Plane.create([1, 1, 1], [0, 3, 0], [2, 1, 1])).to.vector.equal([1.75, 3, 0]);
+      testIntersectionWith(Segment, expectCall);
     });
   })
 });

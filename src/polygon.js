@@ -65,7 +65,7 @@ export class Polygon {
     const anchor = this.vertices.first.data;
     this.plane.anchor.setElements(anchor);
     this.updateTrianglePlanes(plane => {
-      return Plane.create(anchor, plane.normal);
+      return new Plane(anchor, plane.normal);
     });
     return this;
   }

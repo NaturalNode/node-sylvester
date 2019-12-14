@@ -1,250 +1,21 @@
 import { Line } from './line';
 import { Matrix } from './matrix';
-import { Sylvester, OutOfRangeError } from './sylvester';
+import { Sylvester, OutOfRangeError, InvalidOperationError } from './sylvester';
 import { Vector } from './vector';
+import { isPlaneLike, isLineLike, isSegmentLike, isVectorOrListLike, isGeometry } from './likeness';
 
 export class Plane {
-  // Returns true iff the plane occupies the same space as the argument
-  eql(plane) {
-    return (this.contains(plane.anchor) && this.isParallelTo(plane));
-  }
-
-  // Returns a copy of the plane
-  dup() {
-    return Plane.create(this.anchor, this.normal);
-  }
-
-  // Returns the result of translating the plane by the given vector
-  translate(vector) {
-    const V = Vector.toElements(vector, 3);
-    return Plane.create([
-      this.anchor.elements[0] + V[0],
-      this.anchor.elements[1] + V[1],
-      this.anchor.elements[2] + V[2]
-    ], this.normal);
-  }
-
-  // Returns true iff the plane is parallel to the argument. Will return true
-  // if the planes are equal, or if you give a line and it lies in the plane.
-  isParallelTo(obj) {
-    let theta;
-    if (obj.normal) {
-      // obj is a plane
-      theta = this.normal.angleFrom(obj.normal);
-      return (Math.abs(theta) <= Sylvester.precision || Math.abs(Math.PI - theta) <= Sylvester.precision);
-    } else if (obj.direction) {
-      // obj is a line
-      return this.normal.isPerpendicularTo(obj.direction);
-    }
-    return null;
-  }
-
-  // Returns true iff the receiver is perpendicular to the argument
-  isPerpendicularTo(plane) {
-    const theta = this.normal.angleFrom(plane.normal);
-    return Math.abs((Math.PI / 2) - theta) <= Sylvester.precision;
-  }
-
-  // Returns the plane's distance from the given object (point, line or plane)
-  distanceFrom(obj) {
-    if (this.intersects(obj) || this.contains(obj)) {
-      return 0;
-    }
-    if (obj.anchor) {
-      // obj is a plane or line
-      const A = this.anchor.elements;
-      const B = obj.anchor.elements;
-      const N = this.normal.elements;
-      return Math.abs(((A[0] - B[0]) * N[0]) + ((A[1] - B[1]) * N[1]) + ((A[2] - B[2]) * N[2]));
-    }
-
-    // obj is a point
-    const P = Vector.toElements(obj, 3);
-    const A = this.anchor.elements;
-    const N = this.normal.elements;
-    return Math.abs(((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - P[2]) * N[2]));
-  }
-
-  // Returns true iff the plane contains the given point or line
-  contains(obj) {
-    if (obj.normal) {
-      return null;
-    }
-    if (obj.direction) {
-      return (this.contains(obj.anchor) && this.contains(obj.anchor.add(obj.direction)));
-    }
-
-    const P = Vector.toElements(obj, 3);
-    const A = this.anchor.elements;
-    const N = this.normal.elements;
-    const diff = Math.abs((N[0] * (A[0] - P[0])) + (N[1] * (A[1] - P[1])) + (N[2] * (A[2] - P[2])));
-    return (diff <= Sylvester.precision);
-  }
-
-  // Returns true iff the plane has a unique point/line of intersection with the argument
-  intersects(obj) {
-    if (typeof (obj.direction) === 'undefined' && typeof (obj.normal) === 'undefined') {
-      return null;
-    }
-    return !this.isParallelTo(obj);
-  }
-
-  // Returns the unique intersection with the argument, if one exists. The result
-  // will be a vector if a line is supplied, and a line if a plane is supplied.
-  intersectionWith(obj) {
-    if (!this.intersects(obj)) {
-      return null;
-    }
-
-    if (obj.direction) {
-      // obj is a line
-      const A = obj.anchor.elements;
-
-      const D = obj.direction.elements;
-      const P = this.anchor.elements;
-      const N = this.normal.elements;
-      const multiplier = (
-        (N[0] * (P[0] - A[0])) +
-        (N[1] * (P[1] - A[1])) +
-        (N[2] * (P[2] - A[2]))
-      ) / (
-        (N[0] * D[0]) +
-        (N[1] * D[1]) +
-        (N[2] * D[2])
-      );
-
-      return new Vector([
-        A[0] + (D[0] * multiplier),
-        A[1] + (D[1] * multiplier),
-        A[2] + (D[2] * multiplier)
-      ]);
-    }
-
-    if (obj.normal) {
-      // obj is a plane
-      const direction = this.normal.cross(obj.normal).toUnitVector();
-
-      // To find an anchor point, we find one co-ordinate that has a value
-      // of zero somewhere on the intersection, and remember which one we picked
-      const N = this.normal.elements;
-
-      const A = this.anchor.elements;
-      const O = obj.normal.elements;
-      const B = obj.anchor.elements;
-      let solver = Matrix.Zero(2, 2);
-      let i = 0;
-      while (solver.isSingular()) {
-        i++;
-        solver = Matrix.create([
-          [N[i % 3], N[(i + 1) % 3]],
-          [O[i % 3], O[(i + 1) % 3]]
-        ]);
-      }
-      // Then we solve the simultaneous equations in the remaining dimensions
-      const inverse = solver.inverse().elements;
-      const x = (N[0] * A[0]) + (N[1] * A[1]) + (N[2] * A[2]);
-      const y = (O[0] * B[0]) + (O[1] * B[1]) + (O[2] * B[2]);
-      const intersection = [
-        (inverse[0][0] * x) + (inverse[0][1] * y),
-        (inverse[1][0] * x) + (inverse[1][1] * y)
-      ];
-      const anchor = [];
-      for (let j = 1; j <= 3; j++) {
-        // This formula picks the right element from intersection by
-        // cycling depending on which element we set to zero above
-        anchor.push((i === j) ? 0 : intersection[(j + ((5 - i) % 3)) % 3]);
-      }
-      return new Line(anchor, direction);
-    }
-
-    return null; // todo(connor4312): is this a case that needs to be handled?
-  }
-
-  // Returns the point in the plane closest to the given point
-  pointClosestTo(point) {
-    const P = Vector.toElements(point, 3);
-    const A = this.anchor.elements;
-    const N = this.normal.elements;
-    const dot = ((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - P[2]) * N[2]);
-    return new Vector([P[0] + (N[0] * dot), P[1] + (N[1] * dot), P[2] + (N[2] * dot)]);
-  }
-
-  // Returns a copy of the plane, rotated by t radians about the given line
-  // See notes on Line#rotate.
-  rotate(t, line) {
-    const R = t instanceof Matrix ? t.elements : Matrix.Rotation(t, line.direction).elements;
-    const C = line.pointClosestTo(this.anchor).elements;
-    const A = this.anchor.elements;
-    const N = this.normal.elements;
-    const C1 = C[0];
-    const C2 = C[1];
-    const C3 = C[2];
-    const A1 = A[0];
-    const A2 = A[1];
-    const A3 = A[2];
-    const x = A1 - C1;
-    const y = A2 - C2;
-    const z = A3 - C3;
-    return Plane.create([
-      C1 + (R[0][0] * x) + (R[0][1] * y) + (R[0][2] * z),
-      C2 + (R[1][0] * x) + (R[1][1] * y) + (R[1][2] * z),
-      C3 + (R[2][0] * x) + (R[2][1] * y) + (R[2][2] * z)
-    ], [
-      (R[0][0] * N[0]) + (R[0][1] * N[1]) + (R[0][2] * N[2]),
-      (R[1][0] * N[0]) + (R[1][1] * N[1]) + (R[1][2] * N[2]),
-      (R[2][0] * N[0]) + (R[2][1] * N[1]) + (R[2][2] * N[2])
-    ]);
-  }
-
-  // Returns the reflection of the plane in the given point, line or plane.
-  reflectionIn(obj) {
-    if (obj.normal) {
-      // obj is a plane
-      const A = this.anchor.elements;
-
-      const N = this.normal.elements;
-      const A1 = A[0];
-      const A2 = A[1];
-      const A3 = A[2];
-      const N1 = N[0];
-      const N2 = N[1];
-      const N3 = N[2];
-      const newA = this.anchor.reflectionIn(obj).elements;
-
-      // Add the plane's normal to its anchor, then mirror that in the other plane
-      const AN1 = A1 + N1;
-
-      const AN2 = A2 + N2;
-      const AN3 = A3 + N3;
-      const Q = obj.pointClosestTo([AN1, AN2, AN3]).elements;
-      const newN = [Q[0] + (Q[0] - AN1) - newA[0], Q[1] + (Q[1] - AN2) - newA[1], Q[2] + (Q[2] - AN3) - newA[2]];
-      return Plane.create(newA, newN);
-    }
-    if (obj.direction) {
-      // obj is a line
-      return this.rotate(Math.PI, obj);
-    }
-
-    // obj is a point
-    const P = Vector.toElements(vector, 3);
-    return Plane.create(this.anchor.reflectionIn([P[0], P[1], P[2]]), this.normal);
-  }
-
-  // Sets the anchor point and normal to the plane. If three arguments are specified,
-  // the normal is calculated by assuming the three points should lie in the same plane.
-  // If only two are sepcified, the second is taken to be the normal. Normal vector is
-  // normalised before storage.
   /**
-   * Sets the anchor point and normal to the plane. If three arguments are
-   * specified, the normal is calculated by assuming the three points should
-   * lie in the same plane. If only two are sepcified, the second is taken to
-   * be the normal. Normal vector is normalised before storage.
+   * Creates a plan from the anchor point and normal to the plane. If three
+   * arguments are specified, the normal is calculated by assuming the three
+   * points should lie in the same plane. If only two are sepcified, the second
+   * is taken to be the normal. Normal vector is normalised before storage.
    * @param {Vector|number[]} anchor
    * @param {Vector|number[]} v1
    * @param {?(Vector|number[])} v2
    * @returns {Plane}
    */
-  setVectors(anchor, v1, v2 = null) {
+  constructor(anchor, v1, v2 = null) {
     anchor = new Vector(anchor).to3D();
     v1 = new Vector(v1).to3D();
     v2 = v2 && new Vector(v2).to3D();
@@ -290,18 +61,315 @@ export class Plane {
 
     this.anchor = anchor;
     this.normal = normal;
-    return this;
   }
 
-  // Constructor function
-  static create(anchor, v1, v2) {
-    const P = new Plane();
-    return P.setVectors(anchor, v1, v2);
+  /**
+   * Returns true iff the plane occupies the same space as the argument.
+   * @param {Plane} plane
+   * @param {Number} epsilon precision used for comparing angles
+   * @returns {Boolean}
+   */
+  eql(plane, epsilon = Sylvester.precision) {
+    return (this.contains(plane.anchor) && this.isParallelTo(plane, epsilon));
   }
 
-  // Returns the plane containing the given points (can be arrays as
-  // well as vectors). If the points are not coplanar, returns null.
-  static fromPoints(points) {
+  /**
+   * Returns the result of translating the plane by the given vector
+   * @param {Vector|number[]} vector
+   * @returns {Plane}
+   */
+  translate(vector) {
+    const V = Vector.toElements(vector, 3);
+    return new Plane([
+      this.anchor.elements[0] + V[0],
+      this.anchor.elements[1] + V[1],
+      this.anchor.elements[2] + V[2]
+    ], this.normal);
+  }
+
+  /**
+   * Returns true iff the plane is parallel to the argument. Will return true
+   * if the planes are equal, or if you give a line and it lies in the plane.
+   *
+   * @param {Plane|Line|Segment|Vector} obj
+   * @param {Number} epsilon precision used for comparing angles
+   * @returns {Boolean}
+   */
+  isParallelTo(obj, epsilon = Sylvester.precision) {
+    if (isPlaneLike(obj)) {
+      return this.normal.isParallelTo(obj.normal, epsilon);
+    } else if (isLineLike(obj)) {
+      return this.normal.isPerpendicularTo(obj.direction, epsilon);
+    } else if (isSegmentLike(obj)) {
+      return this.normal.isPerpendicularTo(obj.line.direction, epsilon);
+    } else if (isVectorOrListLike(obj)) {
+      return this.normal.isPerpendicularTo(obj, epsilon);
+    } else {
+      throw new InvalidOperationError(`Cannot check whether ${obj} is parallel to a plane`);
+    }
+  }
+
+  /**
+   * Returns true iff the receiver is perpendicular to the argument.
+   * @param {Plane|Line|Segment|Vector} obj
+   * @returns {Boolean}
+   */
+  isPerpendicularTo(obj, epsilon = Sylvester.precision) {
+    if (isPlaneLike(obj)) {
+      return this.normal.isPerpendicularTo(obj.normal, epsilon);
+    } else if (isLineLike(obj)) {
+      return this.normal.isParallelTo(obj.direction, epsilon);
+    } else if (isSegmentLike(obj)) {
+      return this.normal.isParallelTo(obj.line.direction, epsilon);
+    } else if (isVectorOrListLike(obj)) {
+      return this.normal.isParallelTo(obj, epsilon);
+    } else {
+      throw new InvalidOperationError(`Cannot check whether ${obj} is parallel to a plane`);
+    }
+  }
+
+  /**
+   * Returns the plane's distance from the given object (point, line or plane)
+   * @param {Line|Plane|Vector} obj
+   * @returns {Number}
+   */
+  distanceFrom(obj) {
+    if (this.intersects(obj) || this.contains(obj)) {
+      return 0;
+    }
+
+    if (isSegmentLike(obj)) {
+      return Math.min(this.distanceFrom(obj.start), this.distanceFrom(obj.end));
+    } else if (isLineLike(obj) || isPlaneLike(obj)) {
+      const A = this.anchor.elements;
+      const B = obj.anchor.elements;
+      const N = this.normal.elements;
+      return Math.abs(((A[0] - B[0]) * N[0]) + ((A[1] - B[1]) * N[1]) + ((A[2] - B[2]) * N[2]));
+    } else if (isVectorOrListLike(obj)) {
+      const P = Vector.toElements(obj, 3);
+      const A = this.anchor.elements;
+      const N = this.normal.elements;
+      return Math.abs(((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - P[2]) * N[2]));
+    } else {
+      throw new InvalidOperationError(`Cannot get plane distance from {obj}`);
+    }
+  }
+
+  /**
+   * Returns true iff the plane contains the given point or line.
+   * @param {Line|Vector} obj
+   * @param {Number} epsilon precision used for comparing angles
+   * @returns {Boolean}
+   */
+  contains(obj, epsilon = Sylvester.precision) {
+    if (isLineLike(obj)) {
+      return (this.contains(obj.anchor, epsilon) && this.contains(obj.anchor.add(obj.direction), epsilon));
+    } else if (isSegmentLike(obj)) {
+      return this.contains(obj.line, epsilon);
+    } else if (isPlaneLike(obj)) {
+      return this.eql(obj, epsilon);
+    } else if (isVectorOrListLike(obj)) {
+      const P = Vector.toElements(obj, 3);
+      const A = this.anchor.elements;
+      const N = this.normal.elements;
+      const diff = Math.abs((N[0] * (A[0] - P[0])) + (N[1] * (A[1] - P[1])) + (N[2] * (A[2] - P[2])));
+      return (diff <= epsilon);
+    } else {
+      throw new InvalidOperationError(`Cannot check if a plane contains {obj}`);
+    }
+  }
+
+  /**
+   * Returns true iff the plane has a unique point/line of intersection with the argument.
+   * @param {Plane|Line|Segment|Vector} obj
+   * @param {Number} epsilon precision used for comparing angles
+   * @returns {Boolean}
+   */
+  intersects(obj, epsilon = Sylvester.precision) {
+    if (isVectorOrListLike(obj)) {
+      return this.contains(obj, epsilon);
+    } else if (isGeometry(obj)) {
+      return !this.isParallelTo(obj, epsilon);
+    } else {
+      throw new InvalidOperationError(`Cannot get a plane's intersection with ${obj}`);
+    }
+  }
+
+  /**
+   * Returns the unique intersection with the argument, if one exists. The result
+   * will be a vector if a line is supplied, and a line if a plane is supplied.
+   * @param {Line|Plane} obj
+   * @param {Number} epsilon precision used for comparing angles
+   * @returns {Vector|Plane|null} a vector on an intersection with a line, a
+   * line if intersecting with a plane, or null if there is no intersection.
+   */
+  intersectionWith(obj, epsilon = Sylvester.precision) {
+    if (!this.intersects(obj, epsilon)) {
+      return null;
+    }
+
+    if (isLineLike(obj)) {
+      const A = obj.anchor.elements;
+
+      const D = obj.direction.elements;
+      const P = this.anchor.elements;
+      const N = this.normal.elements;
+      const multiplier = (
+        (N[0] * (P[0] - A[0])) +
+        (N[1] * (P[1] - A[1])) +
+        (N[2] * (P[2] - A[2]))
+      ) / (
+        (N[0] * D[0]) +
+        (N[1] * D[1]) +
+        (N[2] * D[2])
+      );
+
+      return new Vector([
+        A[0] + (D[0] * multiplier),
+        A[1] + (D[1] * multiplier),
+        A[2] + (D[2] * multiplier)
+      ]);
+    }
+
+    if (isSegmentLike(obj)) {
+      const point = this.intersectionWith(obj.line);
+      return obj.contains(point) ? point : null;
+    }
+
+    if (isPlaneLike(obj)) {
+      const direction = this.normal.cross(obj.normal).toUnitVector();
+
+      // To find an anchor point, we find one co-ordinate that has a value
+      // of zero somewhere on the intersection, and remember which one we picked
+      const N = this.normal.elements;
+
+      const A = this.anchor.elements;
+      const O = obj.normal.elements;
+      const B = obj.anchor.elements;
+      let solver = Matrix.Zero(2, 2);
+      let i = 0;
+      while (solver.isSingular()) {
+        i++;
+        solver = Matrix.create([
+          [N[i % 3], N[(i + 1) % 3]],
+          [O[i % 3], O[(i + 1) % 3]]
+        ]);
+      }
+      // Then we solve the simultaneous equations in the remaining dimensions
+      const inverse = solver.inverse().elements;
+      const x = (N[0] * A[0]) + (N[1] * A[1]) + (N[2] * A[2]);
+      const y = (O[0] * B[0]) + (O[1] * B[1]) + (O[2] * B[2]);
+      const intersection = [
+        (inverse[0][0] * x) + (inverse[0][1] * y),
+        (inverse[1][0] * x) + (inverse[1][1] * y)
+      ];
+      const anchor = [];
+      for (let j = 1; j <= 3; j++) {
+        // This formula picks the right element from intersection by
+        // cycling depending on which element we set to zero above
+        anchor.push((i === j) ? 0 : intersection[(j + ((5 - i) % 3)) % 3]);
+      }
+      return new Line(anchor, direction);
+    }
+
+    throw new InvalidOperationError(`Cannot get a plane's intersection with ${obj}`);
+  }
+
+  /**
+   * Returns the point in the plane closest to the given point.
+   * @param {Vector|number[]} point
+   * @returns {Vector}
+   */
+  pointClosestTo(point) {
+    const P = Vector.toElements(point, 3);
+    const A = this.anchor.elements;
+    const N = this.normal.elements;
+    const dot = ((A[0] - P[0]) * N[0]) + ((A[1] - P[1]) * N[1]) + ((A[2] - P[2]) * N[2]);
+    return new Vector([P[0] + (N[0] * dot), P[1] + (N[1] * dot), P[2] + (N[2] * dot)]);
+  }
+
+  /**
+   * Returns a copy of the plane, rotated by t radians about the given line.
+   * See notes on {@link Line.rotate}.
+   * @param {Number} t
+   * @param {Line} line
+   * @returns {Plane}
+   */
+  rotate(t, line) {
+    const R = t instanceof Matrix ? t.elements : Matrix.Rotation(t, line.direction).elements;
+    const C = line.pointClosestTo(this.anchor).elements;
+    const A = this.anchor.elements;
+    const N = this.normal.elements;
+    const C1 = C[0];
+    const C2 = C[1];
+    const C3 = C[2];
+    const A1 = A[0];
+    const A2 = A[1];
+    const A3 = A[2];
+    const x = A1 - C1;
+    const y = A2 - C2;
+    const z = A3 - C3;
+    return new Plane([
+      C1 + (R[0][0] * x) + (R[0][1] * y) + (R[0][2] * z),
+      C2 + (R[1][0] * x) + (R[1][1] * y) + (R[1][2] * z),
+      C3 + (R[2][0] * x) + (R[2][1] * y) + (R[2][2] * z)
+    ], [
+      (R[0][0] * N[0]) + (R[0][1] * N[1]) + (R[0][2] * N[2]),
+      (R[1][0] * N[0]) + (R[1][1] * N[1]) + (R[1][2] * N[2]),
+      (R[2][0] * N[0]) + (R[2][1] * N[1]) + (R[2][2] * N[2])
+    ]);
+  }
+
+  /**
+   * Returns the reflection of the plane in the given point, line or plane.
+   * @param {Plane|Line|Vector|number[]} obj
+   * @returns {Plane}
+   */
+  reflectionIn(obj) {
+    if (isPlaneLike(obj)) {
+      const A = this.anchor.elements;
+      const N = this.normal.elements;
+      const A1 = A[0];
+      const A2 = A[1];
+      const A3 = A[2];
+      const N1 = N[0];
+      const N2 = N[1];
+      const N3 = N[2];
+      const newA = this.anchor.reflectionIn(obj).elements;
+
+      // Add the plane's normal to its anchor, then mirror that in the other plane
+      const AN1 = A1 + N1;
+
+      const AN2 = A2 + N2;
+      const AN3 = A3 + N3;
+      const Q = obj.pointClosestTo([AN1, AN2, AN3]).elements;
+      const newN = [Q[0] + (Q[0] - AN1) - newA[0], Q[1] + (Q[1] - AN2) - newA[1], Q[2] + (Q[2] - AN3) - newA[2]];
+      return new Plane(newA, newN);
+    }
+
+    if (isLineLike(obj)) {
+      return this.rotate(Math.PI, obj);
+    }
+
+    const P = Vector.toElements(obj, 3);
+    return new Plane(this.anchor.reflectionIn([P[0], P[1], P[2]]), this.normal);
+  }
+
+  /**
+   * Returns a textual representation of the object.
+   * @returns {String}
+   */
+  inspect() {
+    return `Plane<${this.anchor.inspect()}, ${this.normal.inspect()}>`;
+  }
+
+  /**
+   * Returns the plane containing the given points (can be arrays as
+   * well as vectors). If the points are not coplanar, returns null.
+   * @param {(Vector|number)[]} points
+   * @returns {Vector|null}
+   */
+  static fromPoints(...points) {
     const np = points.length;
     const list = [];
     let i;
@@ -316,9 +384,6 @@ export class Plane {
     let totalN = Vector.Zero(3);
     for (i = 0; i < np; i++) {
       P = new Vector(points[i]).to3D();
-      if (P === null) {
-        return null;
-      }
       list.push(P);
       n = list.length;
       if (n > 2) {
@@ -339,7 +404,7 @@ export class Plane {
           theta = N.angleFrom(prevN);
           if (theta !== null) {
             if (!(Math.abs(theta) <= Sylvester.precision || Math.abs(theta - Math.PI) <= Sylvester.precision)) {
-              return null;
+              throw new OutOfRangeError('The point provided to Vector.fromPoints are no coplanar');
             }
           }
         }
@@ -361,11 +426,12 @@ export class Plane {
       ((B[2] - C[2]) * (D[0] - C[0])) - ((B[0] - C[0]) * (D[2] - C[2])),
       ((B[0] - C[0]) * (D[1] - C[1])) - ((B[1] - C[1]) * (D[0] - C[0]))
     ]).toUnitVector());
-    return Plane.create(list[0], totalN);
+
+    return new Plane(list[0], totalN);
   }
 }
 
 // X-Y-Z planes
-Plane.XY = Plane.YX = Plane.create(Vector.Zero(3), Vector.k);
-Plane.YZ = Plane.ZY = Plane.create(Vector.Zero(3), Vector.i);
-Plane.ZX = Plane.XZ = Plane.create(Vector.Zero(3), Vector.j);
+Plane.XY = Plane.YX = new Plane(Vector.Zero(3), Vector.k);
+Plane.YZ = Plane.ZY = new Plane(Vector.Zero(3), Vector.i);
+Plane.ZX = Plane.XZ = new Plane(Vector.Zero(3), Vector.j);

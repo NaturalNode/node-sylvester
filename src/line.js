@@ -2,9 +2,9 @@
 import { Vector } from './vector';
 import { Matrix } from './matrix';
 import { Plane } from './plane';
-import { Sylvester, DimensionalityMismatchError } from './sylvester';
+import { Sylvester, DimensionalityMismatchError, InvalidOperationError } from './sylvester';
+import { isSegmentLike, isPlaneLike, isVectorLike, isLineLike, isVectorOrListLike } from './likeness';
 
-// Line class - depends on Vector, and some methods require Matrix and Plane.
 export class Line {
   /**
    * Creates a new line from the anchor in the given direction.
@@ -54,20 +54,59 @@ export class Line {
   }
 
   /**
-   * Returns true if the line is parallel to the argument. Here, 'parallel to'
+   * Returns true if the line is perpendicular to the argument. Here, 'parallel to'
    * means that the argument's direction is either parallel or antiparallel to
    * the line's own direction. A line is parallel to a plane if the two do not
    * have a unique intersection.
-   * @param {Line|Plane} obj
+   * @param {Line|Plane|Vector|Segment|number[]} obj
    * @param {?Number} epsilon Precision at which to calculate angle equality
    * @returns {Boolean}
    */
   isParallelTo(obj, epsilon = Sylvester.precision) {
-    if (obj instanceof Plane || obj instanceof Segment) {
-      return obj.isParallelTo(this, epsilon);
+    if (isPlaneLike(obj)) {
+      return this.direction.isPerpendicularTo(obj.normal, epsilon);
     }
-    const theta = this.direction.angleFrom(obj.direction);
+
+    const theta = this._getAngleFromObject(obj);
     return (Math.abs(theta) <= epsilon || Math.abs(theta - Math.PI) <= epsilon);
+  }
+
+  /**
+   * Returns true if the line is perpendicular to the argument. Here, 'parallel to'
+   * means that the argument's direction is either parallel or antiparallel to
+   * the line's own direction. A line is parallel to a plane if the two do not
+   * have a unique intersection.
+   * @param {Line|Plane|Vector|Segment|number[]} obj
+   * @param {?Number} epsilon Precision at which to calculate angle equality
+   * @returns {Boolean}
+   */
+  isPerpendicularTo(obj, epsilon = Sylvester.precision) {
+    if (isPlaneLike(obj)) {
+      return this.direction.isParallelTo(obj.normal, epsilon);
+    }
+
+    const theta = Math.abs(this._getAngleFromObject(obj)) - Math.PI / 2;
+    return theta <= epsilon && theta >= -epsilon;
+  }
+
+  /**
+   * @private
+   * @returns {?Number}
+   */
+  _getAngleFromObject(obj) {
+    if (isLineLike(obj)) {
+      return this.direction.angleFrom(obj.direction);
+    }
+
+    if (isSegmentLike(obj)) {
+      return this.direction.angleFrom(obj.line.direction);
+    }
+
+    if (isVectorOrListLike(obj)) {
+      return this.direction.angleFrom(Vector.toElements(obj, 3));
+    }
+
+    throw new InvalidOperationError(`Cannot compare the angle of {obj} to a line`);
   }
 
   /**
@@ -77,11 +116,9 @@ export class Line {
    * @returns {Number}
    */
   distanceFrom(obj) {
-    if (obj instanceof Plane) {
+    if (isPlaneLike(obj) || isSegmentLike(obj)) {
       return obj.distanceFrom(this);
-    }
-
-    if (obj instanceof Line) {
+    } else if (isLineLike(obj)) {
       if (this.isParallelTo(obj)) {
         return this.distanceFrom(obj.anchor);
       }
@@ -94,31 +131,32 @@ export class Line {
         ((A[1] - B[1]) * N[1]) +
         ((A[2] - B[2]) * N[2])
       );
+    } else if (isVectorOrListLike(obj)) {
+      // todo: a more optimized vector algorithm, perhaps:
+      // const P = new Vector(obj).to3D();
+      // const A = this.anchor;
+      // const aSubP = A.subtract(P);
+      // return aSubP.subtract(this.direction.multiply(aSubP.dot(this.direction))).modulus();
+
+      // obj is a point
+      const P = Vector.toElements(obj, 3);
+      const A = this.anchor.elements;
+      const D = this.direction.elements;
+      const PA1 = P[0] - A[0];
+      const PA2 = P[1] - A[1];
+      const PA3 = P[2] - A[2];
+      const modPA = Math.sqrt((PA1 * PA1) + (PA2 * PA2) + (PA3 * PA3));
+      if (modPA === 0) {
+        return 0;
+      }
+
+      // Assumes direction vector is normalized
+      const cosTheta = ((PA1 * D[0]) + (PA2 * D[1]) + (PA3 * D[2])) / modPA;
+      const sin2 = 1 - (cosTheta * cosTheta);
+      return Math.abs(modPA * Math.sqrt(sin2 < 0 ? 0 : sin2));
+    } else {
+      throw new InvalidOperationError(`Cannot get a line's distance from {obj}`);
     }
-
-
-    // todo: a more optimized vector algorithm, perhaps:
-    // const P = new Vector(obj).to3D();
-    // const A = this.anchor;
-    // const aSubP = A.subtract(P);
-    // return aSubP.subtract(this.direction.multiply(aSubP.dot(this.direction))).modulus();
-
-    // obj is a point
-    const P = Vector.toElements(obj, 3);
-    const A = this.anchor.elements;
-    const D = this.direction.elements;
-    const PA1 = P[0] - A[0];
-    const PA2 = P[1] - A[1];
-    const PA3 = P[2] - A[2];
-    const modPA = Math.sqrt((PA1 * PA1) + (PA2 * PA2) + (PA3 * PA3));
-    if (modPA === 0) {
-      return 0;
-    }
-
-    // Assumes direction vector is normalized
-    const cosTheta = ((PA1 * D[0]) + (PA2 * D[1]) + (PA3 * D[2])) / modPA;
-    const sin2 = 1 - (cosTheta * cosTheta);
-    return Math.abs(modPA * Math.sqrt(sin2 < 0 ? 0 : sin2));
   }
 
   /**
@@ -129,7 +167,7 @@ export class Line {
    * @returns {Boolean}
    */
   contains(obj, epsilon = Sylvester.precision) {
-    if (obj instanceof Segment) {
+    if (isSegmentLike(obj)) {
       return this.contains(obj.start) && this.contains(obj.end);
     }
 
@@ -172,7 +210,7 @@ export class Line {
    * @returns {Boolean}
    */
   intersects(obj, epsilon = Sylvester.precision) {
-    if (obj instanceof Plane) {
+    if (isPlaneLike(obj)) {
       return obj.intersects(this);
     }
     return (!this.isParallelTo(obj) && this.distanceFrom(obj) <= epsilon);
@@ -185,7 +223,7 @@ export class Line {
    * @returns {?Vector}
    */
   intersectionWith(obj) {
-    if (obj instanceof Plane || obj instanceof Segment) {
+    if (isPlaneLike(obj) || isSegmentLike(obj)) {
       return obj.intersectionWith(this);
     }
     if (!this.intersects(obj)) {
@@ -221,17 +259,17 @@ export class Line {
    * @returns {?Vector} a vector, or null if this is parallel to the object
    */
   pointClosestTo(obj) {
-    if (obj instanceof Plane) {
+    if (isPlaneLike(obj)) {
       return this.intersectionWith(obj);
     }
 
-    if (obj instanceof Segment) {
+    if (isSegmentLike(obj)) {
       // obj is a line segment
       const p = obj.pointClosestTo(this);
       return p ? this.pointClosestTo(p) : null;
     }
 
-    if (obj instanceof Line) {
+    if (isLineLike(obj)) {
       if (this.intersects(obj)) {
         return this.intersectionWith(obj);
       }
@@ -253,7 +291,7 @@ export class Line {
       const y = (D1 * E2) - (D2 * E1);
       const z = (D2 * E3) - (D3 * E2);
       const N = [(x * E3) - (y * E2), (y * E1) - (z * E3), (z * E2) - (x * E1)];
-      const P = Plane.create(obj.anchor, N);
+      const P = new Plane(obj.anchor, N);
       return P.intersectionWith(this);
     }
 
@@ -295,7 +333,7 @@ export class Line {
    */
   rotate(theta, line) {
     // If we're working in 2D
-    if (!(line instanceof Line)) {
+    if (!isLineLike(line)) {
       line = new Line(line, Vector.k);
     }
     const R = Matrix.Rotation(theta, line.direction).elements;
@@ -337,7 +375,7 @@ export class Line {
    * @returns {Line}
    */
   reflectionIn(obj) {
-    if (obj instanceof Plane) {
+    if (isPlaneLike(obj)) {
       // obj is a plane
       const A = this.anchor.elements;
 
@@ -363,7 +401,7 @@ export class Line {
       ];
       return new Line(newA, newD);
     }
-    if (obj instanceof Line) {
+    if (isLineLike(obj)) {
       // obj is a line - reflection obtained by rotating PI radians about obj
       return this.rotate(Math.PI, obj);
     }
@@ -371,6 +409,14 @@ export class Line {
     // obj is a point - just reflect the line's anchor in it
     const P = Vector.toElements(obj, 3);
     return new Line(this.anchor.reflectionIn([P[0], P[1], P[2]]), this.direction);
+  }
+
+  /**
+   * Returns a textual representation of the object.
+   * @returns {String}
+   */
+  inspect() {
+    return `Line<${this.anchor.inspect()} @ ${this.direction.inspect()}>`;
   }
 }
 
@@ -440,7 +486,7 @@ export class Segment {
    * @returns {Plane}
    */
   bisectingPlane() {
-    return Plane.create(this.midpoint(), this.toVector());
+    return new Plane(this.midpoint(), this.toVector());
   }
 
   /**
@@ -458,8 +504,8 @@ export class Segment {
   }
 
   /**
-   * Returns true iff the line segment is parallel to the argument. It simply forwards
-   * @param {Line|Plane} obj
+   * Returns true iff the line segment is parallel to the argument.
+   * @param {Line|Plane|Segment|Vector} obj
    * @param {?Number} epsilon Precision at which to calculate angle equality
    * @returns {Boolean}
    */
@@ -468,15 +514,28 @@ export class Segment {
   }
 
   /**
+   * Returns true iff the line segment is perpendicular to the argument.
+   * @param {Line|Plane|Segment|Vector} obj
+   * @param {?Number} epsilon Precision at which to calculate angle equality
+   * @returns {Boolean}
+   */
+  isPerpendicularTo(obj, epsilon = Sylvester.precision) {
+    return this.line.isPerpendicularTo(obj, epsilon);
+  }
+
+  /**
    * Returns the distance between the argument and the line segment's closest point to the argument
    * @param {Vector|Line|Plane} obj
    */
   distanceFrom(obj) {
-    if (obj instanceof Vector) {
+    if (isVectorLike(obj)) {
       obj = obj.to3D();
     }
     const P = this.pointClosestTo(obj);
-    return (P === null) ? null : P.distanceFrom(obj);
+
+    // If there's no specific point closest to the object, then it's a parallel
+    // line or plane. In that case, get its distance from one of our anchors.
+    return P === null ? obj.distanceFrom(this.start) : P.distanceFrom(obj);
   }
 
   /**
@@ -484,8 +543,12 @@ export class Segment {
    * @param {Segment|Vector} obj
    */
   contains(obj) {
-    if (obj instanceof Segment) {
+    if (isSegmentLike(obj)) {
       return this.contains(obj.start) && this.contains(obj.end);
+    }
+
+    if (isPlaneLike(obj)) {
+      return this.direction.liesIn(obj)
     }
 
     const P = Vector.toElements(obj, 3);
@@ -516,6 +579,7 @@ export class Segment {
     if (!this.line.intersects(obj)) {
       return null;
     }
+
     const P = this.line.intersectionWith(obj);
     return (this.contains(P) ? P : null);
   }
@@ -526,26 +590,35 @@ export class Segment {
    * @returns {Vector|null} The vector, or null if the object is parallel to the segment.
    */
   pointClosestTo(obj) {
-    if (obj instanceof Plane) {
+    if (isPlaneLike(obj)) {
       // obj is a plane
       const V = this.line.intersectionWith(obj);
       if (V === null) {
         return null;
       }
       return this.pointClosestTo(V);
-    }
+    } else if (isLineLike(obj) || isSegmentLike(obj) || isVectorOrListLike(obj)) {
+      const P = this.line.pointClosestTo(obj);
+      if (P === null) {
+        return null;
+      }
 
-    // obj is a line (segment) or point
-    const P = this.line.pointClosestTo(obj);
-    if (P === null) {
-      return null;
-    }
+      if (this.contains(P)) {
+        return P;
+      }
 
-    if (this.contains(P)) {
-      return P;
+      return this.line.positionOf(P) < 0 ? this.start : this.end;
+    } else {
+      throw new InvalidOperationError(`Get the point closest to ${obj}`);
     }
+  }
 
-    return this.line.positionOf(P) < 0 ? this.start : this.end;
+  /**
+   * Returns a textual representation of the object.
+   * @returns {String}
+   */
+  inspect() {
+    return `Line.Segment<${this.start.inspect()} -> ${this.end.inspect()}>`;
   }
 }
 
