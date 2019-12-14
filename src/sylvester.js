@@ -4,7 +4,7 @@
  */
 export const Sylvester = {
   precision: 1e-6,
-  approxPrecision: 1e-5
+  approxPrecision: 1e-5,
 };
 
 /**

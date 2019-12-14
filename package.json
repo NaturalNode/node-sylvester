@@ -10,9 +10,11 @@
     "build:dist": "babel src -d dist",
     "build:doc": "rimraf doc-output && esdoc -c esdoc.json",
     "test:cover": "nyc mocha --opts mocha.opts",
+    "test:fmt": "prettier --list-different \"{src,test}/**/*.js\" \"*.md\"",
     "test:unit": "mocha --opts mocha.opts",
-    "test:lint": "xo \"test/**/*.js\" --env=mocha && xo \"src/**/*.js\" \"doc/**/*.js\"",
-    "test": "npm-run-all --parallel --silent test:unit test:lint"
+    "test:lint": "echo todo",
+    "test": "npm-run-all --parallel --silent test:unit test:lint test:fmt",
+    "fmt": "prettier --write \"{src,test}/**/*.js\" \"*.md\" && npm run test:lint -- --fix"
   },
   "author": "Chris Umbel <chris@chrisumbel.com>",
   "license": "MIT",
@@ -53,8 +55,8 @@
     "mocha": "^6.2.2",
     "npm-run-all": "^4.0.0",
     "nyc": "^14.1.1",
-    "rimraf": "^2.5.4",
-    "xo": "^0.17.1"
+    "prettier": "^1.19.1",
+    "rimraf": "^2.5.4"
   },
   "optionalDependencies": {
     "lapack": "^0.1.0"
@@ -62,17 +64,9 @@
   "browser": {
     "lapack": false
   },
-  "xo": {
-    "esnext": true,
-    "space": true,
-    "rules": {
-      "object-curly-spacing": [
-        2,
-        "always"
-      ],
-      "import/prefer-default-export": 0,
-      "no-unused-expressions": 0,
-      "new-cap": 0
-    }
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }

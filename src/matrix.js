@@ -39,17 +39,19 @@ function identSize(M, m, n, k) {
 }
 
 function pca(X) {
-  const Sigma = X.transpose().x(X).x(1 / X.rows());
+  const Sigma = X.transpose()
+    .x(X)
+    .x(1 / X.rows());
   const svd = Sigma.svd();
   return {
     U: svd.U,
-    S: svd.S
+    S: svd.S,
   };
 }
 
 const sizeStr = matrix => `${matrix.rows()}x${matrix.cols()} matrix`;
 
-const extractElements = (matrixOrRows) => {
+const extractElements = matrixOrRows => {
   const rows = matrixOrRows.elements || matrixOrRows;
   if (typeof rows[0][0] === 'undefined') {
     return Matrix.create(rows).elements;
@@ -66,7 +68,7 @@ export class Matrix {
     const y = lu.L.forwardSubstitute(b);
     const x = lu.U.backSubstitute(y);
     return lu.P.x(x);
-        // return this.inv().x(b);
+    // return this.inv().x(b);
   }
 
   // project a matrix onto a lower dim
@@ -75,7 +77,7 @@ export class Matrix {
     const Ureduce = U.slice(1, U.rows(), 1, k);
     return {
       Z: this.x(Ureduce),
-      U
+      U,
     };
   }
 
@@ -170,7 +172,7 @@ export class Matrix {
    */
   row(i) {
     if (i < 1 || i > this.elements.length) {
-      throw new OutOfRangeError(`Row ${i} is outside the bounds of this ${sizeStr(this)}`)
+      throw new OutOfRangeError(`Row ${i} is outside the bounds of this ${sizeStr(this)}`);
     }
     return new Vector(this.elements[i - 1]);
   }
@@ -183,7 +185,7 @@ export class Matrix {
    */
   col(j) {
     if (j < 1 || j > this.elements[0].length) {
-      throw new OutOfRangeError(`Column ${j} is outside the bounds of this ${sizeStr(this)}`)
+      throw new OutOfRangeError(`Column ${j} is outside the bounds of this ${sizeStr(this)}`);
     }
     const col = [];
     const n = this.elements.length;
@@ -200,7 +202,7 @@ export class Matrix {
   dimensions() {
     return {
       rows: this.elements.length,
-      cols: this.elements[0].length
+      cols: this.elements[0].length,
     };
   }
 
@@ -295,7 +297,7 @@ export class Matrix {
   isSameSizeAs(matrix) {
     const M = extractElements(matrix);
 
-    return (this.elements.length === M.length && this.elements[0].length === M[0].length);
+    return this.elements.length === M.length && this.elements[0].length === M[0].length;
   }
 
   /**
@@ -305,14 +307,16 @@ export class Matrix {
    * @returns {Matrix}
    */
   add(matrix) {
-    if (typeof (matrix) === 'number') {
+    if (typeof matrix === 'number') {
       return this.map(x => x + matrix);
     }
 
     const M = extractElements(matrix);
 
     if (!this.isSameSizeAs(M)) {
-      throw new DimensionalityMismatchError(`Cannot add a ${sizeStr(matrix)} to this (sizeStr(matrix))`);
+      throw new DimensionalityMismatchError(
+        `Cannot add a ${sizeStr(matrix)} to this (sizeStr(matrix))`,
+      );
     }
     return this.map((x, i, j) => x + M[i - 1][j - 1]);
   }
@@ -324,13 +328,15 @@ export class Matrix {
    * @returns {Matrix}
    */
   subtract(matrix) {
-    if (typeof (matrix) === 'number') {
+    if (typeof matrix === 'number') {
       return this.map(x => x - matrix);
     }
 
     const M = extractElements(matrix);
     if (!this.isSameSizeAs(M)) {
-      throw new DimensionalityMismatchError(`Cannot add a ${sizeStr(matrix)} to this (sizeStr(matrix))`);
+      throw new DimensionalityMismatchError(
+        `Cannot add a ${sizeStr(matrix)} to this (sizeStr(matrix))`,
+      );
     }
     return this.map((x, i, j) => x - M[i - 1][j - 1]);
   }
@@ -343,7 +349,7 @@ export class Matrix {
   canMultiplyFromLeft(matrix) {
     const M = extractElements(matrix);
     // this.columns should equal matrix.rows
-    return (this.elements[0].length === M.length);
+    return this.elements[0].length === M.length;
   }
 
   /**
@@ -372,7 +378,9 @@ export class Matrix {
     const M = extractElements(matrix);
     if (!this.canMultiplyFromLeft(M)) {
       throw new DimensionalityMismatchError(
-        `Cannot multiply a ${sizeStr(this)} by a ${sizeStr(matrix)}, expected an ${this.cols()}xN matrix`
+        `Cannot multiply a ${sizeStr(this)} by a ${sizeStr(
+          matrix,
+        )}, expected an ${this.cols()}xN matrix`,
       );
     }
 
@@ -459,7 +467,7 @@ export class Matrix {
   elementMultiply(v) {
     if (!this.isSameSizeAs(v)) {
       throw new DimensionalityMismatchError(
-        `Cannot element multiple a ${sizeStr(this)} by a ${sizeStr(v)}, expected the same size`
+        `Cannot element multiple a ${sizeStr(this)} by a ${sizeStr(v)}, expected the same size`,
       );
     }
     return this.map((k, i, j) => {
@@ -473,7 +481,8 @@ export class Matrix {
    */
   sum() {
     let sum = 0;
-    this.map(x => { // eslint-disable-line array-callback-return
+    this.map(x => {
+      // eslint-disable-line array-callback-return
       sum += x;
     });
     return sum;
@@ -581,7 +590,7 @@ export class Matrix {
    * @returns {Boolean}
    */
   isSquare() {
-    return (this.elements.length === this.elements[0].length);
+    return this.elements.length === this.elements[0].length;
   }
 
   /**
@@ -621,7 +630,7 @@ export class Matrix {
         if (this.elements[i][j] === x) {
           return {
             i: i + 1,
-            j: j + 1
+            j: j + 1,
           };
         }
       }
@@ -638,7 +647,7 @@ export class Matrix {
   diagonal() {
     if (!this.isSquare()) {
       throw new DimensionalityMismatchError(
-        `Cannot get the diagonal of a ${sizeStr(this)} matrix, matrix must be square`
+        `Cannot get the diagonal of a ${sizeStr(this)} matrix, matrix must be square`,
       );
     }
     const els = [];
@@ -685,7 +694,7 @@ export class Matrix {
             // of the row that we're subtracting can safely be set straight to
             // zero, since that's the point of this routine and it avoids having
             // to loop over and correct rounding errors later
-            els.push(p <= i ? 0 : M.elements[j][p] - (M.elements[i][p] * multiplier));
+            els.push(p <= i ? 0 : M.elements[j][p] - M.elements[i][p] * multiplier);
           }
           M.elements[j] = els;
         }
@@ -739,7 +748,7 @@ export class Matrix {
    * @returns {Boolean}
    */
   isSingular() {
-    return (this.isSquare() && this.determinant() === 0);
+    return this.isSquare() && this.determinant() === 0;
   }
 
   /**
@@ -833,10 +842,12 @@ export class Matrix {
    */
   inverse() {
     if (!this.isSquare()) {
-      throw new DimensionalityMismatchError(`A matrix must be square to be inverted, provided a ${sizeStr(this)}`)
+      throw new DimensionalityMismatchError(
+        `A matrix must be square to be inverted, provided a ${sizeStr(this)}`,
+      );
     }
     if (this.isSingular()) {
-      throw new DimensionalityMismatchError(`Cannot invert the current matrix (determinant=0)`)
+      throw new DimensionalityMismatchError(`Cannot invert the current matrix (determinant=0)`);
     }
 
     const n = this.elements.length;
@@ -874,7 +885,7 @@ export class Matrix {
       while (j--) {
         els = [];
         for (p = 0; p < np; p++) {
-          els.push(M.elements[j][p] - (M.elements[i][p] * M.elements[j][i]));
+          els.push(M.elements[j][p] - M.elements[i][p] * M.elements[j][i]);
         }
         M.elements[j] = els;
       }
@@ -907,7 +918,7 @@ export class Matrix {
    * @return {Matrix}
    */
   snapTo(target, epsilon = Sylvester.precision) {
-    return this.map(p => Math.abs(p - target) <= epsilon ? target : p);
+    return this.map(p => (Math.abs(p - target) <= epsilon ? target : p));
   }
 
   /**
@@ -943,7 +954,7 @@ export class Matrix {
     let i;
     let j;
     const elements = els.elements || els;
-    if (typeof (elements[0][0]) !== 'undefined') {
+    if (typeof elements[0][0] !== 'undefined') {
       i = elements.length;
       this.elements = [];
       while (i--) {
@@ -1149,7 +1160,9 @@ export class Matrix {
       U = U.x(qr.Q);
       S = qr.R;
 
-      const e = S.triu(1).unroll().norm();
+      const e = S.triu(1)
+        .unroll()
+        .norm();
       let f = S.diagonal().norm();
 
       if (f === 0) {
@@ -1170,7 +1183,7 @@ export class Matrix {
 
       if (ssn < 0) {
         for (let j = 0; j < U.rows(); j++) {
-          V.elements[j][i - 1] = -(V.elements[j][i - 1]);
+          V.elements[j][i - 1] = -V.elements[j][i - 1];
         }
       }
     }
@@ -1178,7 +1191,7 @@ export class Matrix {
     return {
       U,
       S: new Vector(s).toDiagonalMatrix(),
-      V
+      V,
     };
   }
 
@@ -1188,8 +1201,10 @@ export class Matrix {
 
     return {
       U: Matrix.create(result.U),
-      S: Matrix.create(result.S).column(1).toDiagonalMatrix(),
-      V: Matrix.create(result.VT).transpose()
+      S: Matrix.create(result.S)
+        .column(1)
+        .toDiagonalMatrix(),
+      V: Matrix.create(result.VT).transpose(),
     };
   }
 
@@ -1211,16 +1226,24 @@ export class Matrix {
       oneZero = new Vector(oneZero);
       const vk = ak.add(oneZero.x(ak.norm() * sign(ak.e(1))));
       const Vk = Matrix.create(vk);
-      const Hk = Matrix.I(m - k + 1).subtract(Vk.x(2).x(Vk.transpose()).div(Vk.transpose().x(Vk).e(1, 1)));
+      const Hk = Matrix.I(m - k + 1).subtract(
+        Vk.x(2)
+          .x(Vk.transpose())
+          .div(
+            Vk.transpose()
+              .x(Vk)
+              .e(1, 1),
+          ),
+      );
       const Qk = identSize(Hk, m, n, k);
       A = Qk.x(A);
-          // slow way to compute Q
+      // slow way to compute Q
       Q = Q.x(Qk);
     }
 
     return {
       Q,
-      R: A
+      R: A,
     };
   }
 
@@ -1230,7 +1253,7 @@ export class Matrix {
 
     return {
       Q: Matrix.create(qr.Q),
-      R: Matrix.create(qr.R)
+      R: Matrix.create(qr.R),
     };
   }
 
@@ -1240,8 +1263,8 @@ export class Matrix {
     return {
       L: Matrix.create(lu.L),
       U: Matrix.create(lu.U),
-      P: Matrix.create(lu.P)
-          // don't pass back IPIV
+      P: Matrix.create(lu.P),
+      // don't pass back IPIV
     };
   }
 
@@ -1277,7 +1300,7 @@ export class Matrix {
     return {
       L,
       U,
-      P
+      P,
     };
   }
 
@@ -1333,12 +1356,15 @@ export class Matrix {
    */
   static Rotation(theta, axis) {
     if (!axis) {
-      return Matrix.create([[Math.cos(theta), -Math.sin(theta)], [Math.sin(theta), Math.cos(theta)]]);
+      return Matrix.create([
+        [Math.cos(theta), -Math.sin(theta)],
+        [Math.sin(theta), Math.cos(theta)],
+      ]);
     }
 
     if (axis.elements.length !== 3) {
       throw new DimensionalityMismatchError(
-        `A 3-element vector must be provided to Rotation, got ${axis.elements.length} elements`
+        `A 3-element vector must be provided to Rotation, got ${axis.elements.length} elements`,
       );
     }
     const mod = axis.modulus();
@@ -1354,21 +1380,9 @@ export class Matrix {
     const c = Math.cos(theta);
     const t = 1 - c;
     return Matrix.create([
-      [
-        (t * x * x) + c,
-        (t * x * y) - (s * z),
-        (t * x * z) + (s * y)
-      ],
-      [
-        (t * x * y) + (s * z),
-        (t * y * y) + c,
-        (t * y * z) - (s * x)
-      ],
-      [
-        (t * x * z) - (s * y),
-        (t * y * z) + (s * x),
-        (t * z * z) + c
-      ]
+      [t * x * x + c, t * x * y - s * z, t * x * z + s * y],
+      [t * x * y + s * z, t * y * y + c, t * y * z - s * x],
+      [t * x * z - s * y, t * y * z + s * x, t * z * z + c],
     ]);
   }
 
@@ -1380,7 +1394,11 @@ export class Matrix {
   static RotationX(t) {
     const c = Math.cos(t);
     const s = Math.sin(t);
-    return Matrix.create([[1, 0, 0], [0, c, -s], [0, s, c]]);
+    return Matrix.create([
+      [1, 0, 0],
+      [0, c, -s],
+      [0, s, c],
+    ]);
   }
 
   /**
@@ -1391,7 +1409,11 @@ export class Matrix {
   static RotationY(t) {
     const c = Math.cos(t);
     const s = Math.sin(t);
-    return Matrix.create([[c, 0, s], [0, 1, 0], [-s, 0, c]]);
+    return Matrix.create([
+      [c, 0, s],
+      [0, 1, 0],
+      [-s, 0, c],
+    ]);
   }
 
   /**
@@ -1402,7 +1424,11 @@ export class Matrix {
   static RotationZ(t) {
     const c = Math.cos(t);
     const s = Math.sin(t);
-    return Matrix.create([[c, -s, 0], [s, c, 0], [0, 0, 1]]);
+    return Matrix.create([
+      [c, -s, 0],
+      [s, c, 0],
+      [0, 0, 1],
+    ]);
   }
 
   /**
@@ -1496,7 +1522,7 @@ if (lapack) {
   Matrix.prototype.qr = Matrix.prototype.qrPack;
   Matrix.prototype.lu = Matrix.prototype.luPack;
 } else {
-    // otherwise use the slower pure Javascript versions
+  // otherwise use the slower pure Javascript versions
   Matrix.prototype.svd = Matrix.prototype.svdJs;
   Matrix.prototype.qr = Matrix.prototype.qrJs;
   Matrix.prototype.lu = Matrix.prototype.luJs;

@@ -2,7 +2,7 @@ import chai from 'chai';
 import { Matrix, Vector, Sylvester, Line, Plane } from '../src';
 import { Segment } from '../src/line';
 
-chai.Assertion.addProperty('matrix', function () {
+chai.Assertion.addProperty('matrix', function() {
   new chai.Assertion(this._obj).to.be.instanceOf(Matrix);
 
   return {
@@ -17,13 +17,13 @@ chai.Assertion.addProperty('matrix', function () {
         'expected #{this} to not equal #{exp}',
         this._obj,
         other,
-        true
+        true,
       );
-    }
+    },
   };
 });
 
-chai.Assertion.addProperty('vector', function () {
+chai.Assertion.addProperty('vector', function() {
   new chai.Assertion(this._obj).to.be.instanceOf(Vector);
 
   return {
@@ -38,13 +38,13 @@ chai.Assertion.addProperty('vector', function () {
         'expected #{this} to not equal #{exp}',
         this._obj,
         other,
-        true
+        true,
       );
-    }
+    },
   };
 });
 
-chai.Assertion.addProperty('line', function () {
+chai.Assertion.addProperty('line', function() {
   new chai.Assertion(this._obj).to.be.instanceOf(Line);
 
   return {
@@ -59,13 +59,13 @@ chai.Assertion.addProperty('line', function () {
         'expected #{this} to not equal #{exp}',
         this._obj,
         lineOrOrigin,
-        true
+        true,
       );
-    }
+    },
   };
 });
 
-chai.Assertion.addProperty('segment', function () {
+chai.Assertion.addProperty('segment', function() {
   new chai.Assertion(this._obj).to.be.instanceOf(Segment);
 
   return {
@@ -80,30 +80,30 @@ chai.Assertion.addProperty('segment', function () {
         'expected #{this} to not equal #{exp}',
         this._obj,
         startOrSegment,
-        true
+        true,
       );
-    }
+    },
   };
 });
 
-chai.Assertion.addProperty('plane', function () {
+chai.Assertion.addProperty('plane', function() {
   new chai.Assertion(this._obj).to.be.instanceOf(Plane);
 
   return {
-    equal: (expectedPlane) => {
+    equal: expectedPlane => {
       this.assert(
         this._obj.eql(expectedPlane, 0.001),
         'expected #{this} to equal #{exp}',
         'expected #{this} to not equal #{exp}',
         this._obj,
         expectedPlane,
-        true
+        true,
       );
-    }
+    },
   };
 });
 
-chai.Assertion.addProperty('approx', function () {
+chai.Assertion.addProperty('approx', function() {
   return {
     equal: other => {
       this.assert(
@@ -112,8 +112,8 @@ chai.Assertion.addProperty('approx', function () {
         'expected #{this} to not equal #{exp}',
         this._obj,
         other,
-        true
+        true,
       );
-    }
+    },
   };
 });

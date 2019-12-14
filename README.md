@@ -4,7 +4,7 @@ Modern and expanded implementation of James Coglan's "Sylvester" matrix math lib
 
 # Documentation
 
-The original documentation for "Sylvester" should help you through basic operations. An intro that contains node-specific features  can also be found {on Chris Umbel's blog}[http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math]. We're looking for someone to help get the documentation situation under control.
+The original documentation for "Sylvester" should help you through basic operations. An intro that contains node-specific features can also be found {on Chris Umbel's blog}[http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math]. We're looking for someone to help get the documentation situation under control.
 
 # Installation
 
@@ -16,7 +16,7 @@ The original documentation for "Sylvester" should help you through basic operati
 
 First I'd like to show some examples of features that aren't in the standard (non-node) Sylvester. I'll likely attempt to commit these back to Sylvester at some point soon.
 
-Note that the decompositions are all available in pure JavaScript, but if the [lapack](https://github.com/NaturalNode/node-lapack) NPM is installed with LAPACK built as a shared library then efficient native code will be used. The LAPACK integration is still *highly* experimental.
+Note that the decompositions are all available in pure JavaScript, but if the [lapack](https://github.com/NaturalNode/node-lapack) NPM is installed with LAPACK built as a shared library then efficient native code will be used. The LAPACK integration is still _highly_ experimental.
 
 ### Vector
 
@@ -85,7 +85,7 @@ element-wise multiplication:
 
     A.elementMultiply(vector)
 
-add all	elements into a	single scalar:
+add all elements into a single scalar:
 
     A.sum()
 
@@ -111,10 +111,10 @@ create a 2x3 matrix of ones:
 
 LU decomposition (with partial pivoting)
 
-   var lu = A.lu();
-   console.log(lu.L);
-   console.log(lu.U);
-   console.log(lu.P);
+var lu = A.lu();
+console.log(lu.L);
+console.log(lu.U);
+console.log(lu.P);
 
 QR decomposition (feature still inefficient and experimental, but uses pure javascript):
 
@@ -190,16 +190,15 @@ transpose a matrix:
     var B_T = B.transpose();
     // B is 2x3, B_T is 3x2
 
-
 ## Contributing
 
 Contributions to node-sylvester are more than welcome. If you changed or added functionality, you should make sure tests pass. You can do this locally by running `npm test`, after running `npm install` initially.
 
 Development depends on the lapack module, which requires the LAPACK linear algebra library to be installed locally.
 
- - OSX seems to have lapack installed by default.
- - On Linux, lapack is available via most package managers, [including apt](https://astroiisc.wikispaces.com/Lapack+Installation+in+Ubuntu).
- - On Windows, the easiest way is to use Docker. Build the Dockerfile in this repository once: `docker build -t node-sylvester .`. Then:
+- OSX seems to have lapack installed by default.
+- On Linux, lapack is available via most package managers, [including apt](https://astroiisc.wikispaces.com/Lapack+Installation+in+Ubuntu).
+- On Windows, the easiest way is to use Docker. Build the Dockerfile in this repository once: `docker build -t node-sylvester .`. Then:
 
-    - On the default shell: `docker run --rm -v \`pwd\`:/sylv -w /sylv node-sylvester sh -c /bin/watch`
-    - On Cygwin: `docker run --rm -v \`cygpath -aw $(pwd)\`:/sylv -w /sylv node-sylvester sh -c /bin/watch`
+  - On the default shell: `docker run --rm -v \`pwd\`:/sylv -w /sylv node-sylvester sh -c /bin/watch`
+  - On Cygwin: `docker run --rm -v \`cygpath -aw \$(pwd)\`:/sylv -w /sylv node-sylvester sh -c /bin/watch`

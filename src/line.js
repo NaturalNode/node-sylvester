@@ -3,7 +3,13 @@ import { Vector } from './vector';
 import { Matrix } from './matrix';
 import { Plane } from './plane';
 import { Sylvester, DimensionalityMismatchError, InvalidOperationError } from './sylvester';
-import { isSegmentLike, isPlaneLike, isVectorLike, isLineLike, isVectorOrListLike } from './likeness';
+import {
+  isSegmentLike,
+  isPlaneLike,
+  isVectorLike,
+  isLineLike,
+  isVectorOrListLike,
+} from './likeness';
 
 export class Line {
   /**
@@ -23,7 +29,7 @@ export class Line {
     this.direction = new Vector([
       direction.elements[0] / mod,
       direction.elements[1] / mod,
-      direction.elements[2] / mod
+      direction.elements[2] / mod,
     ]);
 
     return this;
@@ -36,7 +42,7 @@ export class Line {
    * @returns {Boolean}
    */
   eql(line, epsilon = Sylvester.precision) {
-    return (this.isParallelTo(line, epsilon) && this.contains(line.anchor, epsilon));
+    return this.isParallelTo(line, epsilon) && this.contains(line.anchor, epsilon);
   }
 
   /**
@@ -46,11 +52,14 @@ export class Line {
    */
   translate(vector) {
     const V = Vector.toElements(vector, 3);
-    return new Line([
-      this.anchor.elements[0] + V[0],
-      this.anchor.elements[1] + V[1],
-      this.anchor.elements[2] + V[2]
-    ], this.direction);
+    return new Line(
+      [
+        this.anchor.elements[0] + V[0],
+        this.anchor.elements[1] + V[1],
+        this.anchor.elements[2] + V[2],
+      ],
+      this.direction,
+    );
   }
 
   /**
@@ -68,7 +77,7 @@ export class Line {
     }
 
     const theta = this._getAngleFromObject(obj);
-    return (Math.abs(theta) <= epsilon || Math.abs(theta - Math.PI) <= epsilon);
+    return Math.abs(theta) <= epsilon || Math.abs(theta - Math.PI) <= epsilon;
   }
 
   /**
@@ -126,11 +135,7 @@ export class Line {
       const N = this.direction.cross(obj.direction).toUnitVector().elements;
       const A = this.anchor.elements;
       const B = obj.anchor.elements;
-      return Math.abs(
-        ((A[0] - B[0]) * N[0]) +
-        ((A[1] - B[1]) * N[1]) +
-        ((A[2] - B[2]) * N[2])
-      );
+      return Math.abs((A[0] - B[0]) * N[0] + (A[1] - B[1]) * N[1] + (A[2] - B[2]) * N[2]);
     } else if (isVectorOrListLike(obj)) {
       // todo: a more optimized vector algorithm, perhaps:
       // const P = new Vector(obj).to3D();
@@ -145,14 +150,14 @@ export class Line {
       const PA1 = P[0] - A[0];
       const PA2 = P[1] - A[1];
       const PA3 = P[2] - A[2];
-      const modPA = Math.sqrt((PA1 * PA1) + (PA2 * PA2) + (PA3 * PA3));
+      const modPA = Math.sqrt(PA1 * PA1 + PA2 * PA2 + PA3 * PA3);
       if (modPA === 0) {
         return 0;
       }
 
       // Assumes direction vector is normalized
-      const cosTheta = ((PA1 * D[0]) + (PA2 * D[1]) + (PA3 * D[2])) / modPA;
-      const sin2 = 1 - (cosTheta * cosTheta);
+      const cosTheta = (PA1 * D[0] + PA2 * D[1] + PA3 * D[2]) / modPA;
+      const sin2 = 1 - cosTheta * cosTheta;
       return Math.abs(modPA * Math.sqrt(sin2 < 0 ? 0 : sin2));
     } else {
       throw new InvalidOperationError(`Cannot get a line's distance from {obj}`);
@@ -172,7 +177,7 @@ export class Line {
     }
 
     const dist = this.distanceFrom(obj);
-    return (dist !== null && dist <= epsilon);
+    return dist !== null && dist <= epsilon;
   }
 
   /**
@@ -189,9 +194,7 @@ export class Line {
     const P = Vector.toElements(point, 3);
     const A = this.anchor.elements;
     const D = this.direction.elements;
-    return ((P[0] - A[0]) * D[0]) +
-      ((P[1] - A[1]) * D[1]) +
-      ((P[2] - A[2]) * D[2]);
+    return (P[0] - A[0]) * D[0] + (P[1] - A[1]) * D[1] + (P[2] - A[2]) * D[2];
   }
 
   /**
@@ -213,7 +216,7 @@ export class Line {
     if (isPlaneLike(obj)) {
       return obj.intersects(this);
     }
-    return (!this.isParallelTo(obj) && this.distanceFrom(obj) <= epsilon);
+    return !this.isParallelTo(obj) && this.distanceFrom(obj) <= epsilon;
   }
 
   /**
@@ -242,14 +245,14 @@ export class Line {
     const PsubQ1 = P[0] - Q[0];
     const PsubQ2 = P[1] - Q[1];
     const PsubQ3 = P[2] - Q[2];
-    const XdotQsubP = (-X1 * PsubQ1) - (X2 * PsubQ2) - (X3 * PsubQ3);
-    const YdotPsubQ = (Y1 * PsubQ1) + (Y2 * PsubQ2) + (Y3 * PsubQ3);
-    const XdotX = (X1 * X1) + (X2 * X2) + (X3 * X3);
-    const YdotY = (Y1 * Y1) + (Y2 * Y2) + (Y3 * Y3);
-    const XdotY = (X1 * Y1) + (X2 * Y2) + (X3 * Y3);
-    const k = ((XdotQsubP * YdotY / XdotX) + (XdotY * YdotPsubQ)) / (YdotY - (XdotY * XdotY));
+    const XdotQsubP = -X1 * PsubQ1 - X2 * PsubQ2 - X3 * PsubQ3;
+    const YdotPsubQ = Y1 * PsubQ1 + Y2 * PsubQ2 + Y3 * PsubQ3;
+    const XdotX = X1 * X1 + X2 * X2 + X3 * X3;
+    const YdotY = Y1 * Y1 + Y2 * Y2 + Y3 * Y3;
+    const XdotY = X1 * Y1 + X2 * Y2 + X3 * Y3;
+    const k = ((XdotQsubP * YdotY) / XdotX + XdotY * YdotPsubQ) / (YdotY - XdotY * XdotY);
 
-    return new Vector([P[0] + (k * X1), P[1] + (k * X2), P[2] + (k * X3)]);
+    return new Vector([P[0] + k * X1, P[1] + k * X2, P[2] + k * X3]);
   }
 
   /**
@@ -287,10 +290,10 @@ export class Line {
 
       // Create plane containing obj and the shared normal and intersect this with it
       // Thank you: https://web.archive.org/web/20100222230012/http://www.cgafaq.info/wiki/Line-line_distance
-      const x = (D3 * E1) - (D1 * E3);
-      const y = (D1 * E2) - (D2 * E1);
-      const z = (D2 * E3) - (D3 * E2);
-      const N = [(x * E3) - (y * E2), (y * E1) - (z * E3), (z * E2) - (x * E1)];
+      const x = D3 * E1 - D1 * E3;
+      const y = D1 * E2 - D2 * E1;
+      const z = D2 * E3 - D3 * E2;
+      const N = [x * E3 - y * E2, y * E1 - z * E3, z * E2 - x * E1];
       const P = new Plane(obj.anchor, N);
       return P.intersectionWith(this);
     }
@@ -309,15 +312,15 @@ export class Line {
     const A1 = A[0];
     const A2 = A[1];
     const A3 = A[2];
-    const x = (D1 * (P[1] - A2)) - (D2 * (P[0] - A1));
-    const y = (D2 * ((P[2] || 0) - A3)) - (D3 * (P[1] - A2));
-    const z = (D3 * (P[0] - A1)) - (D1 * ((P[2] || 0) - A3));
-    const V = new Vector([(D2 * x) - (D3 * z), (D3 * y) - (D1 * x), (D1 * z) - (D2 * y)]);
+    const x = D1 * (P[1] - A2) - D2 * (P[0] - A1);
+    const y = D2 * ((P[2] || 0) - A3) - D3 * (P[1] - A2);
+    const z = D3 * (P[0] - A1) - D1 * ((P[2] || 0) - A3);
+    const V = new Vector([D2 * x - D3 * z, D3 * y - D1 * x, D1 * z - D2 * y]);
     const k = this.distanceFrom(P) / V.modulus();
     return new Vector([
-      P[0] + (V.elements[0] * k),
-      P[1] + (V.elements[1] * k),
-      (P[2] || 0) + (V.elements[2] * k)
+      P[0] + V.elements[0] * k,
+      P[1] + V.elements[1] * k,
+      (P[2] || 0) + V.elements[2] * k,
     ]);
   }
 
@@ -349,15 +352,18 @@ export class Line {
     const x = A1 - C1;
     const y = A2 - C2;
     const z = A3 - C3;
-    return new Line([
-      C1 + (R[0][0] * x) + (R[0][1] * y) + (R[0][2] * z),
-      C2 + (R[1][0] * x) + (R[1][1] * y) + (R[1][2] * z),
-      C3 + (R[2][0] * x) + (R[2][1] * y) + (R[2][2] * z)
-    ], [
-      (R[0][0] * D[0]) + (R[0][1] * D[1]) + (R[0][2] * D[2]),
-      (R[1][0] * D[0]) + (R[1][1] * D[1]) + (R[1][2] * D[2]),
-      (R[2][0] * D[0]) + (R[2][1] * D[1]) + (R[2][2] * D[2])
-    ]);
+    return new Line(
+      [
+        C1 + R[0][0] * x + R[0][1] * y + R[0][2] * z,
+        C2 + R[1][0] * x + R[1][1] * y + R[1][2] * z,
+        C3 + R[2][0] * x + R[2][1] * y + R[2][2] * z,
+      ],
+      [
+        R[0][0] * D[0] + R[0][1] * D[1] + R[0][2] * D[2],
+        R[1][0] * D[0] + R[1][1] * D[1] + R[1][2] * D[2],
+        R[2][0] * D[0] + R[2][1] * D[1] + R[2][2] * D[2],
+      ],
+    );
   }
 
   /**
@@ -397,7 +403,7 @@ export class Line {
       const newD = [
         Q[0] + (Q[0] - AD1) - newA[0],
         Q[1] + (Q[1] - AD2) - newA[1],
-        Q[2] + (Q[2] - AD3) - newA[2]
+        Q[2] + (Q[2] - AD3) - newA[2],
       ];
       return new Line(newA, newD);
     }
@@ -443,8 +449,10 @@ export class Segment {
    * @returns {Boolean}
    */
   eql(segment) {
-    return (this.start.eql(segment.start) && this.end.eql(segment.end)) ||
-        (this.start.eql(segment.end) && this.end.eql(segment.start));
+    return (
+      (this.start.eql(segment.start) && this.end.eql(segment.end)) ||
+      (this.start.eql(segment.end) && this.end.eql(segment.start))
+    );
   }
 
   /**
@@ -457,7 +465,7 @@ export class Segment {
     const C1 = B[0] - A[0];
     const C2 = B[1] - A[1];
     const C3 = B[2] - A[2];
-    return Math.sqrt((C1 * C1) + (C2 * C2) + (C3 * C3));
+    return Math.sqrt(C1 * C1 + C2 * C2 + C3 * C3);
   }
 
   /**
@@ -499,7 +507,7 @@ export class Segment {
     const E = this.end.elements;
     return new Segment(
       [S[0] + V[0], S[1] + V[1], S[2] + V[2]],
-      [E[0] + V[0], E[1] + V[1], E[2] + V[2]]
+      [E[0] + V[0], E[1] + V[1], E[2] + V[2]],
     );
   }
 
@@ -548,7 +556,7 @@ export class Segment {
     }
 
     if (isPlaneLike(obj)) {
-      return this.direction.liesIn(obj)
+      return this.direction.liesIn(obj);
     }
 
     const P = Vector.toElements(obj, 3);
@@ -567,7 +575,7 @@ export class Segment {
    * @returns {Boolean}
    */
   intersects(obj) {
-    return (this.intersectionWith(obj) !== null);
+    return this.intersectionWith(obj) !== null;
   }
 
   /**
@@ -581,7 +589,7 @@ export class Segment {
     }
 
     const P = this.line.intersectionWith(obj);
-    return (this.contains(P) ? P : null);
+    return this.contains(P) ? P : null;
   }
 
   /**

@@ -13,7 +13,8 @@ const examples = {};
  * });
  * @param  {String} name identifier of the diagram
  */
-export function asDiagram(name) { // yes, this is very magic, but it makes our tests clean
+export function asDiagram(name) {
+  // yes, this is very magic, but it makes our tests clean
   function expectCall(instance) {
     return new Proxy(instance, {
       get(callee, method) {
@@ -27,8 +28,8 @@ export function asDiagram(name) { // yes, this is very magic, but it makes our t
           }
 
           return expect(retValue);
-        }
-      }
+        };
+      },
     });
   }
 
@@ -39,13 +40,10 @@ export function asDiagram(name) { // yes, this is very magic, but it makes our t
       }
 
       it(tname, () => handler(expectCall));
-    }
+    },
   };
 }
 
 after(() =>
-  fs.writeFileSync(
-    `${__dirname}/../doc/gen/examples.json`,
-    JSON.stringify(examples, null, 2)
-  )
+  fs.writeFileSync(`${__dirname}/../doc/gen/examples.json`, JSON.stringify(examples, null, 2)),
 );

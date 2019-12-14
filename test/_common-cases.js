@@ -1,43 +1,58 @@
-import { Line, Plane, Vector, InvalidOperationError } from "../src";
+import { Line, Plane, Vector, InvalidOperationError } from '../src';
 import { expect, assert } from 'chai';
 
 const testCommunitiveCases = (method, testCases) => (ForType, expectCall) => {
   const compare = (a, b) =>
     a && typeof a === 'object' && 'eql' in a
-    ?  a.eql(b)
-    : typeof a === 'number' && typeof b === 'number'
-    ? Math.abs(a - b) < 0.0001
-    : a === b;
+      ? a.eql(b)
+      : typeof a === 'number' && typeof b === 'number'
+      ? Math.abs(a - b) < 0.0001
+      : a === b;
 
-  const inspect = v => v && typeof v === 'object' && 'inspect' in v ? v.inspect() : v;
+  const inspect = v => (v && typeof v === 'object' && 'inspect' in v ? v.inspect() : v);
 
   for (let [a, b, expected] of testCases) {
     if (b instanceof ForType && !(a instanceof ForType)) {
-      [a, b] = [b, a]
+      [a, b] = [b, a];
     }
 
     if (a instanceof ForType) {
-      const v = expected && typeof expected === 'object' && 'inspect' in expected
-        ? expected.inspect()
-        : expected;
+      const v =
+        expected && typeof expected === 'object' && 'inspect' in expected
+          ? expected.inspect()
+          : expected;
 
       if (!compare(a[method](b), expected)) {
         const actual = a[method](b);
-        assert.fail(actual, expected,
-        `Expected ${a.inspect()}.${method}(${b.inspect()}) = ${inspect(v)}, got ${inspect(actual)}`);
+        assert.fail(
+          actual,
+          expected,
+          `Expected ${a.inspect()}.${method}(${b.inspect()}) = ${inspect(v)}, got ${inspect(
+            actual,
+          )}`,
+        );
       }
 
       if (!compare(b[method](a), expected)) {
         const actual = b[method](a);
-        assert.fail(actual, expected,
-        `Expected ${b.inspect()}.${method}(${a.inspect()}) = ${inspect(v)}, got ${inspect(actual)}`);
+        assert.fail(
+          actual,
+          expected,
+          `Expected ${b.inspect()}.${method}(${a.inspect()}) = ${inspect(v)}, got ${inspect(
+            actual,
+          )}`,
+        );
       }
 
       expectCall(a)[method](b); // just for the docs
-      expect(() => a[method]({})).to.throw(InvalidOperationError, '', `Expected ${a.inspect()}.${method}({}) to throw`);
+      expect(() => a[method]({})).to.throw(
+        InvalidOperationError,
+        '',
+        `Expected ${a.inspect()}.${method}({}) to throw`,
+      );
     }
   }
-}
+};
 
 export const testPerpendicularTo = testCommunitiveCases('isPerpendicularTo', [
   // Lines:
@@ -88,8 +103,16 @@ export const testParallelTo = testCommunitiveCases('isParallelTo', [
   [new Line.Segment([1, 2], [4, 6]), new Vector([7, 8]), false],
 
   // Planes:
-  [Plane.fromPoints([1, 1, 1], [1, 0, 0], [2, 2, 2]), Plane.fromPoints([1, 1, 2], [1, 0, 1], [2, 2, 3]), true],
-  [Plane.fromPoints([1, 1, 1], [1, 0, 0], [2, 2, 2]), Plane.fromPoints([1, 1, 1], [1, 0, 1], [2, 2, 3]), false],
+  [
+    Plane.fromPoints([1, 1, 1], [1, 0, 0], [2, 2, 2]),
+    Plane.fromPoints([1, 1, 2], [1, 0, 1], [2, 2, 3]),
+    true,
+  ],
+  [
+    Plane.fromPoints([1, 1, 1], [1, 0, 0], [2, 2, 2]),
+    Plane.fromPoints([1, 1, 1], [1, 0, 1], [2, 2, 3]),
+    false,
+  ],
   [Plane.fromPoints([1, 1, 1], [1, 0, 1], [2, 2, 1]), new Vector([3, 4, 0]), true],
   [Plane.fromPoints([1, 1, 1], [1, 0, 0], [2, 2, 2]), new Vector([3, 4, 1]), false],
 

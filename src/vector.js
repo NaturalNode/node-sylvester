@@ -1,5 +1,12 @@
 import { DimensionalityMismatchError, Sylvester, InvalidOperationError } from './sylvester';
-import { isSegmentLike, isPlaneLike, isVectorLike, isLineLike, isVectorOrListLike, isGeometry } from './likeness';
+import {
+  isSegmentLike,
+  isPlaneLike,
+  isVectorLike,
+  isLineLike,
+  isVectorOrListLike,
+  isGeometry,
+} from './likeness';
 import { Matrix } from './matrix';
 import { Line } from './line';
 
@@ -8,7 +15,7 @@ import { Line } from './line';
  * @param {Vector|Number[]} vectorOrList
  * @returns {Number[]}
  */
-const getElements = (vectorOrList) => vectorOrList.elements || vectorOrList;
+const getElements = vectorOrList => vectorOrList.elements || vectorOrList;
 
 /**
  * The Vector class is designed to model vectors in any number of dimensions.
@@ -39,7 +46,7 @@ export class Vector {
 
     elements = elements.slice();
     while (elements.length < requireDimension) {
-      elements.push(0)
+      elements.push(0);
     }
 
     return elements;
@@ -78,7 +85,7 @@ export class Vector {
    * @return {Number}
    */
   e(i) {
-    return (i < 1 || i > this.elements.length) ? null : this.elements[i - 1];
+    return i < 1 || i > this.elements.length ? null : this.elements[i - 1];
   }
 
   /**
@@ -90,7 +97,7 @@ export class Vector {
   dimensions() {
     return {
       rows: 1,
-      cols: this.elements.length
+      cols: this.elements.length,
     };
   }
 
@@ -195,7 +202,7 @@ export class Vector {
     const n = this.elements.length;
     if (n !== V.length) {
       throw new DimensionalityMismatchError(
-        'Cannot compute the angle between vectors with different dimensionality'
+        'Cannot compute the angle between vectors with different dimensionality',
       );
     }
 
@@ -411,7 +418,7 @@ export class Vector {
     let n = this.elements.length;
     if (n !== V.length) {
       throw new DimensionalityMismatchError(
-        'Cannot compute the dot product of vectors with different dimensionality'
+        'Cannot compute the dot product of vectors with different dimensionality',
       );
     }
 
@@ -433,15 +440,15 @@ export class Vector {
     const B = getElements(vector);
     if (this.elements.length !== 3 || B.length !== 3) {
       throw new DimensionalityMismatchError(
-        `A cross-product can only be calculated between 3-dimensional vectors (got ${B.length} and ${this.elements.length})`
+        `A cross-product can only be calculated between 3-dimensional vectors (got ${B.length} and ${this.elements.length})`,
       );
     }
 
     const A = this.elements;
     return new Vector([
-      (A[1] * B[2]) - (A[2] * B[1]),
-      (A[2] * B[0]) - (A[0] * B[2]),
-      (A[0] * B[1]) - (A[1] * B[0])
+      A[1] * B[2] - A[2] * B[1],
+      A[2] * B[0] - A[0] * B[2],
+      A[0] * B[1] - A[1] * B[0],
     ]);
   }
 
@@ -532,7 +539,7 @@ export class Vector {
    * @return {Matrix}
    */
   snapTo(target, epsilon = Sylvester.precision) {
-    return this.map(p => Math.abs(p - target) <= epsilon ? target : p);
+    return this.map(p => (Math.abs(p - target) <= epsilon ? target : p));
   }
 
   /**
@@ -601,12 +608,9 @@ export class Vector {
         }
         x = this.elements[0] - V[0];
         y = this.elements[1] - V[1];
-        return new Vector([
-          V[0] + (R[0][0] * x) + (R[0][1] * y),
-          V[1] + (R[1][0] * x) + (R[1][1] * y)
-        ]);
+        return new Vector([V[0] + R[0][0] * x + R[0][1] * y, V[1] + R[1][0] * x + R[1][1] * y]);
       case 3:
-        if (!(isLineLike(obj))) {
+        if (!isLineLike(obj)) {
           throw new DimensionalityMismatchError('A line must be provided to rotate a 3D vector');
         }
         C = obj.pointClosestTo(this).elements;
@@ -617,9 +621,9 @@ export class Vector {
         y = this.elements[1] - C[1];
         z = this.elements[2] - C[2];
         return new Vector([
-          C[0] + (R[0][0] * x) + (R[0][1] * y) + (R[0][2] * z),
-          C[1] + (R[1][0] * x) + (R[1][1] * y) + (R[1][2] * z),
-          C[2] + (R[2][0] * x) + (R[2][1] * y) + (R[2][2] * z)
+          C[0] + R[0][0] * x + R[0][1] * y + R[0][2] * z,
+          C[1] + R[1][0] * x + R[1][1] * y + R[1][2] * z,
+          C[2] + R[2][0] * x + R[2][1] * y + R[2][2] * z,
         ]);
       default:
         throw new DimensionalityMismatchError(`Cannot rotate a ${this.elements.length}D vector`);
@@ -642,7 +646,7 @@ export class Vector {
     const Q = getElements(obj);
     if (this.elements.length !== Q.length) {
       throw new DimensionalityMismatchError(
-        `Cannot rotate a ${this.elements.dimensions}D point around the given ${Q.length}D point`
+        `Cannot rotate a ${this.elements.dimensions}D point around the given ${Q.length}D point`,
       );
     }
     return this.map((x, i) => {
@@ -677,7 +681,9 @@ export class Vector {
    */
   toDimension(n) {
     if (this.elements.length > n) {
-      throw new DimensionalityMismatchError(`Cannot convert a ${this.elements.length}D vector to a ${n}D one`);
+      throw new DimensionalityMismatchError(
+        `Cannot convert a ${this.elements.length}D vector to a ${n}D one`,
+      );
     }
 
     const next = new Array(n);
@@ -757,6 +763,6 @@ Vector.k = new Vector([0, 0, 1]);
 // The following are shims for deprecated methods removed in 1.0.0
 Vector.prototype.modulus = Vector.prototype.magnitude;
 Vector.prototype.norm = Vector.prototype.magnitude;
-Vector.prototype.dup = function () {
+Vector.prototype.dup = function() {
   return this.map(x => x);
 };

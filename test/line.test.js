@@ -2,7 +2,12 @@ import { expect } from 'chai';
 import { Line, Plane, Vector, DimensionalityMismatchError } from '../src';
 import { asDiagram } from './_as-diagram';
 import { Segment } from '../src/line';
-import { testParallelTo, testPerpendicularTo, testIntersectionWith, testDistanceFrom } from './_common-cases';
+import {
+  testParallelTo,
+  testPerpendicularTo,
+  testIntersectionWith,
+  testDistanceFrom,
+} from './_common-cases';
 
 describe('line', () => {
   const lineA = new Line([0, 0], [1, 1]);
@@ -21,7 +26,9 @@ describe('line', () => {
   });
 
   asDiagram('Line.translate').it(expectCall => {
-    expectCall(lineA).translate([2, 3]).to.line.equal([2, 3], [1, 1]);
+    expectCall(lineA)
+      .translate([2, 3])
+      .to.line.equal([2, 3], [1, 1]);
   });
 
   asDiagram('Line.isParallelTo').it(expectCall => {
@@ -44,8 +51,12 @@ describe('line', () => {
   });
 
   asDiagram('Line.positionOf').it(expectCall => {
-    expectCall(lineA).positionOf(new Vector([2, 2])).to.approx.equal(2.828427);
-    expectCall(lineA).positionOf(new Vector([-2, -2])).to.approx.equal(-2.828427);
+    expectCall(lineA)
+      .positionOf(new Vector([2, 2]))
+      .to.approx.equal(2.828427);
+    expectCall(lineA)
+      .positionOf(new Vector([-2, -2]))
+      .to.approx.equal(-2.828427);
     expectCall(lineA).positionOf(new Vector([3, 1])).to.be.null;
   });
 
@@ -66,43 +77,68 @@ describe('line', () => {
   });
 
   asDiagram('Line.pointClosestTo').it(expectCall => {
-    expectCall(lineA).pointClosestTo([3, 1]).to.vector.equal([2, 2, 0]);
-    expectCall(lineA).pointClosestTo([1, 1]).to.vector.equal([1, 1, 0]);
+    expectCall(lineA)
+      .pointClosestTo([3, 1])
+      .to.vector.equal([2, 2, 0]);
+    expectCall(lineA)
+      .pointClosestTo([1, 1])
+      .to.vector.equal([1, 1, 0]);
 
-    expectCall(lineA).pointClosestTo(new Segment([-2, 2], [1, 2])).to.vector.equal([1.5, 1.5, 0]);
+    expectCall(lineA)
+      .pointClosestTo(new Segment([-2, 2], [1, 2]))
+      .to.vector.equal([1.5, 1.5, 0]);
     expectCall(lineA).pointClosestTo(new Segment([1, 1], [-1, -1])).to.be.null;
 
-    expectCall(lineA).pointClosestTo(lineB.translate([0, 1])).to.vector.equal([0.5, 0.5, 0]);
+    expectCall(lineA)
+      .pointClosestTo(lineB.translate([0, 1]))
+      .to.vector.equal([0.5, 0.5, 0]);
     expectCall(lineA).pointClosestTo(lineA.translate([0, 1])).to.be.null;
-    expectCall(lineA).pointClosestTo(new Line([0, 1, 1], [1, 1, 3])).to.vector.equal([0.166666, 0.166666, 0]);
+    expectCall(lineA)
+      .pointClosestTo(new Line([0, 1, 1], [1, 1, 3]))
+      .to.vector.equal([0.166666, 0.166666, 0]);
 
-    expectCall(lineA).pointClosestTo(new Plane([-1, -1, -1], [1, 1, 3], [2, 0, 1])).to.vector.equal([-0.5, -0.5, 0]);
+    expectCall(lineA)
+      .pointClosestTo(new Plane([-1, -1, -1], [1, 1, 3], [2, 0, 1]))
+      .to.vector.equal([-0.5, -0.5, 0]);
     expectCall(lineA).pointClosestTo(new Plane([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.be.null;
   });
 
   asDiagram('Line.rotate').it(expectCall => {
-    expectCall(lineA).rotate(Math.PI / 2, Line.X)
+    expectCall(lineA)
+      .rotate(Math.PI / 2, Line.X)
       .to.line.equal([0, 0], [1, 0, 1]);
-    expectCall(lineA).rotate(Math.PI / 2, Line.Y)
+    expectCall(lineA)
+      .rotate(Math.PI / 2, Line.Y)
       .to.line.equal([0, 0], [0, 1, -1]);
-    expectCall(lineA).rotate(Math.PI / 2, Line.Z)
+    expectCall(lineA)
+      .rotate(Math.PI / 2, Line.Z)
       .to.line.equal([0, 0], [-1, 1, 0]);
 
-    expectCall(lineA).rotate(Math.PI / 2, new Line([0, 0, 0], [1, 1, 1]))
+    expectCall(lineA)
+      .rotate(Math.PI / 2, new Line([0, 0, 0], [1, 1, 1]))
       .to.line.equal([0, 0], [0.063156, 0.879654, 0.471402]);
 
-    expectCall(lineA).rotate(Math.PI, [0, 1])
+    expectCall(lineA)
+      .rotate(Math.PI, [0, 1])
       .to.line.equal([0, 2], [-1, -1, 0]);
   });
 
   asDiagram('Line.reverse').it(expectCall => {
-    expectCall(lineA).reverse().to.line.equal([0, 0], [-1, -1]);
+    expectCall(lineA)
+      .reverse()
+      .to.line.equal([0, 0], [-1, -1]);
   });
 
   asDiagram('Line.reflectionIn').it(expectCall => {
-    expectCall(lineA).reflectionIn([-1, 1]).to.line.equal([-2, 2], [1, 1]);
-    expectCall(lineA).reflectionIn(Line.Y).to.line.equal([0, 0], [-1, 1]);
-    expectCall(lineA).reflectionIn(new Plane([1, 1, 1], [0, 0, 1], [2, 1, 1])).to.line.equal([0, 0, 2], [1, 1, 0]);
+    expectCall(lineA)
+      .reflectionIn([-1, 1])
+      .to.line.equal([-2, 2], [1, 1]);
+    expectCall(lineA)
+      .reflectionIn(Line.Y)
+      .to.line.equal([0, 0], [-1, 1]);
+    expectCall(lineA)
+      .reflectionIn(new Plane([1, 1, 1], [0, 0, 1], [2, 1, 1]))
+      .to.line.equal([0, 0, 2], [1, 1, 0]);
   });
 
   describe('segment', () => {
@@ -116,23 +152,33 @@ describe('line', () => {
     });
 
     asDiagram('Segment.length').it(expectCall => {
-      expectCall(segA).length().to.equal(5);
+      expectCall(segA)
+        .length()
+        .to.equal(5);
     });
 
     asDiagram('Segment.length').it(expectCall => {
-      expectCall(segA).toVector().to.vector.equal([3, 4, 0]);
+      expectCall(segA)
+        .toVector()
+        .to.vector.equal([3, 4, 0]);
     });
 
     asDiagram('Segment.midpoint').it(expectCall => {
-      expectCall(segA).midpoint().to.vector.equal([2.5, 4, 0]);
+      expectCall(segA)
+        .midpoint()
+        .to.vector.equal([2.5, 4, 0]);
     });
 
     asDiagram('Segment.bisectingPlane').it(expectCall => {
-      expectCall(segA).bisectingPlane().to.plane.equal(new Plane([2.5, 4], [3, 4]));
+      expectCall(segA)
+        .bisectingPlane()
+        .to.plane.equal(new Plane([2.5, 4], [3, 4]));
     });
 
     asDiagram('Segment.translate').it(expectCall => {
-      expectCall(segA).translate(new Vector([-2, -4])).to.segment.equal([-1, -2], [2, 2]);
+      expectCall(segA)
+        .translate(new Vector([-2, -4]))
+        .to.segment.equal([-1, -2], [2, 2]);
     });
 
     asDiagram('Segment.isParallelTo').it(expectCall => {
@@ -165,5 +211,5 @@ describe('line', () => {
     asDiagram('Segment.intersectionWith').it(expectCall => {
       testIntersectionWith(Segment, expectCall);
     });
-  })
+  });
 });
