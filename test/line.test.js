@@ -172,7 +172,7 @@ describe('line', () => {
     asDiagram('Segment.bisectingPlane').it(expectCall => {
       expectCall(segA)
         .bisectingPlane()
-        .to.plane.equal(new Plane([2.5, 4], [3, 4]));
+        .to.geo.equal(new Plane([2.5, 4], [3, 4]));
     });
 
     asDiagram('Segment.translate').it(expectCall => {

@@ -406,14 +406,14 @@ export class Plane {
           // This might be a slightly long-winded way of doing things, but we need the sum of all the normals
           // to find which way the plane normal should point so that the points form an anticlockwise list.
           theta = N.angleFrom(prevN);
-          if (theta !== null) {
+          if (!isNaN(theta)) {
             if (
               !(
                 Math.abs(theta) <= Sylvester.precision ||
                 Math.abs(theta - Math.PI) <= Sylvester.precision
               )
             ) {
-              throw new OutOfRangeError('The point provided to Vector.fromPoints are no coplanar');
+              throw new OutOfRangeError('The points provided to Plane.fromPoints are colinear');
             }
           }
         }

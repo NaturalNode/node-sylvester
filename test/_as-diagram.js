@@ -1,5 +1,9 @@
 import fs from 'fs';
 import { expect } from 'chai';
+import { Vector } from '../src/vector';
+import { Matrix } from '../src/matrix';
+import { Line, Segment } from '../src/line';
+import { Polygon } from '../src/polygon';
 
 const examples = {};
 
@@ -44,6 +48,22 @@ export function asDiagram(name) {
   };
 }
 
+const replacer = (_key, value) => {
+  if (value instanceof Vector) {
+    return { type: 'Vector', elements: value.elements };
+  } else if (value instanceof Matrix) {
+    return { type: 'Matrix', elements: value.elements };
+  } else if (value instanceof Line) {
+    return { type: 'Line', anchor: value.anchor.elements, direction: value.direction.elements };
+  } else if (value instanceof Segment) {
+    return { type: 'Segment', start: value.start.elements, end: value.end.elements };
+  } else if (value instanceof Polygon) {
+    return { type: 'Polygon', verticies: value.vertices.toArray().map(v => v.elements) };
+  } else {
+    return value;
+  }
+};
+
 after(() =>
-  fs.writeFileSync(`${__dirname}/../doc/gen/examples.json`, JSON.stringify(examples, null, 2)),
+  fs.writeFileSync(`${__dirname}/../doc/gen/examples.json`, JSON.stringify(examples, replacer, 2)),
 );

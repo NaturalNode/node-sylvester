@@ -1,6 +1,7 @@
 import chai from 'chai';
 import { Matrix, Vector, Sylvester, Line, Plane } from '../src';
 import { Segment } from '../src/line';
+import { Polygon } from '../src/polygon';
 
 chai.Assertion.addProperty('matrix', function() {
   new chai.Assertion(this._obj).to.be.instanceOf(Matrix);
@@ -86,9 +87,7 @@ chai.Assertion.addProperty('segment', function() {
   };
 });
 
-chai.Assertion.addProperty('plane', function() {
-  new chai.Assertion(this._obj).to.be.instanceOf(Plane);
-
+chai.Assertion.addProperty('geo', function() {
   return {
     equal: expectedPlane => {
       this.assert(
