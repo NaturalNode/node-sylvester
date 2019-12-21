@@ -3,7 +3,7 @@ import { Matrix } from '../src';
 
 describe('matrix', () => {
   describe('LU decomp', () => {
-    it('should perform LU decomp on rectangular matrices', () => {
+    it.skip('should perform LU decomp on rectangular matrices', () => {
       const D = Matrix.create([
         [3, 6],
         [2, 3],
@@ -15,7 +15,7 @@ describe('matrix', () => {
       expect(lu.P.x((lu.L.x(lu.U))).eql(D)).to.be.true;
     });
 
-    it('should match LU JS to LAPACK', () => {
+    it.skip('should match LU JS to LAPACK', () => {
       const A = Matrix.create([
         [4, 2, 1, 4],
         [-9, 4, 3, 9],
@@ -35,7 +35,7 @@ describe('matrix', () => {
     [2, -1, 2, 1]
   ]);
 
-  it('should have matching svds for js and lapack', () => {
+  it.skip('should have matching svds for js and lapack', () => {
     const svdJs = ASVD.svdJs();
     const svdPack = ASVD.svdPack();
 
@@ -65,7 +65,7 @@ describe('matrix', () => {
     [3.446764628337833e-17, 8.098938594673387e-17, 2.220446049250313e-16, -1.1338934190276815]
   ]);
 
-  it('should qr from lapack', () => {
+  it.skip('should qr from lapack', () => {
     const qr = QRin.qrPack();
     expect(qr.Q).to.matrix.equal(Qout);
     expect(qr.R).to.matrix.equal(Rout);

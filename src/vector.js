@@ -12,6 +12,7 @@ export class Vector {
 
   /**
    * Creates a new vector, initializing it with the provided elements.
+   *
    * @param  {Number[]} elements
    */
   constructor(elements) {
@@ -81,6 +82,7 @@ export class Vector {
 
   /**
    * Returns if the Vector is equal to the input vector.
+   *
    * $example Vector.eql
    * @param  {Vector} vector
    * @return {Boolean}
@@ -101,6 +103,7 @@ export class Vector {
 
   /**
    * Returns a new function created by calling the iterator on all values of this vector.
+   *
    * @param  {Function} fn
    * @return {Vector}
    */
@@ -116,6 +119,7 @@ export class Vector {
 
   /**
    * Iterates through the elements of the vector
+   *
    * @param {Function} fn called with the `(element, index)`
    */
   each(fn) {
@@ -144,6 +148,7 @@ export class Vector {
   /**
    * Returns the angle between this vector the argument in radians. If the
    * vectors are mirrored across their axes this will return `NaN`.
+   *
    * $example Vector.angleFrom
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
@@ -186,6 +191,7 @@ export class Vector {
 
   /**
    * Returns whether the vectors are parallel to each other.
+   *
    * $example Vector.isParallelTo
    * @return {Boolean}
    */
@@ -196,6 +202,7 @@ export class Vector {
 
   /**
    * Returns whether the vectors are antiparallel to each other.
+   *
    * $example Vector.isAntiparallelTo
    * @return {Boolean}
    */
@@ -206,6 +213,7 @@ export class Vector {
 
   /**
    * Returns whether the vectors are perpendicular to each other.
+   *
    * $example Vector.isPerpendicularTo
    * @return {Boolean}
    */
@@ -229,6 +237,7 @@ export class Vector {
   /**
    * When the input is a constant, this returns the result of adding it to
    * all cevtor elements. When it's a vector, the vectors will be added.
+   *
    * $example Vector.add
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
@@ -242,6 +251,7 @@ export class Vector {
   /**
    * When the input is a constant, this returns the result of subtracting it
    * from all vector elements. When it's a vector, the vectors will be subtracted.
+   *
    * $example Vector.subtract
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
@@ -256,6 +266,7 @@ export class Vector {
    * When the input is a constant, this returns the result of multiplying it
    * with all vector elements. When it's a vector, the vectors will be
    * element-wise multiplied.
+   *
    * $example Vector.multiply
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
@@ -268,6 +279,7 @@ export class Vector {
 
   /**
    * Returns the sum of all elements in the Vector.
+   *
    * $example Vector.sum
    * @return {Number}
    */
@@ -281,6 +293,7 @@ export class Vector {
 
   /**
    * Returns a new vector with the first `n` elements removed from the beginning.
+   *
    * $example Vector.chomp
    * @param  {Number} n
    * @return {Vector}
@@ -296,6 +309,7 @@ export class Vector {
 
   /**
    * Returns a new vector consisting only of the first `n` elements.
+   *
    * $example Vector.chomp
    * @param  {Number} n
    * @return {Vector}
@@ -311,6 +325,7 @@ export class Vector {
 
   /**
    * Returns a new vector with the provided `elements` concatenated on the end.
+   *
    * $example Vector.augment
    * @param  {Number[]|Vector} elements
    * @return {Vector}
@@ -320,14 +335,26 @@ export class Vector {
   }
 
   /**
-   * @alias Vector#multiply
+   * Alias for {@link Vector#multiply}
+   *
+   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   *     different dimensions
+   * @param {Number|Number[]|Vector} value
+   * @return {Vector}
    */
-  x(k) {
-    return this.multiply(k);
+  x(value) {
+    return this.multiply(value);
   }
 
-  log() {
-    return Vector.log(this);
+  /**
+   * Returns a vector made up the base `base` logarithm of this vector's values.
+   *
+   * $example Vector.log
+   * @param {Number} [base=Math.E]
+   * @return {Vector}
+   */
+  log(base = Math.E) {
+    return Vector.log(this, base);
   }
 
   /**
@@ -370,13 +397,23 @@ export class Vector {
     return product;
   }
 
-  // Returns the vector product of the vector with the argument
-  // Both vectors must have dimensionality 3
-
+  /**
+   * Returns the cross product of this vector with the other one. Both vectors
+   * must have a dimensionality of three.
+   *
+   * $example Vector.cross
+   * @see https://en.wikipedia.org/wiki/Cross_product
+   * @param  {Vector|Number[]} vector
+   * @return {Vector}
+   * @throws {DimensionalityMismatchError} If either this vector or the other
+   *     is not three-dimensional.
+   */
   cross(vector) {
     const B = vector.elements || vector;
     if (this.elements.length !== 3 || B.length !== 3) {
-      return null;
+      throw new DimensionalityMismatchError(
+        'Cannot compute the cross product of vectors that aren\'t three-dimensional'
+      );
     }
     const A = this.elements;
     return Vector.create([
@@ -386,27 +423,30 @@ export class Vector {
     ]);
   }
 
-  // Returns the (absolute) largest element of the vector
-
+  /**
+   * Returns the absolute largest element in this vector.
+   *
+   * $example Vector.max
+   * @return {Number}
+   */
   max() {
-    let m = 0;
-    let i = this.elements.length;
-    while (i--) {
-      if (Math.abs(this.elements[i]) > Math.abs(m)) {
-        m = this.elements[i];
-      }
-    }
-    return m;
+    return this.elements[this.maxIndex() - 1];
   }
 
+  /**
+   * Returns the index of the absolute largest item in this vector.
+   *
+   * $example Vector.maxIndex
+   * @return {Number}
+   */
   maxIndex() {
-    let m = 0;
     let i = this.elements.length;
-    let maxIndex = -1;
+    let maxValue = 0;
+    let maxIndex = 0;
 
     while (i--) {
-      if (Math.abs(this.elements[i]) > Math.abs(m)) {
-        m = this.elements[i];
+      if (Math.abs(this.elements[i]) >= maxValue) {
+        maxValue = Math.abs(this.elements[i]);
         maxIndex = i + 1;
       }
     }
@@ -414,35 +454,51 @@ export class Vector {
     return maxIndex;
   }
 
-  // Returns the index of the first match found
-
+  /**
+   * Returns the index of the first occurrence of x in the vector,
+   * or -1 if it wasn't found.
+   *
+   * $example Vector.indexOf
+   * @return {Number}
+   */
   indexOf(x) {
-    let index = null;
     const n = this.elements.length;
     for (let i = 0; i < n; i++) {
-      if (index === null && this.elements[i] === x) {
-        index = i + 1;
+      if (this.elements[i] === x) {
+        return i + 1;
       }
     }
-    return index;
+
+    return -1;
   }
 
-  // Returns a diagonal matrix with the vector's elements as its diagonal elements
-
+  /**
+   * Returns a diagonal matrix with the vector's elements
+   * as its diagonal elements.
+   *
+   * $example Vector.toDiagonalMatrix
+   * @return {Matrix}
+   */
   toDiagonalMatrix() {
     return Matrix.Diagonal(this.elements);
   }
 
-  // Returns the result of rounding the elements of the vector
-
+  /**
+   * Returns the result of rounding the elements of the vector.
+   *
+   * $example Vector.round
+   * @return {Vector}
+   */
   round() {
-    return this.map(x => {
-      return Math.round(x);
-    });
+    return this.map(x => Math.round(x));
   }
 
-  // Transpose a Vector, return a 1xn Matrix
-
+  /**
+   * Transpose the vector into a 1xN matrix.
+   *
+   * $example Vector.transpose
+   * @return {Matrix}
+   */
   transpose() {
     const rows = this.elements.length;
     const elements = [];
@@ -453,25 +509,38 @@ export class Vector {
     return Matrix.create(elements);
   }
 
-  // Returns a copy of the vector with elements set to the given value if they
-  // differ from it by less than Sylvester.precision
-
+  /**
+   * Returns a copy of the vector with elements set to the given value if
+   * they differ from it by less than Sylvester.precision
+   *
+   * @param {Number} x
+   * @return {Vector}
+   */
   snapTo(x) {
     return this.map(y => {
       return (Math.abs(y - x) <= Sylvester.precision) ? x : y;
     });
   }
 
-  // Returns the vector's distance from the argument, when considered as a point in space
-
+  /**
+   * Returns the vector's distance from the argument,
+   *  when considered as a point in space.
+   *
+   * @throws {DimensionalityMismatchError} If the dimensionality differs.
+   * @param {Vector|Line|Plane} obj
+   * @return {Vector}
+   */
   distanceFrom(obj) {
     if (obj.anchor || (obj.start && obj.end)) {
       return obj.distanceFrom(this);
     }
     const V = obj.elements || obj;
     if (V.length !== this.elements.length) {
-      return null;
+      throw new DimensionalityMismatchError(
+        'Cannot compute the distance between objects in different dimensions'
+      );
     }
+
     let sum = 0;
     let part;
     this.each((x, i) => {
@@ -481,64 +550,85 @@ export class Vector {
     return Math.sqrt(sum);
   }
 
-  // Returns true if the vector is point on the given line
-
+  /**
+   * Returns true if the vector is point on the given line
+   *
+   * @param {Line} line
+   * @return {Boolean}
+   */
   liesOn(line) {
     return line.contains(this);
   }
 
-  // Return true iff the vector is a point in the given plane
-
+  /**
+   * Return true iff the vector is a point in the given plane
+   *
+   * @param {Line} x
+   * @return {Boolean}
+   */
   liesIn(plane) {
     return plane.contains(this);
   }
 
-  // Rotates the vector about the given object. The object should be a
-  // point if the vector is 2D, and a line if it is 3D. Be careful with line directions!
-
+  /**
+   * Rotates the vector about the given object. The object should be a
+   * point if the vector is 2D, and a line if it is 3D
+   * Be careful with line directions!
+   *
+   * @throws {DimensionalityMismatchError} If the dimensionality differs.
+   * @param {Number|Matrix} t the radians to rotate, or a rotation matrix
+   * @param {Line|Vector} obj the object to rotate around
+   * @return {Boolean}
+   */
   rotate(t, obj) {
-    let V;
+    let X;
     let R = null;
     let x;
     let y;
     let z;
-    let C;
     if (t.determinant) {
       R = t.elements;
     }
     switch (this.elements.length) {
       case 2:
-        V = obj.elements || obj;
-        if (V.length !== 2) {
-          return null;
+        X = obj.elements || obj;
+        if (X.length !== 2) {
+          throw new DimensionalityMismatchError(
+            `Two-dimensional vectors cannot be rotated around ${X.length}-dimensional objects`
+          );
         }
+
         if (!R) {
           R = Matrix.Rotation(t).elements;
         }
-        x = this.elements[0] - V[0];
-        y = this.elements[1] - V[1];
+        x = this.elements[0] - X[0];
+        y = this.elements[1] - X[1];
         return Vector.create([
-          V[0] + (R[0][0] * x) + (R[0][1] * y),
-          V[1] + (R[1][0] * x) + (R[1][1] * y)
+          X[0] + (R[0][0] * x) + (R[0][1] * y),
+          X[1] + (R[1][0] * x) + (R[1][1] * y)
         ]);
       case 3:
         if (!obj.direction) {
-          return null;
+          throw new DimensionalityMismatchError(
+            `Three-dimensional vectors can only be rotated around lines.`
+          );
         }
-        C = obj.pointClosestTo(this).elements;
+        X = obj.pointClosestTo(this).elements;
         if (!R) {
           R = Matrix.Rotation(t, obj.direction).elements;
         }
-        x = this.elements[0] - C[0];
-        y = this.elements[1] - C[1];
-        z = this.elements[2] - C[2];
+        x = this.elements[0] - X[0];
+        y = this.elements[1] - X[1];
+        z = this.elements[2] - X[2];
         return Vector.create([
-          C[0] + (R[0][0] * x) + (R[0][1] * y) + (R[0][2] * z),
-          C[1] + (R[1][0] * x) + (R[1][1] * y) + (R[1][2] * z),
-          C[2] + (R[2][0] * x) + (R[2][1] * y) + (R[2][2] * z)
+          X[0] + (R[0][0] * x) + (R[0][1] * y) + (R[0][2] * z),
+          X[1] + (R[1][0] * x) + (R[1][1] * y) + (R[1][2] * z),
+          X[2] + (R[2][0] * x) + (R[2][1] * y) + (R[2][2] * z)
         ]);
       default:
-        return null;
+        throw new DimensionalityMismatchError(
+          `${this.elements.length}-dimensional vectors cannot be rotated.`
+        );
     }
   }
 
@@ -631,10 +721,16 @@ export class Vector {
     return Vector.Fill(n, 1);
   }
 
-  static log(v) {
-    return v.map(x => {
-      return Math.log(x);
-    });
+  /**
+   * Taks the base `base` logathim of all elements of the provided vector, and
+   * return the new one.
+   * @param  {Vector} v
+   * @param  {Number} [base=Math.E]
+   * @return {Vector}
+   */
+  static log(v, base = Math.E) {
+    const logBase = Math.log(base);
+    return v.map(x => Math.log(x) / logBase);
   }
 }
 

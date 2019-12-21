@@ -46,34 +46,54 @@ function anyHavePrecisionGreaterThan(numbers, amount) {
   return false;
 }
 
+function primitiveToTex(data, rounding) {
+  if (data === null || data === undefined) {
+    return '\\mathbf{null}';
+  }
+
+  switch (typeof data) {
+    case 'string':
+      return data;
+    case 'number':
+      return hasPrecisionGreaterThan(data, rounding)
+        ? data.toFixed(rounding)
+        : String(data);
+    case 'boolean':
+      return `\\mathbf{${!!data}}`;
+    default:
+      throw new Error(`Value not primitive: ${JSON.stringify(data)}`);
+  }
+}
+
 function symbolToTex(data, rounding) {
-  if (typeof data === 'string') {
-    return data;
+  if (data.type !== 'object' || data.value === null) {
+    return primitiveToTex(data.value, rounding);
   }
 
-  if (typeof data === 'number') {
-    return hasPrecisionGreaterThan(data, rounding) ? data.toFixed(rounding) : String(data);
+  switch (data.constructor) {
+    case 'Matrix':
+      return '\\begin{bmatrix}' +
+        data.value.elements
+          .map(row => {
+            return row.map(r => primitiveToTex(r, rounding)).join(' & ');
+          })
+          .join('\\\\') +
+        '\\end{bmatrix}';
+
+    case 'Vector':
+    case 'Array':
+      return `\\begin{bmatrix}
+        ${data.value.map(r => primitiveToTex(r, rounding)).join(' & ')}
+      \\end{bmatrix}`;
+
+    default:
+      return '\\left\\{' +
+        Object.keys(data.value)
+          .map(key => `\\mathrm{${key}\\!:}\\,${primitiveToTex(data[key], rounding)}`)
+          .join(', ') +
+        '\\right\\}';
   }
 
-  if (data === null || typeof data === 'boolean') {
-    return `\\mathbf{${data}}`;
-  }
-
-  if (data instanceof Array) {
-    if (data[0] instanceof Array) {
-      data = data.map(row => row.map(r => symbolToTex(r, rounding)).join(' & '));
-    }
-
-    return `\\begin{bmatrix}
-      ${data.map(r => symbolToTex(r, rounding)).join('\\\\\n')}
-    \\end{bmatrix}`;
-  }
-
-  return '\\left\\{' +
-    Object.keys(data)
-      .map(key => `\\mathrm{${key}\\!:}\\,${symbolToTex(data[key], rounding)}`)
-      .join(', ') +
-    '\\right\\}';
 }
 
 const startBlock = `\\begin{sylvEquation}`;
@@ -99,7 +119,7 @@ class Renderer {
         .map(eg => {
           const approx = anyHavePrecisionGreaterThan(eg.retValue, this._precision);
           return symbolToTex(eg.callee) +
-            `\\!\\!{.}\\mathrm{${symbolToTex(eg.method)}}` +
+            `\\!\\!{.}\\mathrm{${eg.method}}` +
             `(${eg.args.map(symbolToTex).join(', ')})&` +
             (approx ? '\\approx' : '=') +
             symbolToTex(eg.retValue, this._precision);

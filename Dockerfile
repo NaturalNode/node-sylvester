@@ -7,9 +7,9 @@ RUN apt-get install -y liblapacke liblapack-dev
 # Create watcher script
 RUN npm install -g nodemon
 RUN echo '#!/bin/sh \n\
-nodemon -w /sylv -x "cp -R /sylv/src /usr/src/app \
-    && cp -R /sylv/test /usr/src/app \
-    && cd /usr/src/app \
+cd /usr/src/app \n\
+nodemon -L --watch /sylv/test --watch /sylv/src -x "cp -R /sylv/src . \
+    && cp -R /sylv/test . \
     && npm test \
     && cp /usr/src/app/doc/gen/examples.json /sylv/doc/gen" \
 ' > /bin/watch

@@ -61,6 +61,19 @@ class Interceptor {
 }
 
 /**
+ * Formats the return value for marshalling.
+ * @param  {Object} value
+ * @return {Object}
+ */
+function formatValue(value) {
+  return {
+    constructor: value && value.constructor && value.constructor.name,
+    type: typeof value,
+    value
+  };
+}
+
+/**
  * Magical function that can intercept method calls and stick them in a JSON
  * for the LaTeX renderer to pull.
  * @example
@@ -73,7 +86,13 @@ class Interceptor {
 export function asDiagram(name) { // yes, this is very magic, but it makes our tests clean
   function expectCall(instance) {
     new Interceptor(instance).intercept((method, args, retValue) => {
-      const record = { callee: instance, args, method, retValue };
+      const record = {
+        args: args.map(formatValue),
+        callee: formatValue(instance),
+        method,
+        retValue: formatValue(retValue)
+      };
+
       if (name in examples) {
         examples[name].push(record);
       } else {
