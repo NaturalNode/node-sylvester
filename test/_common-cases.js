@@ -45,11 +45,6 @@ const testCommunitiveCases = (method, testCases) => (ForType, expectCall) => {
       }
 
       expectCall(a)[method](b); // just for the docs
-      expect(() => a[method]({})).to.throw(
-        InvalidOperationError,
-        '',
-        `Expected ${a.inspect()}.${method}({}) to throw`,
-      );
     }
   }
 };

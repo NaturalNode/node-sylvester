@@ -2,9 +2,19 @@ import { Line } from './line';
 import { Matrix } from './matrix';
 import { Sylvester, OutOfRangeError, InvalidOperationError } from './sylvester';
 import { Vector } from './vector';
-import { isPlaneLike, isLineLike, isSegmentLike, isVectorOrListLike, isGeometry } from './likeness';
+import { isPlaneLike, isLineLike, isSegmentLike, isVectorOrListLike, isGeometry, VectorOrList, Geometry } from './likeness';
 
 export class Plane {
+  /**
+   * Plane anchor point.
+   */
+  public readonly anchor: Vector;
+
+  /**
+   * Plane normal from the anchor.
+   */
+  public readonly normal: Vector;
+
   /**
    * Creates a plan from the anchor point and normal to the plane. If three
    * arguments are specified, the normal is calculated by assuming the three
@@ -15,7 +25,7 @@ export class Plane {
    * @param {?(Vector|number[])} v2
    * @returns {Plane}
    */
-  constructor(anchor, v1, v2 = null) {
+  constructor(anchor: VectorOrList, v1: VectorOrList, v2?: VectorOrList) {
     anchor = new Vector(anchor).to3D();
     v1 = new Vector(v1).to3D();
     v2 = v2 && new Vector(v2).to3D();
@@ -27,7 +37,7 @@ export class Plane {
     const v13 = v1.elements[2];
     let normal;
     let mod;
-    if (v2 === null) {
+    if (!v2) {
       mod = Math.sqrt(v11 * v11 + v12 * v12 + v13 * v13);
       if (mod === 0) {
         throw new OutOfRangeError('Vectors provided to the plane must refer to unique points');
@@ -43,7 +53,7 @@ export class Plane {
         (v13 - A3) * (v21 - A1) - (v11 - A1) * (v23 - A3),
         (v11 - A1) * (v22 - A2) - (v12 - A2) * (v21 - A1),
       ]);
-      mod = normal.modulus();
+      mod = normal.magnitude();
       if (mod === 0) {
         throw new OutOfRangeError(
           'Vectors provided to the plane must refer to unique, non-colinear points',
@@ -63,20 +73,16 @@ export class Plane {
 
   /**
    * Returns true iff the plane occupies the same space as the argument.
-   * @param {Plane} plane
-   * @param {Number} epsilon precision used for comparing angles
-   * @returns {Boolean}
+   * @param epsilon - precision used for comparing angles
    */
-  eql(plane, epsilon = Sylvester.precision) {
-    return this.contains(plane.anchor) && this.isParallelTo(plane, epsilon);
+  public eql(plane: unknown, epsilon = Sylvester.precision): boolean {
+    return plane instanceof Plane && this.contains(plane.anchor) && this.isParallelTo(plane, epsilon);
   }
 
   /**
    * Returns the result of translating the plane by the given vector
-   * @param {Vector|number[]} vector
-   * @returns {Plane}
    */
-  translate(vector) {
+  public translate(vector: VectorOrList): Plane {
     const V = Vector.toElements(vector, 3);
     return new Plane(
       [
@@ -91,12 +97,9 @@ export class Plane {
   /**
    * Returns true iff the plane is parallel to the argument. Will return true
    * if the planes are equal, or if you give a line and it lies in the plane.
-   *
-   * @param {Plane|Line|Segment|Vector} obj
-   * @param {Number} epsilon precision used for comparing angles
-   * @returns {Boolean}
+   * @param epsilon - precision used for comparing angles
    */
-  isParallelTo(obj, epsilon = Sylvester.precision) {
+  public isParallelTo(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isPlaneLike(obj)) {
       return this.normal.isParallelTo(obj.normal, epsilon);
     } else if (isLineLike(obj)) {
@@ -112,10 +115,9 @@ export class Plane {
 
   /**
    * Returns true iff the receiver is perpendicular to the argument.
-   * @param {Plane|Line|Segment|Vector} obj
-   * @returns {Boolean}
+   * @param epsilon - precision used for comparing angles
    */
-  isPerpendicularTo(obj, epsilon = Sylvester.precision) {
+  public isPerpendicularTo(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isPlaneLike(obj)) {
       return this.normal.isPerpendicularTo(obj.normal, epsilon);
     } else if (isLineLike(obj)) {
@@ -131,10 +133,8 @@ export class Plane {
 
   /**
    * Returns the plane's distance from the given object (point, line or plane)
-   * @param {Line|Plane|Vector} obj
-   * @returns {Number}
    */
-  distanceFrom(obj) {
+  public distanceFrom(obj: Geometry): number {
     if (this.intersects(obj) || this.contains(obj)) {
       return 0;
     }
@@ -158,11 +158,9 @@ export class Plane {
 
   /**
    * Returns true iff the plane contains the given point or line.
-   * @param {Line|Vector} obj
-   * @param {Number} epsilon precision used for comparing angles
-   * @returns {Boolean}
+   * @param epsilon - precision used for comparing angles
    */
-  contains(obj, epsilon = Sylvester.precision) {
+  public contains(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isLineLike(obj)) {
       return (
         this.contains(obj.anchor, epsilon) && this.contains(obj.anchor.add(obj.direction), epsilon)
@@ -188,7 +186,7 @@ export class Plane {
    * @param {Number} epsilon precision used for comparing angles
    * @returns {Boolean}
    */
-  intersects(obj, epsilon = Sylvester.precision) {
+  public intersects(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isVectorOrListLike(obj)) {
       return this.contains(obj, epsilon);
     } else if (isGeometry(obj)) {
@@ -201,12 +199,11 @@ export class Plane {
   /**
    * Returns the unique intersection with the argument, if one exists. The result
    * will be a vector if a line is supplied, and a line if a plane is supplied.
-   * @param {Line|Plane} obj
-   * @param {Number} epsilon precision used for comparing angles
-   * @returns {Vector|Plane|null} a vector on an intersection with a line, a
-   * line if intersecting with a plane, or null if there is no intersection.
+   * @param epsilon - precision used for comparing angles
    */
-  intersectionWith(obj, epsilon = Sylvester.precision) {
+  intersectionWith(obj: Line, epsilon?: number): Vector;
+  intersectionWith(obj: Plane, epsilon?: number): Line;
+  intersectionWith(obj: Plane | Line, epsilon = Sylvester.precision): Line | Vector | null {
     if (!this.intersects(obj, epsilon)) {
       return null;
     }
@@ -247,7 +244,7 @@ export class Plane {
       let i = 0;
       while (solver.isSingular()) {
         i++;
-        solver = Matrix.create([
+        solver = new Matrix([
           [N[i % 3], N[(i + 1) % 3]],
           [O[i % 3], O[(i + 1) % 3]],
         ]);
@@ -277,7 +274,7 @@ export class Plane {
    * @param {Vector|number[]} point
    * @returns {Vector}
    */
-  pointClosestTo(point) {
+  public pointClosestTo(point: VectorOrList): Vector {
     const P = Vector.toElements(point, 3);
     const A = this.anchor.elements;
     const N = this.normal.elements;
@@ -288,11 +285,9 @@ export class Plane {
   /**
    * Returns a copy of the plane, rotated by t radians about the given line.
    * See notes on {@link Line.rotate}.
-   * @param {Number} t
-   * @param {Line} line
-   * @returns {Plane}
+   * @param t - degrees in radians
    */
-  rotate(t, line) {
+  public rotate(t: number | Matrix, line: Line): Plane {
     const R = t instanceof Matrix ? t.elements : Matrix.Rotation(t, line.direction).elements;
     const C = line.pointClosestTo(this.anchor).elements;
     const A = this.anchor.elements;
@@ -322,10 +317,8 @@ export class Plane {
 
   /**
    * Returns the reflection of the plane in the given point, line or plane.
-   * @param {Plane|Line|Vector|number[]} obj
-   * @returns {Plane}
    */
-  reflectionIn(obj) {
+  public reflectionIn(obj: Geometry): Plane {
     if (isPlaneLike(obj)) {
       const A = this.anchor.elements;
       const N = this.normal.elements;
@@ -355,6 +348,10 @@ export class Plane {
       return this.rotate(Math.PI, obj);
     }
 
+    if (isSegmentLike(obj)) {
+      return this.rotate(Math.PI, obj.line);
+    }
+
     const P = Vector.toElements(obj, 3);
     return new Plane(this.anchor.reflectionIn([P[0], P[1], P[2]]), this.normal);
   }
@@ -363,7 +360,7 @@ export class Plane {
    * Returns a textual representation of the object.
    * @returns {String}
    */
-  inspect() {
+  public inspect() {
     return `Plane<${this.anchor.inspect()}, ${this.normal.inspect()}>`;
   }
 
@@ -373,18 +370,18 @@ export class Plane {
    * @param {(Vector|number)[]} points
    * @returns {Vector|null}
    */
-  static fromPoints(...points) {
+  public static fromPoints(...points: ReadonlyArray<VectorOrList>) {
     const np = points.length;
-    const list = [];
-    let i;
-    let P;
-    let n;
-    let N;
-    let A;
-    let B;
-    let C;
-    let theta;
-    let prevN;
+    const list: Vector[] = [];
+    let i: number;
+    let P: Vector;
+    let n: number = 0;
+    let N: Vector;
+    let A: ReadonlyArray<number>;
+    let B: ReadonlyArray<number>;
+    let C: ReadonlyArray<number>;
+    let theta: number;
+    let prevN: Vector | undefined;
     let totalN = Vector.Zero(3);
     for (i = 0; i < np; i++) {
       P = new Vector(points[i]).to3D();
@@ -405,7 +402,7 @@ export class Plane {
           // If the latest normal is not (anti)parallel to the previous one, we've strayed off the plane.
           // This might be a slightly long-winded way of doing things, but we need the sum of all the normals
           // to find which way the plane normal should point so that the points form an anticlockwise list.
-          theta = N.angleFrom(prevN);
+          theta = N.angleFrom(prevN!);
           if (!isNaN(theta)) {
             if (
               !(
@@ -444,9 +441,32 @@ export class Plane {
 
     return new Plane(list[0], totalN);
   }
-}
 
-// X-Y-Z planes
-Plane.XY = Plane.YX = new Plane(Vector.Zero(3), Vector.k);
-Plane.YZ = Plane.ZY = new Plane(Vector.Zero(3), Vector.i);
-Plane.ZX = Plane.XZ = new Plane(Vector.Zero(3), Vector.j);
+  /**
+   * XY plane.
+   */
+  public static readonly XY = new Plane(Vector.Zero(3), Vector.k);
+
+  /**
+   * YX plane.
+   */
+  public static readonly YX = new Plane(Vector.Zero(3), Vector.k);
+  /**
+   * YZ plane.
+   */
+  public static readonly YZ = new Plane(Vector.Zero(3), Vector.i);
+
+  /**
+   * ZY plane.
+   */
+  public static readonly ZY = new Plane(Vector.Zero(3), Vector.i);
+  /**
+   * ZX plane.
+   */
+  public static readonly ZX = new Plane(Vector.Zero(3), Vector.j);
+
+  /**
+   * XZ plane.
+   */
+  public static readonly XZ = new Plane(Vector.Zero(3), Vector.j);
+}

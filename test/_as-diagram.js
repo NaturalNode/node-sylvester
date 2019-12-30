@@ -1,4 +1,4 @@
-import fs from 'fs';
+import * as fs from 'fs';
 import { expect } from 'chai';
 import { Vector } from '../src/vector';
 import { Matrix } from '../src/matrix';
@@ -65,5 +65,8 @@ const replacer = (_key, value) => {
 };
 
 after(() =>
-  fs.writeFileSync(`${__dirname}/../doc/gen/examples.json`, JSON.stringify(examples, replacer, 2)),
+  fs.writeFileSync(
+    `${__dirname}/../../doc/gen/examples.json`,
+    JSON.stringify(examples, replacer, 2),
+  ),
 );

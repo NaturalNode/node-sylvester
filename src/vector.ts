@@ -1,21 +1,23 @@
 import { DimensionalityMismatchError, Sylvester, InvalidOperationError } from './sylvester';
 import {
-  isSegmentLike,
   isPlaneLike,
-  isVectorLike,
   isLineLike,
   isVectorOrListLike,
   isGeometry,
+  VectorOrList,
+  Geometry,
 } from './likeness';
 import { Matrix } from './matrix';
 import { Line } from './line';
+import { Plane } from './plane';
 
 /**
  * Returns the elements from the given vector or number array.
  * @param {Vector|Number[]} vectorOrList
  * @returns {Number[]}
  */
-const getElements = vectorOrList => vectorOrList.elements || vectorOrList;
+const getElements = (vectorOrList: VectorOrList): ReadonlyArray<number> =>
+  (vectorOrList as any).elements || vectorOrList;
 
 /**
  * The Vector class is designed to model vectors in any number of dimensions.
@@ -27,12 +29,11 @@ const getElements = vectorOrList => vectorOrList.elements || vectorOrList;
 export class Vector {
   /**
    * Gets the elements of the vector or list of numbers.
-   * @param {Vector|number} vectorOrElements
-   * @param {number} Desired dimension of elements
+   * @param requireDimension - Desired dimension of elements
    * @private
    */
-  static toElements(vectorOrElements, requireDimension = undefined) {
-    let elements = vectorOrElements.elements || vectorOrElements;
+  public static toElements(vectorOrElements: VectorOrList, requireDimension?: number) {
+    let elements = getElements(vectorOrElements);
 
     if (!requireDimension || requireDimension === elements.length) {
       return elements;
@@ -44,30 +45,48 @@ export class Vector {
       );
     }
 
-    elements = elements.slice();
+    const dup = (elements = elements.slice());
     while (elements.length < requireDimension) {
-      elements.push(0);
+      dup.push(0);
     }
 
-    return elements;
+    return dup;
   }
 
   /**
-   * Creates a new vector, initializing it with the provided elements.
-   * @param  {Vector|Number[]} elements
+   * Unit vector `[1, 0, 0]`
    */
-  constructor(elements) {
+  public static readonly i = new Vector([1, 0, 0]);
+
+  /**
+   * Unit vector `[0, 1, 0]`
+   */
+  public static readonly j = new Vector([0, 1, 0]);
+
+  /**
+   * Unit vector `[0, 0, 1]`
+   */
+  public static readonly k = new Vector([0, 0, 1]);
+
+  /**
+   * Vector elements.
+   */
+  public readonly elements: ReadonlyArray<number>;
+
+  /**
+   * Creates a new vector, initializing it with the provided elements.
+   */
+  constructor(elements: VectorOrList) {
     this.elements = Vector.toElements(elements);
   }
 
   /**
    * Returns the magnitude (also: euclidean norm, magnitude) of the vector.
    *
-   * $example Vector.magnitude
    * @see https://en.wikipedia.org/wiki/Euclidean_distance
    * @return {Number}
    */
-  magnitude() {
+  public magnitude() {
     let sum = 0;
     for (let i = 0; i < this.elements.length; i++) {
       sum += this.elements[i] * this.elements[i];
@@ -79,12 +98,8 @@ export class Vector {
   /**
    * Returns the `ith` element if the vector. Returns null if `i` is out
    * of bounds, indexing starts from 1.
-   *
-   * $example Vector.e
-   * @param  {Number} i
-   * @return {Number}
    */
-  e(i) {
+  public e(i: number) {
     return i < 1 || i > this.elements.length ? null : this.elements[i - 1];
   }
 
@@ -94,7 +109,7 @@ export class Vector {
    * $example Vector.dimensions
    * @return {IDimensions} the "rows" will always equal zero
    */
-  dimensions() {
+  public dimensions() {
     return {
       rows: 1,
       cols: this.elements.length,
@@ -107,7 +122,7 @@ export class Vector {
    * $example Vector.rows
    * @return {Number} always `1`
    */
-  rows() {
+  public rows() {
     return 1;
   }
 
@@ -117,41 +132,42 @@ export class Vector {
    * $example Vector.cols
    * @return {Number}
    */
-  cols() {
+  public cols() {
     return this.elements.length;
   }
 
   /**
    * Returns if the Vector is equal to the input vector.
-   * $example Vector.eql
-   * @param {Vector} vector
-   * @param {Number} epsilon The precision to compare each number.
-   * @return {Boolean}
+   * @param epsilon - The precision to compare each number.
    */
-  eql(vector, precision = Sylvester.approxPrecision) {
-    if (!isVectorOrListLike(vector)) {
+  public eql(other: unknown, precision = Sylvester.approxPrecision) {
+    if (!isGeometry(other)) {
+      return false;
+    }
+
+    if (!isVectorOrListLike(other)) {
       return false;
     }
 
     let n = this.elements.length;
-    const elements = getElements(vector);
+    const elements = getElements(other);
     if (n !== elements.length) {
       return false;
     }
+
     while (n--) {
       if (Math.abs(this.elements[n] - elements[n]) > precision) {
         return false;
       }
     }
+
     return true;
   }
 
   /**
    * Returns a new function created by calling the iterator on all values of this vector.
-   * @param  {Function} fn
-   * @return {Vector}
    */
-  map(fn) {
+  public map(fn: (value: number, index: number) => number) {
     const n = this.elements.length;
     const elements = new Array(n);
     for (let i = 0; i < n; i++) {
@@ -165,7 +181,7 @@ export class Vector {
    * Iterates through the elements of the vector
    * @param {Function} fn called with the `(element, index)`
    */
-  each(fn) {
+  public each(fn: (value: number, index: number) => void) {
     const n = this.elements.length;
     for (let i = 0; i < n; i++) {
       fn(this.elements[i], i + 1);
@@ -175,14 +191,11 @@ export class Vector {
   /**
    * Returns a new vector created by normalizing this one to a have a
    * magnitude of `1`. If the vector is the zero vector, it will not be modified.
-   *
-   * $example Vector.toUnitVector
-   * @return {Vector}
    */
-  toUnitVector() {
-    const r = this.modulus();
+  public toUnitVector() {
+    const r = this.magnitude();
     if (r === 0) {
-      return this.dup();
+      return this;
     }
 
     return this.map(x => x / r);
@@ -191,13 +204,11 @@ export class Vector {
   /**
    * Returns the angle between this vector the argument in radians. If the
    * vectors are mirrored across their axes this will return `NaN`.
-   * $example Vector.angleFrom
+   *
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
-   * @param  {Vector|number[]} vector
-   * @return {Number}
    */
-  angleFrom(vector) {
+  public angleFrom(vector: VectorOrList) {
     const V = getElements(vector);
     const n = this.elements.length;
     if (n !== V.length) {
@@ -233,12 +244,9 @@ export class Vector {
 
   /**
    * Returns whether the vectors are parallel to each other.
-   * $example Vector.isParallelTo
-   * @param {Vector|Plane|Segment|Line} obj
-   * @param {Number} epsilon precision used for comparing angles
-   * @return {Boolean}
+   * @param epsilon - precision used for comparing angles
    */
-  isParallelTo(obj, epsilon = Sylvester.precision) {
+  public isParallelTo(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isVectorOrListLike(obj)) {
       return this.angleFrom(obj) <= epsilon;
     } else if (isGeometry(obj)) {
@@ -250,24 +258,19 @@ export class Vector {
 
   /**
    * Returns whether the vectors are antiparallel to each other.
-   * $example Vector.isAntiparallelTo
-   * @param {Vector} vector
-   * @param {Number} epsilon precision used for comparing angles
-   * @return {Boolean}
+   * @param epsilon - precision used for comparing angles
    */
-  isAntiparallelTo(vector, epsilon = Sylvester.precision) {
+  public isAntiparallelTo(vector: VectorOrList, epsilon = Sylvester.precision) {
     const angle = this.angleFrom(vector);
     return Math.abs(angle - Math.PI) <= epsilon;
   }
 
   /**
    * Returns whether the vectors are perpendicular to each other.
-   * $example Vector.isPerpendicularTo
-   * @param {Vector|Plane|Segment|Line|number[]} obj
-   * @param {Number} epsilon precision used for comparing angles
+   * @param epsilon - precision used for comparing angles
    * @return {Boolean}
    */
-  isPerpendicularTo(obj, epsilon = Sylvester.precision) {
+  public isPerpendicularTo(obj: Geometry, epsilon = Sylvester.precision) {
     if (isVectorOrListLike(obj)) {
       return Math.abs(this.dot(obj)) <= epsilon;
     } else if (isGeometry(obj)) {
@@ -277,12 +280,12 @@ export class Vector {
     }
   }
 
-  _runBinaryOp(value, operator) {
+  private _runBinaryOp(value: VectorOrList | number, operator: (a: number, b: number) => number) {
     if (typeof value === 'number') {
       return this.map(v => operator(v, value));
     }
 
-    const values = value.elements || value;
+    const values = getElements(value);
     if (this.elements.length !== values.length) {
       throw new DimensionalityMismatchError('Cannot add vectors with different dimensions.');
     }
@@ -293,26 +296,20 @@ export class Vector {
   /**
    * When the input is a constant, this returns the result of adding it to
    * all cevtor elements. When it's a vector, the vectors will be added.
-   * $example Vector.add
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
-   * @param {Number|Number[]|Vector} value
-   * @return {Vector}
    */
-  add(value) {
+  public add(value: VectorOrList | number) {
     return this._runBinaryOp(value, (a, b) => a + b);
   }
 
   /**
    * When the input is a constant, this returns the result of subtracting it
    * from all vector elements. When it's a vector, the vectors will be subtracted.
-   * $example Vector.subtract
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
-   * @param {Number|Number[]|Vector} value
-   * @return {Vector}
    */
-  subtract(value) {
+  public subtract(value: VectorOrList | number) {
     return this._runBinaryOp(value, (a, b) => a - b);
   }
 
@@ -320,22 +317,24 @@ export class Vector {
    * When the input is a constant, this returns the result of multiplying it
    * with all vector elements. When it's a vector, the vectors will be
    * element-wise multiplied.
-   * $example Vector.multiply
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
-   * @param {Number|Number[]|Vector} value
-   * @return {Vector}
    */
-  multiply(value) {
+  public multiply(value: VectorOrList | number) {
     return this._runBinaryOp(value, (a, b) => a * b);
   }
 
   /**
-   * Returns the sum of all elements in the Vector.
-   * $example Vector.sum
-   * @return {Number}
+   * @alias Vector#multiply
    */
-  sum() {
+  x(value: VectorOrList | number) {
+    return this.multiply(value);
+  }
+
+  /**
+   * Returns the sum of all elements in the Vector.
+   */
+  public sum() {
     let sum = 0;
     this.each(x => {
       sum += x;
@@ -345,11 +344,8 @@ export class Vector {
 
   /**
    * Returns a new vector with the first `n` elements removed from the beginning.
-   * $example Vector.chomp
-   * @param  {Number} n
-   * @return {Vector}
    */
-  chomp(n) {
+  public chomp(n: number) {
     const elements = [];
     for (let i = n; i < this.elements.length; i++) {
       elements.push(this.elements[i]);
@@ -360,11 +356,8 @@ export class Vector {
 
   /**
    * Returns a new vector consisting only of the first `n` elements.
-   * $example Vector.chomp
-   * @param  {Number} n
-   * @return {Vector}
    */
-  top(n) {
+  public top(n: number) {
     const elements = [];
     for (let i = 0; i < n; i++) {
       elements.push(this.elements[i]);
@@ -376,25 +369,15 @@ export class Vector {
   /**
    * Returns a new vector with the provided `elements` concatenated on the end.
    * $example Vector.augment
-   * @param  {Number[]|Vector} elements
-   * @return {Vector}
    */
-  augment(elements) {
-    return new Vector(this.elements.concat(elements.elements || elements));
+  public augment(elements: VectorOrList) {
+    return new Vector(this.elements.concat(getElements(elements)));
   }
 
   /**
-   * @alias Vector#multiply
-   */
-  x(k) {
-    return this.multiply(k);
-  }
-  /**
    * Returns the product of all elements in the vector.
-   * $example Vector.product
-   * @return {Number}
    */
-  product() {
+  public product() {
     let p = 1;
     this.each(v => {
       p *= v;
@@ -405,15 +388,11 @@ export class Vector {
 
   /**
    * Returns the scalar (dot) product of the vector with the argument.
-   *
-   * $example Vector.dot
    * @see https://en.wikipedia.org/wiki/Scalar_product
    * @throws {DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
-   * @param  {Vector|Number[]} vector
-   * @return {Number}
    */
-  dot(vector) {
+  public dot(vector: VectorOrList) {
     const V = getElements(vector);
     let n = this.elements.length;
     if (n !== V.length) {
@@ -431,12 +410,10 @@ export class Vector {
 
   /**
    * Returns the vector product of the vector with the argument.
-   * @param {Vector|number[]} vector
    * @throws {DimensionalityMismatchError} if either this or the other vector
-   * is not three-dimensional.
-   * @returns {Vector}
+   *   is not three-dimensional.
    */
-  cross(vector) {
+  public cross(vector: VectorOrList) {
     const B = getElements(vector);
     if (this.elements.length !== 3 || B.length !== 3) {
       throw new DimensionalityMismatchError(
@@ -454,9 +431,8 @@ export class Vector {
 
   /**
    * Returns the (absolute) largest element of the vector
-   * @returns {Number}
    */
-  max() {
+  public max() {
     let m = 0;
     let i = this.elements.length;
     while (i--) {
@@ -469,9 +445,9 @@ export class Vector {
 
   /**
    * Returns the index of the absolute largest element of the vector.
-   * @returns {Number} Will be -1 if the vector is empty
+   * @returns Will be -1 if the vector is empty
    */
-  maxIndex() {
+  public maxIndex() {
     let m = -1;
     let i = this.elements.length;
     let maxIndex = -1;
@@ -488,10 +464,8 @@ export class Vector {
 
   /**
    * Returns the index of the first instance of the value in the vector, or -1.
-   * @param {Number} x
-   * @returns {Number}
    */
-  indexOf(x) {
+  public indexOf(x: number) {
     for (let i = 0; this.elements.length; i++) {
       if (this.elements[i] === x) {
         return i + 1;
@@ -505,7 +479,7 @@ export class Vector {
    * Returns a diagonal matrix with the vector's elements as its diagonal elements
    * @returns {Matrix}
    */
-  toDiagonalMatrix() {
+  public toDiagonalMatrix() {
     return Matrix.Diagonal(this.elements);
   }
 
@@ -513,7 +487,7 @@ export class Vector {
    * Returns the result of rounding the elements of the vector
    * @returns {Vector}
    */
-  round() {
+  public round() {
     return this.map(x => Math.round(x));
   }
 
@@ -521,14 +495,14 @@ export class Vector {
    * Transpose a Vector, return a 1xn Matrix.
    * @returns {Matrix}
    */
-  transpose() {
+  public transpose() {
     const rows = this.elements.length;
     const elements = [];
 
     for (let i = 0; i < rows; i++) {
       elements.push([this.elements[i]]);
     }
-    return Matrix.create(elements);
+    return new Matrix(elements);
   }
 
   /**
@@ -538,7 +512,7 @@ export class Vector {
    * @param {Number} epsilon
    * @return {Matrix}
    */
-  snapTo(target, epsilon = Sylvester.precision) {
+  public snapTo(target: number, epsilon = Sylvester.precision) {
     return this.map(p => (Math.abs(p - target) <= epsilon ? target : p));
   }
 
@@ -546,10 +520,7 @@ export class Vector {
    * Returns the vector's distance from the argument, when considered as a point in space
    * @param {Vector|Line|Plane} obj
    */
-  distanceFrom(obj) {
-    if (!isGeometry(obj)) {
-      throw new InvalidOperationError(`Cannot get the distance from ${obj}`);
-    }
+  public distanceFrom(obj: Geometry): number {
     if (!isVectorOrListLike(obj)) {
       return obj.distanceFrom(this);
     }
@@ -567,86 +538,64 @@ export class Vector {
 
   /**
    * Returns true if the vector is point on the given line
-   * @param {Line} line
-   * @returns {Boolean}
    */
-  liesOn(line) {
+  public liesOn(line: Line) {
     return line.contains(this);
   }
 
   /**
    * Returns true if the vector is point on the given plane
-   * @param {Plane} plane
-   * @returns {Boolean}
    */
-  liesIn(plane) {
+  public liesIn(plane: Plane) {
     return plane.contains(this);
   }
 
   /**
-   * Rotates the vector about the given object. The object should be a point
-   * if the vector is 2D, and a line if it is 3D. Be careful
-   * with line directions!
-   * @param {Number|Vector|Matrix} t
-   * @param {Vector|Line} obj
+   * Rotates the 2D vector about the given point.
+   * @param t - Radians or rotation matrix to use
    */
-  rotate(t, obj) {
-    let V;
-    let R = null;
-    let x;
-    let y;
-    let z;
-    let C;
-    if (t instanceof Matrix) {
-      R = t.elements;
-    }
-    switch (this.elements.length) {
-      case 2:
-        V = Vector.toElements(obj, 2);
-        if (!R) {
-          R = Matrix.Rotation(t).elements;
-        }
-        x = this.elements[0] - V[0];
-        y = this.elements[1] - V[1];
-        return new Vector([V[0] + R[0][0] * x + R[0][1] * y, V[1] + R[1][0] * x + R[1][1] * y]);
-      case 3:
-        if (!isLineLike(obj)) {
-          throw new DimensionalityMismatchError('A line must be provided to rotate a 3D vector');
-        }
-        C = obj.pointClosestTo(this).elements;
-        if (!R) {
-          R = Matrix.Rotation(t, obj.direction).elements;
-        }
-        x = this.elements[0] - C[0];
-        y = this.elements[1] - C[1];
-        z = this.elements[2] - C[2];
-        return new Vector([
-          C[0] + R[0][0] * x + R[0][1] * y + R[0][2] * z,
-          C[1] + R[1][0] * x + R[1][1] * y + R[1][2] * z,
-          C[2] + R[2][0] * x + R[2][1] * y + R[2][2] * z,
-        ]);
-      default:
-        throw new DimensionalityMismatchError(`Cannot rotate a ${this.elements.length}D vector`);
-    }
+  public rotate2D(t: number | Matrix, obj: VectorOrList) {
+    const V = Vector.toElements(obj, 2);
+    const R = t instanceof Matrix ? t.elements : Matrix.Rotation(t).elements;
+    const x = this.elements[0] - V[0];
+    const y = this.elements[1] - V[1];
+    return new Vector([V[0] + R[0][0] * x + R[0][1] * y, V[1] + R[1][0] * x + R[1][1] * y]);
+  }
+
+  /**
+   * Rotates the 3D vector about the given line. Be careful
+   * with line directions!
+   * @param t - Radians or rotation matrix to use
+   */
+  public rotate3D(t: number | Matrix, obj: Line) {
+    const elements = this.to3D().elements;
+    const pivot = obj.pointClosestTo(elements)!.elements;
+    const rotation = t instanceof Matrix ? t.elements : Matrix.Rotation(t, obj.direction).elements;
+    const x = elements[0] - pivot[0];
+    const y = elements[1] - pivot[1];
+    const z = elements[2] - pivot[2];
+    return new Vector([
+      pivot[0] + rotation[0][0] * x + rotation[0][1] * y + rotation[0][2] * z,
+      pivot[1] + rotation[1][0] * x + rotation[1][1] * y + rotation[1][2] * z,
+      pivot[2] + rotation[2][0] * x + rotation[2][1] * y + rotation[2][2] * z,
+    ]);
   }
 
   /**
    * Returns the result of reflecting the point in the given point, line or plane.
    * @param {Vector|Line|Plane} obj
    */
-  reflectionIn(obj) {
-    if (obj.anchor) {
-      // obj is a plane or line
-      const P = this.elements.slice();
-      const C = obj.pointClosestTo(P).elements;
-      return new Vector(P.map((p, i) => C[i] + (C[i] - p)));
+  public reflectionIn(obj: VectorOrList | Line | Plane) {
+    if (isPlaneLike(obj) || isLineLike(obj)) {
+      const C = obj.pointClosestTo(this)!.elements;
+      return new Vector(this.elements.map((p, i) => C[i] + (C[i] - p)));
     }
 
     // obj is a point
     const Q = getElements(obj);
     if (this.elements.length !== Q.length) {
       throw new DimensionalityMismatchError(
-        `Cannot rotate a ${this.elements.dimensions}D point around the given ${Q.length}D point`,
+        `Cannot rotate a ${this.elements.length}D point around the given ${Q.length}D point`,
       );
     }
     return this.map((x, i) => {
@@ -656,10 +605,8 @@ export class Vector {
 
   /**
    * Runs an element-wise logarithm on the vector.
-   * @param {Number} Log base
-   * @return {Matrix}
    */
-  log(base = Math.E) {
+  public log(base = Math.E) {
     const logBase = Math.log(base); // change of base
     return this.map(x => Math.log(x) / logBase);
   }
@@ -667,19 +614,16 @@ export class Vector {
   /**
    * Utility to make sure vectors are 3D. If they are 1/2D, a zero component is added.
    * @throws {DimensionalityMismatchError} if the vector has greater than three elements
-   * @returns {Vector}
    */
-  to3D() {
+  public to3D() {
     return this.toDimension(3);
   }
 
   /**
    * Pads the vector with zero's until it reaches the given dimension.
    * @throws {DimensionalityMismatchError} if the vector has greater than n elements
-   * @param {Number} n
-   * @returns {Vector}
    */
-  toDimension(n) {
+  public toDimension(n: number) {
     if (this.elements.length > n) {
       throw new DimensionalityMismatchError(
         `Cannot convert a ${this.elements.length}D vector to a ${n}D one`,
@@ -696,25 +640,22 @@ export class Vector {
 
   /**
    * Returns a string representation of the vector
-   * @returns {String}
    */
-  inspect() {
+  public inspect() {
     return `Vector<[${this.elements.join(', ')}]>`;
   }
 
   /**
    * @inheritdoc
    */
-  toJSON() {
+  public toJSON() {
     return this.elements;
   }
 
   /**
    * Creates vector of the given size filled with random values in the range `[0, 1)`.
-   * @param {Number} size
-   * @returns {Vector}
    */
-  static Random(size) {
+  public static Random(size: number): Vector {
     const elements = [];
     while (size--) {
       elements.push(Math.random());
@@ -724,11 +665,8 @@ export class Vector {
 
   /**
    * Creates a vector filled with the given value.
-   * @param {Number} size
-   * @param {Number} value
-   * @returns {Vector}
    */
-  static Fill(size, value) {
+  public static Fill(size: number, value: number): Vector {
     const elements = [];
     while (size--) {
       elements.push(value);
@@ -738,31 +676,15 @@ export class Vector {
 
   /**
    * Creates an n-length vector filled with zeroes.
-   * @param {Number} size
-   * @returns {Vector}
    */
-  static Zero(n) {
+  public static Zero(n: number): Vector {
     return Vector.Fill(n, 0);
   }
 
   /**
    * Creates an n-length vector filled with ones.
-   * @param {Number} size
-   * @returns {Vector}
    */
-  static One(n) {
+  public static One(n: number): Vector {
     return Vector.Fill(n, 1);
   }
 }
-
-// i, j, k unit vectors
-Vector.i = new Vector([1, 0, 0]);
-Vector.j = new Vector([0, 1, 0]);
-Vector.k = new Vector([0, 0, 1]);
-
-// The following are shims for deprecated methods removed in 1.0.0
-Vector.prototype.modulus = Vector.prototype.magnitude;
-Vector.prototype.norm = Vector.prototype.magnitude;
-Vector.prototype.dup = function() {
-  return this.map(x => x);
-};

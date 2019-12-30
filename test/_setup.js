@@ -1,4 +1,4 @@
-import chai from 'chai';
+import * as chai from 'chai';
 import { Matrix, Vector, Sylvester, Line, Plane } from '../src';
 import { Segment } from '../src/line';
 import { Polygon } from '../src/polygon';
@@ -9,7 +9,7 @@ chai.Assertion.addProperty('matrix', function() {
   return {
     equal: other => {
       if (!(other instanceof Matrix)) {
-        other = Matrix.create(other);
+        other = new Matrix(other);
       }
 
       this.assert(

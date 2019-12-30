@@ -1,6 +1,6 @@
-import * as fs from 'fs';
 import { Sylvester, OutOfRangeError, DimensionalityMismatchError } from './sylvester';
 import { Vector } from './vector';
+import { VectorOrList, isVectorLike, MatrixLike, isMatrixLike } from './likeness';
 
 const lapack = (() => {
   try {
@@ -10,13 +10,12 @@ const lapack = (() => {
   }
 })();
 
-function sign(x) {
+function sign(x: number) {
   return x < 0 ? -1 : 1;
 }
 
 // augment a matrix M with identity rows/cols
-function identSize(M, m, n, k) {
-  const e = M.elements;
+function identSize(e: number[][], m: number, n: number, k: number) {
   let i = k - 1;
 
   while (i--) {
@@ -35,13 +34,13 @@ function identSize(M, m, n, k) {
     }
   }
 
-  return Matrix.create(e); // eslint-disable-line no-use-before-define
+  return new Matrix(e);
 }
 
-function pca(X) {
+function pca(X: Matrix) {
   const Sigma = X.transpose()
     .x(X)
-    .x(1 / X.rows());
+    .x(1 / X.rows);
   const svd = Sigma.svd();
   return {
     U: svd.U,
@@ -49,23 +48,63 @@ function pca(X) {
   };
 }
 
-const sizeStr = matrix => `${matrix.rows()}x${matrix.cols()} matrix`;
+const sizeStr = (matrix: MatrixLike) =>
+  matrix instanceof Matrix
+    ? `${matrix.rows}x${matrix.cols} matrix`
+    : `${matrix.length}x${matrix[0].length}`;
 
-const extractElements = matrixOrRows => {
-  const rows = matrixOrRows.elements || matrixOrRows;
+const extractElements = (
+  matrixOrRows: MatrixLike | VectorOrList,
+): ReadonlyArray<ReadonlyArray<number>> => {
+  const rows = (matrixOrRows as any).elements || matrixOrRows;
   if (typeof rows[0][0] === 'undefined') {
-    return Matrix.create(rows).elements;
+    return new Matrix(rows).elements;
   }
 
   return rows;
 };
 
+/**
+ * Returns a mutable copy of the matrix elements. Used internally only to avoid
+ * unnecessary duplication. Dangerous to expose.
+ */
+const takeOwnership = (matrix: Matrix): number[][] => (matrix as any).elements;
+
 export class Matrix {
+  /**
+   * Matrix elements.
+   */
+  public readonly elements: ReadonlyArray<ReadonlyArray<number>>;
+
+  /**
+   * Gets the number of rows in the matrix.
+   */
+  public readonly rows: number;
+
+  /**
+   * Gets the number of columns in the matrix.
+   */
+  public readonly cols: number;
+
+  constructor(input: MatrixLike | VectorOrList) {
+    if (input instanceof Matrix) {
+      this.elements = input.elements;
+    } else if (input instanceof Vector) {
+      this.elements = input.elements.map(e => [e]);
+    } else if (input[0] instanceof Array) {
+      this.elements = input as number[][];
+    } else {
+      this.elements = (input as number[]).map(e => [e]);
+    }
+
+    this.rows = this.elements.length;
+    this.cols = this.rows && this.elements[0].length;
+  }
+
   // solve a system of linear equations (work in progress)
-  solve(b) {
+  solve(b: Vector) {
     const lu = this.lu();
-    b = lu.P.x(b);
-    const y = lu.L.forwardSubstitute(b);
+    const y = lu.L.forwardSubstitute(lu.P.x(b));
     const x = lu.U.backSubstitute(y);
     return lu.P.x(x);
     // return this.inv().x(b);
@@ -73,41 +112,41 @@ export class Matrix {
 
   // project a matrix onto a lower dim
 
-  pcaProject(k, U = pca(this).U) {
-    const Ureduce = U.slice(1, U.rows(), 1, k);
+  pcaProject(k: number, U = pca(this).U) {
+    const Ureduce = U.slice(1, U.rows, 1, k);
     return {
       Z: this.x(Ureduce),
       U,
     };
   }
 
-  // recover a matrix to a higher dimension
-
-  pcaRecover(U) {
-    const k = this.cols();
-    const Ureduce = U.slice(1, U.rows(), 1, k);
+  /**
+   * Recover a matrix to a higher dimension
+   */
+  public pcaRecover(U: Matrix): Matrix {
+    const k = this.cols;
+    const Ureduce = U.slice(1, U.rows, 1, k);
     return this.x(Ureduce.transpose());
   }
-
-  // grab the upper triangular part of the matrix
-
-  triu(k) {
-    if (!k) {
-      k = 0;
-    }
-
+  /**
+   * Grab the upper triangular part of the matrix
+   */
+  public triu(k: number = 0): Matrix {
     return this.map((x, i, j) => {
       return j - i >= k ? x : 0;
     });
   }
 
-  // unroll a matrix into a vector
+  //
 
-  unroll() {
+  /**
+   * Unroll a matrix into a vector
+   */
+  public unroll(): Vector {
     const v = [];
 
-    for (let i = 1; i <= this.cols(); i++) {
-      for (let j = 1; j <= this.rows(); j++) {
+    for (let i = 1; i <= this.cols; i++) {
+      for (let j = 1; j <= this.rows; j++) {
         v.push(this.e(j, i));
       }
     }
@@ -117,21 +156,21 @@ export class Matrix {
 
   /**
    * Returns a sub-block of the matrix.
-   * @param {Number} startRow Top-most starting row.
-   * @param {Number} endRow Bottom-most ending row. If 0, takes the whole matrix.
-   * @param {Number} startCol Left-most starting column.
-   * @param {Number} endCol Right-most ending column. If 0, takes the whole matrix.
+   * @param startRow - Top-most starting row.
+   * @param endRow - Bottom-most ending row. If 0, takes the whole matrix.
+   * @param startCol - Left-most starting column.
+   * @param endCol - Right-most ending column. If 0, takes the whole matrix.
    * @return {Matrix}
    */
-  slice(startRow, endRow, startCol, endCol) {
+  public slice(startRow: number, endRow: number, startCol: number, endCol: number): Matrix {
     const x = [];
 
     if (endRow === 0) {
-      endRow = this.rows();
+      endRow = this.rows;
     }
 
     if (endCol === 0) {
-      endCol = this.cols();
+      endCol = this.cols;
     }
 
     for (let i = Math.max(1, startRow); i <= endRow; i++) {
@@ -144,7 +183,7 @@ export class Matrix {
       x.push(row);
     }
 
-    return Matrix.create(x);
+    return new Matrix(x);
   }
 
   /**
@@ -154,7 +193,7 @@ export class Matrix {
    * @throws {OutOfRangeError} if (i, j) is out of range.
    * @return {Number}
    */
-  e(i, j) {
+  public e(i: number, j: number) {
     if (i < 1 || i > this.elements.length || j < 1 || j > this.elements[0].length) {
       throw new OutOfRangeError(
         `The location (${i}, ${j}) is outside the bounds of this ${sizeStr(this)}`,
@@ -166,11 +205,9 @@ export class Matrix {
 
   /**
    * Returns a vector containing the values in row o.
-   * @param {Number} i
    * @throws {OutOfRangeError} if o is out of range
-   * @return {Vector}
    */
-  row(i) {
+  public row(i: number): Vector {
     if (i < 1 || i > this.elements.length) {
       throw new OutOfRangeError(`Row ${i} is outside the bounds of this ${sizeStr(this)}`);
     }
@@ -179,11 +216,9 @@ export class Matrix {
 
   /**
    * Returns a vector containing the values in column j.
-   * @param {Number} j
    * @throws {OutOfRangeError} if j is out of range
-   * @return {Vector}
    */
-  col(j) {
+  public col(j: number): Vector {
     if (j < 1 || j > this.elements[0].length) {
       throw new OutOfRangeError(`Column ${j} is outside the bounds of this ${sizeStr(this)}`);
     }
@@ -196,52 +231,17 @@ export class Matrix {
   }
 
   /**
-   * Returns the dimensions of the matrix.
-   * @return {{ rows: Number, columns: number }}
-   */
-  dimensions() {
-    return {
-      rows: this.elements.length,
-      cols: this.elements[0].length,
-    };
-  }
-
-  /**
-   * Returns the number of rows in the matrix.
-   * @return {Number}
-   */
-  rows() {
-    return this.elements.length;
-  }
-  /**
-   * Returns the number of columns in the matrix.
-   * @return {Number}
-   */
-  cols() {
-    return this.elements[0].length;
-  }
-
-  /**
    * Returns whether this matrix is approximately equal to the other one,
    * within the given precision.
-   * @param {Matrix} matrix Matrix to compare
-   * @param {Number} epsilon The precision to compare each number.
-   * @return {Boolean} True if the matrices are equal, false if they are not
-   * or a different size.
+   * @param matrix - Matrix or matrix values to compare
+   * @param epsilon - The precision to compare each number.
+   * @return True if the matrices are equal, false if they are not or a different size.
    */
-  approxEql(matrix, epsilon = Sylvester.approxPrecision) {
-    return this.eql(matrix, epsilon);
-  }
+  public eql(matrix: unknown, epsilon = Sylvester.approxPrecision) {
+    if (!isMatrixLike(matrix)) {
+      return false;
+    }
 
-  /**
-   * Returns whether this matrix is approximately equal to the other one,
-   * within the given precision.
-   * @param {Matrix|Number[]} matrix Matrix or matrix values to compare
-   * @param {Number} epsilon The precision to compare each number.
-   * @return {Boolean} True if the matrices are equal, false if they are not
-   * or a different size.
-   */
-  eql(matrix, epsilon = Sylvester.approxPrecision) {
     const M = extractElements(matrix);
     if (this.elements.length !== M.length || this.elements[0].length !== M[0].length) {
       return false;
@@ -261,52 +261,36 @@ export class Matrix {
   }
 
   /**
-   * Creates a copy of the matrix.
-   * @return {Matrix}
-   */
-  dup() {
-    return Matrix.create(this.elements);
-  }
-
-  /**
    * Creates a new matrix by applying the mapping function
    * on all values in this one.
-   * @param {function(value: Number, row: Number, column: Number): Number} fn
-   * @return {Matrix}
    */
-  map(fn) {
-    const els = [];
+  public map(fn: (value: number, row: number, column: number) => number) {
+    const els: number[][] = [];
     let i = this.elements.length;
     const nj = this.elements[0].length;
-    let j;
     while (i--) {
-      j = nj;
+      let j = nj;
       els[i] = [];
       while (j--) {
         els[i][j] = fn(this.elements[i][j], i + 1, j + 1);
       }
     }
-    return Matrix.create(els);
+    return new Matrix(els);
   }
 
   /**
    * Returns whether this matrix is the same size as the other one.
-   * @param {Matrix} matrix
-   * @returns {Boolean}
    */
-  isSameSizeAs(matrix) {
+  public isSameSizeAs(matrix: MatrixLike) {
     const M = extractElements(matrix);
-
     return this.elements.length === M.length && this.elements[0].length === M[0].length;
   }
 
   /**
    * Adds the number or matrix to this matrix.
-   * @param {Number|Matrix} matrix
    * @throws {DimensionalityMismatchError} If the matrix is a different size than this one
-   * @returns {Matrix}
    */
-  add(matrix) {
+  public add(matrix: number | MatrixLike) {
     if (typeof matrix === 'number') {
       return this.map(x => x + matrix);
     }
@@ -323,11 +307,9 @@ export class Matrix {
 
   /**
    * Subtracts the number or matrix to this matrix.
-   * @param {Number|Matrix} matrix
    * @throws {DimensionalityMismatchError} If the matrix is a different size than this one
-   * @returns {Matrix}
    */
-  subtract(matrix) {
+  public subtract(matrix: number | MatrixLike) {
     if (typeof matrix === 'number') {
       return this.map(x => x - matrix);
     }
@@ -343,10 +325,8 @@ export class Matrix {
 
   /**
    * Returns true if the give matrix can multiply this one from the left.
-   * @param {Matrix} matrix
-   * @return {Boolean}
    */
-  canMultiplyFromLeft(matrix) {
+  public canMultiplyFromLeft(matrix: MatrixLike) {
     const M = extractElements(matrix);
     // this.columns should equal matrix.rows
     return this.elements[0].length === M.length;
@@ -367,20 +347,23 @@ export class Matrix {
    * on the right.
    * @return {Matrix|Vector}
    */
-  mulOp(matrix, op) {
+  public mulOp(matrix: VectorOrList, op: (left: number, right: number) => number): Vector;
+  public mulOp(matrix: MatrixLike | number, op: (left: number, right: number) => number): Matrix;
+  public mulOp(
+    matrix: MatrixLike | VectorOrList | number,
+    op: (left: number, right: number) => number,
+  ) {
     if (typeof matrix === 'number') {
       return this.map(x => {
         return op(x, matrix);
       });
     }
 
-    const returnVector = Boolean(matrix.modulus);
+    const returnVector = isVectorLike(matrix);
     const M = extractElements(matrix);
     if (!this.canMultiplyFromLeft(M)) {
       throw new DimensionalityMismatchError(
-        `Cannot multiply a ${sizeStr(this)} by a ${sizeStr(
-          matrix,
-        )}, expected an ${this.cols()}xN matrix`,
+        `Cannot multiply a ${sizeStr(this)} by a ${sizeStr(M)}, expected an ${this.cols}xN matrix`,
       );
     }
 
@@ -415,7 +398,7 @@ export class Matrix {
       elements[i] = rowElem;
     }
 
-    const output = Matrix.create(elements);
+    const output = new Matrix(elements);
     return returnVector ? output.col(1) : output;
   }
 
@@ -426,19 +409,20 @@ export class Matrix {
    * the argument is a vector, a vector is returned, which saves you having
    * to remember calling col(1) on the result.
    *
-   * @param {Matrix|Vector|number} divisor
    * @throws {DimensionalityMismatchError} If the divisor is an
    * inappropriately sized matrix
-   * @return {Matrix|Vector}
    */
-  div(divisor) {
-    return this.mulOp(divisor, (x, y) => x / y);
+  public div(divisor: VectorOrList): Vector;
+  public div(divisor: MatrixLike | number): Matrix;
+  public div(divisor: MatrixLike | VectorOrList | number): Vector | Matrix {
+    // Cast is needed here since TS gets confused with nested overloads like this
+    return this.mulOp(divisor as MatrixLike, (x, y) => x / y);
   }
 
   /**
    * Returns the result of multiplying the matrix from the right by the argument.
    *
-   * If the argument is a scalar then just operate on  all the elements. If
+   * If the argument is a scalar then just operate on all the elements. If
    * the argument is a vector, a vector is returned, which saves you having
    * to remember calling col(1) on the result.
    *
@@ -447,15 +431,21 @@ export class Matrix {
    * inappropriately sized matrix
    * @return {Matrix|Vector}
    */
-  multiply(multiplicand) {
-    return this.mulOp(multiplicand, (x, y) => x * y);
+  public multiply(multiplicand: VectorOrList): Vector;
+  public multiply(multiplicand: MatrixLike | number): Matrix;
+  public multiply(multiplicand: MatrixLike | VectorOrList | number): Vector | Matrix {
+    // Cast is needed here since TS gets confused with nested overloads like this
+    return this.mulOp(multiplicand as MatrixLike, (x, y) => x * y);
   }
 
   /**
    * Alias to {@link Matrix.multiply}
    */
-  x(matrix) {
-    return this.multiply(matrix);
+  public x(multiplicand: VectorOrList): Vector;
+  public x(multiplicand: MatrixLike | number): Matrix;
+  public x(multiplicand: MatrixLike | VectorOrList | number): Vector | Matrix {
+    // Cast is needed here since TS gets confused with nested overloads like this
+    return this.mulOp(multiplicand as MatrixLike, (x, y) => x * y);
   }
 
   /**
@@ -464,7 +454,7 @@ export class Matrix {
    * @throws {DimensionalityMismatchError} If v is not the same size as this matrix
    * @returns {Matrix}
    */
-  elementMultiply(v) {
+  public elementMultiply(v: Matrix) {
     if (!this.isSameSizeAs(v)) {
       throw new DimensionalityMismatchError(
         `Cannot element multiple a ${sizeStr(this)} by a ${sizeStr(v)}, expected the same size`,
@@ -477,14 +467,15 @@ export class Matrix {
 
   /**
    * Sums all the elements of the matrix.
-   * @returns {Number}
    */
-  sum() {
+  public sum() {
     let sum = 0;
-    this.map(x => {
-      // eslint-disable-line array-callback-return
-      sum += x;
-    });
+    for (let i = 0; i < this.rows; i++) {
+      for (let k = 0; k < this.cols; k++) {
+        sum += this.elements[i][k];
+      }
+    }
+
     return sum;
   }
 
@@ -493,44 +484,38 @@ export class Matrix {
    * @return {Vector}
    */
   mean() {
-    const dim = this.dimensions();
     const r = [];
-    for (let i = 1; i <= dim.cols; i++) {
-      r.push(this.col(i).sum() / dim.rows);
+    for (let i = 1; i <= this.cols; i++) {
+      r.push(this.col(i).sum() / this.rows);
     }
     return new Vector(r);
   }
 
   /**
    * Returns a Vector of each column's standard deviation
-   * @return {Vector}
    */
-  std() {
-    const dim = this.dimensions();
+  public std(): Vector {
     const mMean = this.mean();
     const r = [];
-    for (let i = 1; i <= dim.cols; i++) {
-      let meanDiff = this.col(i).subtract(mMean.e(i));
+    for (let i = 1; i <= this.cols; i++) {
+      let meanDiff = this.col(i).subtract(mMean.e(i)!);
       meanDiff = meanDiff.multiply(meanDiff);
-      r.push(Math.sqrt(meanDiff.sum() / dim.rows));
+      r.push(Math.sqrt(meanDiff.sum() / this.rows));
     }
     return new Vector(r);
   }
 
   /**
    * Alias for {@link Matrix.col}
-   * @return {Vector}
    */
-  column(n) {
+  public column(n: number): Vector {
     return this.col(n);
   }
 
   /**
    * Runs an element-wise logarithm on the matrix.
-   * @param {Number} Log base
-   * @return {Matrix}
    */
-  log(base = Math.E) {
+  public log(base = Math.E): Matrix {
     const logBase = Math.log(base); // change of base
     return this.map(x => Math.log(x) / logBase);
   }
@@ -539,18 +524,15 @@ export class Matrix {
    * Returns a submatrix taken from the matrix. Element selection wraps if the
    * required index is outside the matrix's bounds, so you could use this to
    * perform row/column cycling or copy-augmenting.
-   * @param {Number} startRow
-   * @param {Number} startCol Columns to copy
-   * @param {Number} nrows Rows to copy
-   * @param {Number} ncols Columns to copy
-   * @param {Matrix}
+   * @param nrows - Rows to copy
+   * @param ncols - Columns to copy
    */
-  minor(startRow, startCol, nrows, ncols) {
-    const elements = [];
+  minor(startRow: number, startCol: number, nrows: number, ncols: number) {
+    const elements: number[][] = [];
     let ni = nrows;
-    let i;
-    let nj;
-    let j;
+    let i: number;
+    let nj: number;
+    let j: number;
     const rows = this.elements.length;
     const cols = this.elements[0].length;
     while (ni--) {
@@ -562,7 +544,7 @@ export class Matrix {
         elements[i][j] = this.elements[(startRow + i - 1) % rows][(startCol + j - 1) % cols];
       }
     }
-    return Matrix.create(elements);
+    return new Matrix(elements);
   }
 
   /**
@@ -572,9 +554,9 @@ export class Matrix {
   transpose() {
     const rows = this.elements.length;
     const cols = this.elements[0].length;
-    const elements = [];
+    const elements: number[][] = [];
     let i = cols;
-    let j;
+    let j: number;
     while (i--) {
       j = rows;
       elements[i] = [];
@@ -582,7 +564,7 @@ export class Matrix {
         elements[i][j] = this.elements[j][i];
       }
     }
-    return Matrix.create(elements);
+    return new Matrix(elements);
   }
 
   /**
@@ -617,10 +599,8 @@ export class Matrix {
   /**
    * Returns the index of the first occurence of x found
    * by reading row-by-row from left to right, or null.
-   * @param {Number} x
-   * @returns {?({ i: number, j: number })}
    */
-  indexOf(x) {
+  public indexOf(x: number) {
     const ni = this.elements.length;
     let i;
     const nj = this.elements[0].length;
@@ -642,9 +622,8 @@ export class Matrix {
   /**
    * If the matrix is square, returns the diagonal elements as a vector.
    * @throws {DimensionalityMismatchError} if the matrix is not square
-   * @return {Vector}
    */
-  diagonal() {
+  public diagonal() {
     if (!this.isSquare()) {
       throw new DimensionalityMismatchError(
         `Cannot get the diagonal of a ${sizeStr(this)} matrix, matrix must be square`,
@@ -662,10 +641,9 @@ export class Matrix {
    * Make the matrix upper (right) triangular by Gaussian elimination.
    * This method only adds multiples of rows to other rows. No rows are
    * scaled up or switched, and the determinant is preserved.
-   * @return {Matrix}
    */
-  toRightTriangular() {
-    const M = this.dup();
+  public toRightTriangular(): Matrix {
+    const m = this.toArray();
     let els;
     const n = this.elements.length;
     let i;
@@ -673,50 +651,49 @@ export class Matrix {
     const np = this.elements[0].length;
     let p;
     for (i = 0; i < n; i++) {
-      if (M.elements[i][i] === 0) {
+      if (m[i][i] === 0) {
         for (j = i + 1; j < n; j++) {
-          if (M.elements[j][i] !== 0) {
+          if (m[j][i] !== 0) {
             els = [];
             for (p = 0; p < np; p++) {
-              els.push(M.elements[i][p] + M.elements[j][p]);
+              els.push(m[i][p] + m[j][p]);
             }
-            M.elements[i] = els;
+            m[i] = els;
             break;
           }
         }
       }
-      if (M.elements[i][i] !== 0) {
+      if (m[i][i] !== 0) {
         for (j = i + 1; j < n; j++) {
-          const multiplier = M.elements[j][i] / M.elements[i][i];
+          const multiplier = m[j][i] / m[i][i];
           els = [];
           for (p = 0; p < np; p++) {
             // Elements with column numbers up to an including the number
             // of the row that we're subtracting can safely be set straight to
             // zero, since that's the point of this routine and it avoids having
             // to loop over and correct rounding errors later
-            els.push(p <= i ? 0 : M.elements[j][p] - M.elements[i][p] * multiplier);
+            els.push(p <= i ? 0 : m[j][p] - m[i][p] * multiplier);
           }
-          M.elements[j] = els;
+          m[j] = els;
         }
       }
     }
-    return M;
+
+    return new Matrix(m);
   }
 
   /**
    * Alias for {@link Matrix.toRightTriangular}
-   * @returns {Matrix}
    */
-  toUpperTriangular() {
+  public toUpperTriangular(): Matrix {
     return this.toRightTriangular();
   }
 
   /**
    * Returns the determinant of a square matrix.
    * @throws {DimensionalityMismatchError} If the matrix is not square
-   * @returns {Number}
    */
-  determinant() {
+  public determinant(): number {
     if (!this.isSquare()) {
       throw new DimensionalityMismatchError(
         `A matrix must be square to have a determinant, this is a ${sizeStr(this)}`,
@@ -737,26 +714,23 @@ export class Matrix {
   /**
    * Alias for {@link determinant}
    * @throws {DimensionalityMismatchError} If the matrix is not square
-   * @returns {Number}
    */
-  det() {
+  public det(): number {
     return this.determinant();
   }
 
   /**
    * Returns true if the matrix is singular
-   * @returns {Boolean}
    */
-  isSingular() {
+  public isSingular(): boolean {
     return this.isSquare() && this.determinant() === 0;
   }
 
   /**
    * Returns the trace for square matrices
    * @throws {DimensionalityMismatchError} if the matrix is not square
-   * @return {Number}
    */
-  trace() {
+  public trace(): number {
     if (!this.isSquare()) {
       throw new DimensionalityMismatchError(
         `Can only get the trace of square matrices, got a ${sizeStr(this)}`,
@@ -774,18 +748,16 @@ export class Matrix {
   /**
    * Alias for {@link Matrix.trace}.
    * @throws {DimensionalityMismatchError} if the matrix is not square
-   * @return {Number}
    */
-  tr() {
+  public tr() {
     return this.trace();
   }
 
   /**
    * Returns the rank of the matrix.
    * @param {Number} epsilon for comparison against 0
-   * @returns {Number}
    */
-  rank(epsilon = Sylvester.precision) {
+  public rank(epsilon = Sylvester.precision): number {
     const M = this.toRightTriangular();
     let rank = 0;
     let i = this.elements.length;
@@ -805,22 +777,19 @@ export class Matrix {
 
   /**
    * Alias for {@link Matrix.rank}
-   * @param {Number} epsilon for comparison against 0
-   * @returns {Number}
    */
-  rk(epsilon = Sylvester.precision) {
+  public rk(epsilon = Sylvester.precision): number {
     return this.rank(epsilon);
   }
 
   /**
    * Returns the result of attaching the given argument to the right-hand side of the matrix
-   * @param {Matrix|number[][]} matrix
    */
-  augment(matrix) {
+  public augment(matrix: MatrixLike): Matrix {
     const M = extractElements(matrix);
-    const T = this.dup();
-    const cols = T.elements[0].length;
-    let i = T.elements.length;
+    const T = this.toArray();
+    const cols = T[0].length;
+    let i = T.length;
     const nj = M[0].length;
     let j;
     if (i !== M.length) {
@@ -829,10 +798,10 @@ export class Matrix {
     while (i--) {
       j = nj;
       while (j--) {
-        T.elements[i][cols + j] = M[i][j];
+        T[i][cols + j] = M[i][j];
       }
     }
-    return T;
+    return new Matrix(T);
   }
 
   /**
@@ -840,7 +809,7 @@ export class Matrix {
    * @throws {DimensionalityMismatchError} if the matrix is not invertible
    * @return {Matrix}
    */
-  inverse() {
+  public inverse() {
     if (!this.isSquare()) {
       throw new DimensionalityMismatchError(
         `A matrix must be square to be inverted, provided a ${sizeStr(this)}`,
@@ -853,24 +822,24 @@ export class Matrix {
     const n = this.elements.length;
     let i = n;
     let j;
-    const M = this.augment(Matrix.I(n)).toRightTriangular();
-    const np = M.elements[0].length;
+    const M = takeOwnership(this.augment(Matrix.I(n)).toRightTriangular());
+    const np = M[0].length;
     let p;
     let els;
     let divisor;
 
-    const inverseElements = [];
+    const inverseElements: number[][] = [];
     // Matrix is non-singular so there will be no zeros on the diagonal
     // Cycle through rows from last to first
 
-    let newElement;
+    let newElement: number;
     while (i--) {
       // First, normalise diagonal elements to 1
       els = [];
       inverseElements[i] = [];
-      divisor = M.elements[i][i];
+      divisor = M[i][i];
       for (p = 0; p < np; p++) {
-        newElement = M.elements[i][p] / divisor;
+        newElement = M[i][p] / divisor;
         els.push(newElement);
         // Shuffle off the current row of the right hand side into the results
         // array as it will not be modified by later runs through this loop
@@ -878,19 +847,19 @@ export class Matrix {
           inverseElements[i].push(newElement);
         }
       }
-      M.elements[i] = els;
+      M[i] = els;
       // Then, subtract this row from those above it to
       // give the identity matrix on the left hand side
       j = i;
       while (j--) {
         els = [];
         for (p = 0; p < np; p++) {
-          els.push(M.elements[j][p] - M.elements[i][p] * M.elements[j][i]);
+          els.push(M[j][p] - M[i][p] * M[j][i]);
         }
-        M.elements[j] = els;
+        M[j] = els;
       }
     }
-    return Matrix.create(inverseElements);
+    return new Matrix(inverseElements);
   }
 
   /**
@@ -898,7 +867,7 @@ export class Matrix {
    * @throws {DimensionalityMismatchError} if the matrix is not invertible
    * @return {Matrix}
    */
-  inv() {
+  public inv() {
     return this.inverse();
   }
 
@@ -906,7 +875,7 @@ export class Matrix {
    * Rounds all values in the matrix.
    * @return {Matrix}
    */
-  round() {
+  public round() {
     return this.map(x => Math.round(x));
   }
 
@@ -917,15 +886,14 @@ export class Matrix {
    * @param {Number} epsilon
    * @return {Matrix}
    */
-  snapTo(target, epsilon = Sylvester.precision) {
+  public snapTo(target: number, epsilon = Sylvester.precision) {
     return this.map(p => (Math.abs(p - target) <= epsilon ? target : p));
   }
 
   /**
    * Returns a string representation of the matrix.
-   * @return {String}
    */
-  inspect() {
+  public inspect(): string {
     const matrixRows = ['Matrix<'];
     for (let i = 0; i < this.elements.length; i++) {
       matrixRows.push(`  [${this.elements[i].join(', ')}]`);
@@ -938,54 +906,27 @@ export class Matrix {
    * Returns a array representation of the matrix
    * @return {Number[]}
    */
-  toArray() {
-    const matrixRows = [];
+  public toArray(): number[][] {
+    const matrixRows: number[][] = [];
     const n = this.elements.length;
     for (let i = 0; i < n; i++) {
-      matrixRows.push(this.elements[i]);
+      matrixRows.push(this.elements[i].slice());
     }
+
     return matrixRows;
   }
 
   /**
-   * @private
-   */
-  setElements(els) {
-    let i;
-    let j;
-    const elements = els.elements || els;
-    if (typeof elements[0][0] !== 'undefined') {
-      i = elements.length;
-      this.elements = [];
-      while (i--) {
-        j = elements[i].length;
-        this.elements[i] = [];
-        while (j--) {
-          this.elements[i][j] = elements[i][j];
-        }
-      }
-      return this;
-    }
-    const n = elements.length;
-    this.elements = [];
-    for (i = 0; i < n; i++) {
-      this.elements.push([elements[i]]);
-    }
-    return this;
-  }
-
-  /**
    * Return the indexes of the columns with the largest value for each row.
-   * @returns {Vector}
    */
-  maxColumnIndexes() {
+  public maxColumnIndexes(): Vector {
     const maxes = [];
 
-    for (let i = 1; i <= this.rows(); i++) {
+    for (let i = 1; i <= this.rows; i++) {
       let max = null;
       let maxIndex = -1;
 
-      for (let j = 1; j <= this.cols(); j++) {
+      for (let j = 1; j <= this.cols; j++) {
         if (max === null || this.e(i, j) > max) {
           max = this.e(i, j);
           maxIndex = j;
@@ -1000,21 +941,20 @@ export class Matrix {
 
   /**
    * Return the largest values in each row.
-   * @returns {Vector}
    */
-  maxColumns() {
+  public maxColumns(): Vector {
     const maxes = [];
 
-    for (let i = 1; i <= this.rows(); i++) {
+    for (let i = 1; i <= this.rows; i++) {
       let max = null;
 
-      for (let j = 1; j <= this.cols(); j++) {
+      for (let j = 1; j <= this.cols; j++) {
         if (max === null || this.e(i, j) > max) {
           max = this.e(i, j);
         }
       }
 
-      maxes.push(max);
+      maxes.push(max ?? 0);
     }
 
     return new Vector(maxes);
@@ -1022,16 +962,15 @@ export class Matrix {
 
   /**
    * Return the indexes of the columns with the smallest values for each row.
-   * @returns {Vector}
    */
-  minColumnIndexes() {
+  public minColumnIndexes(): Vector {
     const mins = [];
 
-    for (let i = 1; i <= this.rows(); i++) {
+    for (let i = 1; i <= this.rows; i++) {
       let min = null;
       let minIndex = -1;
 
-      for (let j = 1; j <= this.cols(); j++) {
+      for (let j = 1; j <= this.cols; j++) {
         if (min === null || this.e(i, j) < min) {
           min = this.e(i, j);
           minIndex = j;
@@ -1044,79 +983,41 @@ export class Matrix {
     return new Vector(mins);
   }
 
-  // return the smallest values in each row
-
   /**
    * Return the smallest values in each row.
-   * @returns {Vector}
    */
-  minColumns() {
-    const mins = [];
+  public minColumns(): Vector {
+    const mins: number[] = [];
 
-    for (let i = 1; i <= this.rows(); i++) {
+    for (let i = 1; i <= this.rows; i++) {
       let min = null;
 
-      for (let j = 1; j <= this.cols(); j++) {
+      for (let j = 1; j <= this.cols; j++) {
         if (min === null || this.e(i, j) < min) {
           min = this.e(i, j);
         }
       }
 
-      mins.push(min);
+      mins.push(min ?? 0);
     }
 
     return new Vector(mins);
   }
 
-  // perorm a partial pivot on the matrix. essentially move the largest
-  // row below-or-including the pivot and replace the pivot's row with it.
-  // a pivot matrix is returned so multiplication can perform the transform.
-  /**
-   * Perform a partial pivot on the matrix. essentially move the largest
-   * row below-or-including the pivot and replace the pivot's row with it.
-   * a pivot matrix is returned so multiplication can perform the transform.
-   */
-  partialPivot(k, j, P, A) {
-    let maxIndex = 0;
-    let maxValue = 0;
-
-    for (let i = k; i <= A.rows(); i++) {
-      if (Math.abs(A.e(i, j)) > maxValue) {
-        maxValue = Math.abs(A.e(k, j));
-        maxIndex = i;
-      }
-    }
-
-    if (maxIndex !== k) {
-      const tmp = A.elements[k - 1];
-      A.elements[k - 1] = A.elements[maxIndex - 1];
-      A.elements[maxIndex - 1] = tmp;
-
-      P.elements[k - 1][k - 1] = 0;
-      P.elements[k - 1][maxIndex - 1] = 1;
-      P.elements[maxIndex - 1][maxIndex - 1] = 0;
-      P.elements[maxIndex - 1][k - 1] = 1;
-    }
-
-    return P;
-  }
-
   /**
    * Solve lower-triangular matrix * x = b via forward substitution
-   * @param {Number} b
-   * @returns {Vector}
    */
-  forwardSubstitute(b) {
+  public forwardSubstitute(b: Vector): Vector {
     const xa = [];
 
-    for (let i = 1; i <= this.rows(); i++) {
+    for (let i = 1; i <= this.rows; i++) {
       let w = 0;
 
       for (let j = 1; j < i; j++) {
         w += this.e(i, j) * xa[j - 1];
       }
 
-      xa.push((b.e(i) - w) / this.e(i, i));
+      xa.push((b.e(i)! - w) / this.e(i, i));
     }
 
     return new Vector(xa);
@@ -1124,30 +1025,27 @@ export class Matrix {
 
   /**
    * solve an upper-triangular matrix * x = b via back substitution
-   * @param {Number} b
-   * @return {Vector}
    */
-  backSubstitute(b) {
+  public backSubstitute(b: Vector): Vector {
     const xa = [];
 
-    for (let i = this.rows(); i > 0; i--) {
+    for (let i = this.rows; i > 0; i--) {
       let w = 0;
 
-      for (let j = this.cols(); j > i; j--) {
-        w += this.e(i, j) * xa[this.rows() - j];
+      for (let j = this.cols; j > i; j--) {
+        w += this.e(i, j) * xa[this.rows - j];
       }
 
-      xa.push((b.e(i) - w) / this.e(i, i));
+      xa.push((b.e(i)! - w) / this.e(i, i));
     }
 
     return new Vector(xa.reverse());
   }
 
-  svdJs() {
-    const A = this;
-    let V = Matrix.I(A.rows());
-    let S = A.transpose();
-    let U = Matrix.I(A.cols());
+  public svd() {
+    let V = Matrix.I(this.rows);
+    let S = this.transpose();
+    let U = Matrix.I(this.cols);
     let err = Number.MAX_VALUE;
     let i = 0;
     const maxLoop = 100;
@@ -1162,8 +1060,8 @@ export class Matrix {
 
       const e = S.triu(1)
         .unroll()
-        .norm();
-      let f = S.diagonal().norm();
+        .magnitude();
+      let f = S.diagonal().magnitude();
 
       if (f === 0) {
         f = 1;
@@ -1178,12 +1076,13 @@ export class Matrix {
     const s = [];
 
     for (let i = 1; i <= ss.cols(); i++) {
-      const ssn = ss.e(i);
+      const ssn = ss.e(i)!;
       s.push(Math.abs(ssn));
 
+      const els = takeOwnership(V);
       if (ssn < 0) {
-        for (let j = 0; j < U.rows(); j++) {
-          V.elements[j][i - 1] = -V.elements[j][i - 1];
+        for (let j = 0; j < U.rows; j++) {
+          els[j][i - 1] = -els[j][i - 1];
         }
       }
     }
@@ -1200,32 +1099,30 @@ export class Matrix {
     const result = lapack.sgesvd('A', 'A', this.elements);
 
     return {
-      U: Matrix.create(result.U),
-      S: Matrix.create(result.S)
-        .column(1)
-        .toDiagonalMatrix(),
-      V: Matrix.create(result.VT).transpose(),
+      U: new Matrix(result.U),
+      S: new Matrix(result.S).column(1).toDiagonalMatrix(),
+      V: new Matrix(result.VT).transpose(),
     };
   }
 
   // QR decomposition in pure javascript
   qrJs() {
-    const m = this.rows();
-    const n = this.cols();
+    const m = this.rows;
+    const n = this.cols;
     let Q = Matrix.I(m);
-    let A = this;
+    let A: Matrix = this;
 
     for (let k = 1; k < Math.min(m, n); k++) {
       const ak = A.slice(k, 0, k, k).col(1);
-      let oneZero = [1];
+      const oneZero = [1];
 
       while (oneZero.length <= m - k) {
         oneZero.push(0);
       }
 
-      oneZero = new Vector(oneZero);
-      const vk = ak.add(oneZero.x(ak.norm() * sign(ak.e(1))));
-      const Vk = Matrix.create(vk);
+      const oneZeroVec = new Vector(oneZero);
+      const vk = ak.add(oneZeroVec.x(ak.magnitude() * sign(ak.e(1)!)));
+      const Vk = new Matrix(vk);
       const Hk = Matrix.I(m - k + 1).subtract(
         Vk.x(2)
           .x(Vk.transpose())
@@ -1235,7 +1132,7 @@ export class Matrix {
               .e(1, 1),
           ),
       );
-      const Qk = identSize(Hk, m, n, k);
+      const Qk = identSize(takeOwnership(Hk), m, n, k);
       A = Qk.x(A);
       // slow way to compute Q
       Q = Q.x(Qk);
@@ -1252,69 +1149,87 @@ export class Matrix {
     const qr = lapack.qr(this.elements);
 
     return {
-      Q: Matrix.create(qr.Q),
-      R: Matrix.create(qr.R),
+      Q: new Matrix(qr.Q),
+      R: new Matrix(qr.R),
     };
   }
 
-  // LU factorization from LAPACK
-  luPack() {
-    const lu = lapack.lu(this.elements);
-    return {
-      L: Matrix.create(lu.L),
-      U: Matrix.create(lu.U),
-      P: Matrix.create(lu.P),
-      // don't pass back IPIV
-    };
-  }
+  /**
+   * LU factorization.
+   */
+  lu() {
+    const rows = this.rows;
+    const cols = this.cols;
+    const L = Matrix.I(rows).toArray();
+    const A = this.toArray();
+    const P = Matrix.I(rows).toArray();
+    const U = Matrix.Zeros(rows, this.cols).toArray();
 
-  // pure Javascript LU factorization
-  luJs() {
-    const A = this.dup();
-    const L = Matrix.I(A.rows());
-    let P = Matrix.I(A.rows());
-    const U = Matrix.Zeros(A.rows(), A.cols());
     let p = 1;
 
-    for (let k = 1; k <= Math.min(A.cols(), A.rows()); k++) {
-      P = A.partialPivot(k, p, P, A, L);
+    /**
+     * Perform a partial pivot on the matrix. Essentially move the largest
+     * row below-or-including the pivot and replace the pivot's row with it.
+     * a pivot matrix is returned so multiplication can perform the transform.
+     */
+    const partialPivot = (k: number, j: number) => {
+      let maxIndex = 0;
+      let maxValue = 0;
 
-      for (let i = k + 1; i <= A.rows(); i++) {
-        const l = A.e(i, p) / A.e(k, p);
-        L.elements[i - 1][k - 1] = l;
-
-        for (let j = k + 1; j <= A.cols(); j++) {
-          A.elements[i - 1][j - 1] -= A.e(k, j) * l;
+      for (let i = k; i <= rows; i++) {
+        if (Math.abs(A[i - 1][j - 1]) > maxValue) {
+          maxValue = Math.abs(A[k - 1][j - 1]);
+          maxIndex = i;
         }
       }
 
-      for (let j = k; j <= A.cols(); j++) {
-        U.elements[k - 1][j - 1] = A.e(k, j);
+      if (maxIndex !== k) {
+        const tmp = A[k - 1];
+        A[k - 1] = A[maxIndex - 1];
+        A[maxIndex - 1] = tmp;
+
+        P[k - 1][k - 1] = 0;
+        P[k - 1][maxIndex - 1] = 1;
+        P[maxIndex - 1][maxIndex - 1] = 0;
+        P[maxIndex - 1][k - 1] = 1;
       }
 
-      if (p < A.cols()) {
+      return P;
+    };
+
+    for (let k = 1; k <= Math.min(cols, rows); k++) {
+      partialPivot(k, p);
+
+      for (let i = k + 1; i <= rows; i++) {
+        const l = A[i - 1][p - 1] / A[k - 1][p - 1];
+        L[i - 1][k - 1] = l;
+
+        for (let j = k + 1; j <= cols; j++) {
+          A[i - 1][j - 1] -= A[k - 1][j - 1] * l;
+        }
+      }
+
+      for (let j = k; j <= cols; j++) {
+        U[k - 1][j - 1] = A[k - 1][j - 1];
+      }
+
+      if (p < cols) {
         p++;
       }
     }
 
     return {
-      L,
-      U,
-      P,
+      L: new Matrix(L),
+      U: new Matrix(U),
+      P: new Matrix(P),
     };
-  }
-
-  // Constructor function
-  static create(aElements) {
-    const M = new Matrix().setElements(aElements);
-    return M;
   }
 
   /**
    * Creates am identity matrix of the given size.
    * @param {Number} size
    */
-  static I(size) {
+  static I(size: number) {
     const elements = [];
     for (let y = 0; y < size; y++) {
       const row = [];
@@ -1325,15 +1240,13 @@ export class Matrix {
       elements.push(row);
     }
 
-    return Matrix.create(elements);
+    return new Matrix(elements);
   }
 
   /**
    * Creates a diagonal matrix from the given elements.
-   * @param {Number[]} elements
-   * @returns {Matrix}}
    */
-  static Diagonal(elements) {
+  static Diagonal(elements: ReadonlyArray<number>) {
     const rows = [];
     for (let y = 0; y < elements.length; y++) {
       const row = [];
@@ -1344,19 +1257,18 @@ export class Matrix {
       rows.push(row);
     }
 
-    return Matrix.create(rows);
+    return new Matrix(rows);
   }
 
   /**
    * Creates a rotation matrix around the given axis.
-   * @param {Number} theta angle in radians
-   * @param {?Vector} axis 3-element vector describing the axis to rotate
+   * @param theta - angle in radians
+   * @param axis - 3-element vector describing the axis to rotate
    * around. If not provided, creates a 2D rotation.
-   * @return {Matrix}
    */
-  static Rotation(theta, axis) {
+  static Rotation(theta: number, axis?: Vector) {
     if (!axis) {
-      return Matrix.create([
+      return new Matrix([
         [Math.cos(theta), -Math.sin(theta)],
         [Math.sin(theta), Math.cos(theta)],
       ]);
@@ -1367,7 +1279,7 @@ export class Matrix {
         `A 3-element vector must be provided to Rotation, got ${axis.elements.length} elements`,
       );
     }
-    const mod = axis.modulus();
+    const mod = axis.magnitude();
     const x = axis.elements[0] / mod;
     const y = axis.elements[1] / mod;
     const z = axis.elements[2] / mod;
@@ -1379,7 +1291,7 @@ export class Matrix {
 
     const c = Math.cos(theta);
     const t = 1 - c;
-    return Matrix.create([
+    return new Matrix([
       [t * x * x + c, t * x * y - s * z, t * x * z + s * y],
       [t * x * y + s * z, t * y * y + c, t * y * z - s * x],
       [t * x * z - s * y, t * y * z + s * x, t * z * z + c],
@@ -1388,13 +1300,12 @@ export class Matrix {
 
   /**
    * Creates a three-dimensional rotation matrix that rotates around the x axis.
-   * @param {Number} t angle in radians
-   * @return {Matrix}
+   * @param t - angle in radians
    */
-  static RotationX(t) {
+  static RotationX(t: number) {
     const c = Math.cos(t);
     const s = Math.sin(t);
-    return Matrix.create([
+    return new Matrix([
       [1, 0, 0],
       [0, c, -s],
       [0, s, c],
@@ -1403,13 +1314,12 @@ export class Matrix {
 
   /**
    * Creates a three-dimensional rotation matrix that rotates around the y axis.
-   * @param {Number} t angle in radians
-   * @return {Matrix}
+   * @param t - angle in radians
    */
-  static RotationY(t) {
+  static RotationY(t: number) {
     const c = Math.cos(t);
     const s = Math.sin(t);
-    return Matrix.create([
+    return new Matrix([
       [c, 0, s],
       [0, 1, 0],
       [-s, 0, c],
@@ -1418,13 +1328,12 @@ export class Matrix {
 
   /**
    * Creates a three-dimensional rotation matrix that rotates around the z axis.
-   * @param {Number} t angle in radians
-   * @return {Matrix}
+   * @param t - angle in radians
    */
-  static RotationZ(t) {
+  static RotationZ(t: number) {
     const c = Math.cos(t);
     const s = Math.sin(t);
-    return Matrix.create([
+    return new Matrix([
       [c, -s, 0],
       [s, c, 0],
       [0, 0, 1],
@@ -1433,33 +1342,28 @@ export class Matrix {
 
   /**
    * Creates an `n` by `m` matrix filled with random values between 0 and 1.
-   * @param {Number} n rows
-   * @param {Number} m columns
-   * @returns {Matrix}
+   * @param n - rows
+   * @param m - columns
    */
-  static Random(n, m) {
+  static Random(n: number, m: number) {
     if (arguments.length === 1) {
       m = n;
     }
-    return Matrix.Zero(n, m).map(() => {
-      return Math.random();
-    });
+    return Matrix.Zero(n, m).map(() => Math.random());
   }
 
   /**
    * Creates an `n` by `m` matrix filled with the given value.
-   * @param {Number} n rows
-   * @param {Number} m columns
-   * @param {Number} value
-   * @returns {Matrix}
+   * @param n - rows
+   * @param m - columns
    */
-  static Fill(n, m, value) {
+  static Fill(n: number, m: number, value: number) {
     if (arguments.length === 2) {
       value = m;
       m = n;
     }
 
-    const els = [];
+    const els: number[][] = [];
     let i = n;
     let j;
 
@@ -1472,58 +1376,42 @@ export class Matrix {
       }
     }
 
-    return Matrix.create(els);
+    return new Matrix(els);
   }
 
   /**
    * Creates an `n` by `m` matrix filled with 0's.
-   * @param {Number} n rows
-   * @param {Number} m columns
-   * @returns {Matrix}
+   * @param n - rows
+   * @param m - columns
    */
-  static Zero(n, m) {
+  static Zero(n: number, m: number) {
     return Matrix.Fill(n, m, 0);
   }
 
   /**
    * Creates an `n` by `m` matrix filled with 0's.
-   * @param {Number} n rows
-   * @param {Number} m columns
-   * @returns {Matrix}
+   * @param n - rows
+   * @param m - columns
    */
-  static Zeros(n, m) {
+  static Zeros(n: number, m: number) {
     return Matrix.Zero(n, m);
   }
 
   /**
    * Creates an `n` by `m` matrix filled with 1's.
-   * @param {Number} n rows
-   * @param {Number} m columns
-   * @returns {Matrix}
+   * @param n - rows
+   * @param m - columns
    */
-  static One(n, m) {
+  static One(n: number, m: number) {
     return Matrix.Fill(n, m, 1);
   }
 
   /**
    * Creates an `n` by `m` matrix filled with 1's.
-   * @param {Number} n rows
-   * @param {Number} m columns
-   * @returns {Matrix}
+   * @param n - rows
+   * @param m - columns
    */
-  static Ones(n, m) {
+  static Ones(n: number, m: number) {
     return Matrix.One(n, m);
   }
-}
-
-// if node-lapack is installed use the fast, native fortran routines
-if (lapack) {
-  Matrix.prototype.svd = Matrix.prototype.svdPack;
-  Matrix.prototype.qr = Matrix.prototype.qrPack;
-  Matrix.prototype.lu = Matrix.prototype.luPack;
-} else {
-  // otherwise use the slower pure Javascript versions
-  Matrix.prototype.svd = Matrix.prototype.svdJs;
-  Matrix.prototype.qr = Matrix.prototype.qrJs;
-  Matrix.prototype.lu = Matrix.prototype.luJs;
 }

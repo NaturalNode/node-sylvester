@@ -1,50 +1,72 @@
 import { Line } from './line';
-import { Node, CircularLinkedList } from './linkedlist';
+import { Node, CircularLinkedList, IImmutableList } from './linkedlist';
 import { Matrix } from './matrix';
 import { Plane } from './plane';
 import { Sylvester, InvalidOperationError } from './sylvester';
 import { Vector } from './vector';
+import { VectorOrList } from './likeness';
 
-const vertexCompare = (a, b) => a.eql(b);
+const vertexCompare = (a: Vector, b: Vector) => a.eql(b);
 
 export class Polygon {
+  /**
+   * Plane on which the polygon lies.
+   */
+  public readonly plane: Plane;
+
+  /**
+   * Polygon verticies.
+   */
+  public readonly vertices: IImmutableList<Vertex>;
+
+  private surfaceIntegralElements?: ReadonlyArray<Polygon>;
+  private triangles?: ReadonlyArray<Polygon>;
+  private convexVertices: CircularLinkedList<Vertex>;
+  private reflexVertices: CircularLinkedList<Vertex>;
+
   /**
    * Creates a new polygon formed from the given points, optionally projected
    * onto the plane.
    * @param {(Vector|number[])[]} points
    * @param {Plane} plane
    */
-  constructor(points, plane) {
-    points = points.toArray ? points.toArray() : points;
-    /**
-     * @type {Plane}
-     */
-    this.plane = plane || Plane.fromPoints(...points);
-    this.vertices = new CircularLinkedList();
-
-    // Construct linked list of vertices. If each point is already a polygon
-    // vertex, we reference it rather than creating a new vertex.
-    for (const point of points) {
-      const newVertex = point instanceof Polygon.Vertex ? point : new Polygon.Vertex(point);
-      this.vertices.append(new Node(newVertex));
+  constructor(points: ReadonlyArray<VectorOrList> | IImmutableList<VectorOrList>, plane: Plane) {
+    if (points.length === 0) {
+      throw new InvalidOperationError('Cannot create a polygon with zero points');
     }
 
-    this.populateVertexTypeLists();
+      const pointsArray = 'toArray' in points ? points.toArray() : points;
+      const ll = new CircularLinkedList<Vertex>();
+      for (const point of pointsArray) {
+        const newVertex = point instanceof Vertex ? point : new Vertex(point);
+        ll.append(newVertex);
+      }
+
+      this.plane = plane || Plane.fromPoints(...pointsArray);
+      this.vertices = ll;
+
+      this.convexVertices = new CircularLinkedList();
+      this.reflexVertices = new CircularLinkedList();
+      this.vertices.forEach(node => {
+        if (node.data.isConvex(this)) {
+          this.convexVertices.append(node.data);
+        } else {
+          this.reflexVertices.append(node.data);
+        }
+      });
   }
 
   /**
    * Returns whether the other polygon is equal to this one.
-   * @param {Polygon} other
-   * @param {Number} epsilon precision used for calculating equality
-   * @returns {Boolean}
+   * @param epsilon - precision used for calculating equality
    */
-  eql(other, epsilon = Sylvester.precision) {
+  public eql(other: unknown, epsilon = Sylvester.precision) {
     if (!(other instanceof Polygon) || other.vertices.length !== this.vertices.length) {
       return false;
     }
 
-    let a = this.vertices.first;
-    let b = other.vertices.first;
+    let a = this.vertices.first!;
+    let b = other.vertices.first!;
     for (let i = 0; i < this.vertices.length; i++) {
       if (!a.data.eql(b.data, epsilon)) {
         return false;
@@ -59,28 +81,22 @@ export class Polygon {
 
   /**
    * Returns the vertex at the given position on the vertex list, numbered from 1.
-   * @param {Number} i
-   * @returns {Vertex|null}
    */
-  v(i) {
-    return this.vertices.at(i - 1).data;
+  public v(i: number) {
+    return this.vertices.at(i - 1)!.data;
   }
 
   /**
    * Returns the node in the vertices linked list that refers to the given vertex.
-   * @param {Vector} vertex
-   * @returns {Vertex}
    */
-  nodeFor(vertex) {
-    return this.vertices.findNode(vertex, vertexCompare);
+  public nodeFor(vertex: Vector) {
+    return this.vertices.findNode<Vector>(vertex, vertexCompare);
   }
 
   /**
    * Translates the polygon by the given vector and returns the polygon.
-   * @param {Vector} vector
-   * @returns {Polygon}
    */
-  translate(vector) {
+  public translate(vector: VectorOrList) {
     const elements = Vector.toElements(vector, 3);
     return new Polygon(
       this.vertices.map(v => v.add(elements)),
@@ -90,24 +106,22 @@ export class Polygon {
 
   /**
    * Rotates the polygon about the given line and returns the polygon.
-   * @param {Number} t degrees in radians
-   * @param {Line} line
-   * @returns {Polygon}
+   * @param t - degrees in radians
    */
-  rotate(t, line) {
+  public rotate(t: number, line: Line) {
     const R = Matrix.Rotation(t, line.direction);
     return new Polygon(
-      this.vertices.map(v => v.rotate(R, line)),
+      this.vertices.map(v => v.rotate3D(R, line)),
       this.plane.rotate(R, line),
     );
   }
 
   /**
    * Scales the polygon relative to the given point and returns the polygon.
-   * @param {Number} k amount of scale
-   * @param {Vector|number[]} point origin to scale from
+   * @param k - amount of scale
+   * @param point - origin to scale from
    */
-  scale(k, point = Vector.Zero(3)) {
+  public scale(k: number, point: VectorOrList = Vector.Zero(3)) {
     const P = Vector.toElements(point, 3);
 
     return new Polygon(
@@ -119,7 +133,7 @@ export class Polygon {
           P[2] + k * (E[2] - P[2]),
         ]);
       }),
-      new Plane(this.vertices.first.data, this.plane.normal),
+      new Plane(this.vertices.first!.data, this.plane.normal),
     );
   }
 
@@ -143,11 +157,12 @@ export class Polygon {
    * @returns {Polygon[]}
    */
   trianglesForSurfaceIntegral() {
-    if (this._surfaceIntegralElements) {
-      return this._surfaceIntegralElements;
+    if (this.surfaceIntegralElements) {
+      return this.surfaceIntegralElements;
     }
-    const triangles = [];
-    const firstVertex = this.vertices.first.data;
+
+    const triangles: Polygon[] = [];
+    const firstVertex = this.vertices.first!.data;
     const plane = this.plane;
     this.vertices.forEach((node, i) => {
       if (i < 2) {
@@ -171,7 +186,7 @@ export class Polygon {
       );
     });
 
-    this._surfaceIntegralElements = triangles;
+    this.surfaceIntegralElements = triangles;
     return triangles;
   }
 
@@ -183,20 +198,20 @@ export class Polygon {
   area() {
     if (this.isTriangle()) {
       // Area is half the modulus of the cross product of two sides
-      let A = this.vertices.first;
-      let B = A.next;
-      let C = B.next;
-      A = A.data.elements;
-      B = B.data.elements;
-      C = C.data.elements;
+      const nodeA = this.vertices.first!;
+      const nodeB = nodeA.next;
+      const nodeC = nodeB.next;
+      const a = nodeA.data.elements;
+      const b = nodeB.data.elements;
+      const c = nodeC.data.elements;
 
       return (
         0.5 *
         new Vector([
-          (A[1] - B[1]) * (C[2] - B[2]) - (A[2] - B[2]) * (C[1] - B[1]),
-          (A[2] - B[2]) * (C[0] - B[0]) - (A[0] - B[0]) * (C[2] - B[2]),
-          (A[0] - B[0]) * (C[1] - B[1]) - (A[1] - B[1]) * (C[0] - B[0]),
-        ]).modulus()
+          (a[1] - b[1]) * (c[2] - b[2]) - (a[2] - b[2]) * (c[1] - b[1]),
+          (a[2] - b[2]) * (c[0] - b[0]) - (a[0] - b[0]) * (c[2] - b[2]),
+          (a[0] - b[0]) * (c[1] - b[1]) - (a[1] - b[1]) * (c[0] - b[0]),
+        ]).magnitude()
       );
     }
 
@@ -244,10 +259,8 @@ export class Polygon {
 
   /**
    * Returns the polygon's projection on the given plane as another polygon
-   * @param {Plane} plane
-   * @returns {Polygon}
    */
-  projectionOn(plane) {
+  public projectionOn(plane: Plane) {
     return new Polygon(
       this.vertices.map(node => plane.pointClosestTo(node)),
       plane,
@@ -260,7 +273,7 @@ export class Polygon {
    * @param {Vertex} vertex
    * @returns {Polygon}
    */
-  removeVertex(vertex) {
+  public removeVertex(vertex: Vector) {
     if (this.isTriangle()) {
       return this;
     }
@@ -273,22 +286,16 @@ export class Polygon {
 
   /**
    * Returns true iff the point is strictly inside the polygon
-   * @param {Vector|number[]} point
-   * @param {Number} epsilon
-   * @returns {Boolean}
    */
-  contains(point, epsilon = Sylvester.precision) {
+  public contains(point: VectorOrList, epsilon = Sylvester.precision): boolean {
     return this.containsByWindingNumber(point, epsilon);
   }
 
   /**
    * Returns true iff the given point is strictly inside the polygon using
    * the winding number method.
-   * @param {Vector|number[]} point
-   * @param {Number} epsilon
-   * @returns {Boolean}
    */
-  containsByWindingNumber(point, epsilon = Sylvester.precision) {
+  public containsByWindingNumber(point: VectorOrList, epsilon = Sylvester.precision): boolean {
     const P = Vector.toElements(point, 3);
     if (!this.plane.contains(P, epsilon)) {
       return false;
@@ -326,12 +333,10 @@ export class Polygon {
   /**
    * Returns true if the given point lies on an edge of the polygon
    * May cause problems with 'hole-joining' edges.
-   * @param {Vector|number[]} point
-   * @returns {Boolean}
    */
-  hasEdgeContaining(point) {
-    const P = point.elements || point;
-    return this.vertices.some(node => new Line.Segment(node.data, node.next.data).contains(P));
+  public hasEdgeContaining(point: VectorOrList, epsilon = Sylvester.precision): boolean {
+    const P = Vector.toElements(point);
+    return this.vertices.some(node => new Line.Segment(node.data, node.next.data).contains(P, epsilon));
   }
 
   /**
@@ -339,11 +344,11 @@ export class Polygon {
    * @returns {Polygon[]}
    */
   toTriangles() {
-    if (!this._triangles) {
-      this._triangles = this.triangulateByEarClipping();
+    if (!this.triangles) {
+      this.triangles = this.triangulateByEarClipping();
     }
 
-    return this._triangles;
+    return this.triangles;
   }
 
   /**
@@ -353,19 +358,19 @@ export class Polygon {
    * @returns {Polygon[]}
    */
   triangulateByEarClipping() {
-    let poly = this;
+    let poly: Polygon = this;
     const triangles = [];
 
     while (!poly.isTriangle()) {
       let success = false;
-      let trig;
-      let mainNode;
+      let trig: Polygon;
+      let mainNode: Readonly<Node<Vertex>>;
 
       // Ear tips must be convex vertices - let's pick one at random
       let offset = Math.floor(Math.random() * poly.convexVertices.length);
       for (let i = 0; !success && i < poly.convexVertices.length; i++) {
-        const convexNode = poly.convexVertices.at(offset + i);
-        mainNode = poly.vertices.findNode(convexNode.data, vertexCompare);
+        const convexNode = poly.convexVertices.at(offset + i)!;
+        mainNode = poly.vertices.findNode(convexNode.data, vertexCompare)!;
         // For convex vertices, this order will always be anticlockwise
         trig = new Polygon([mainNode.data, mainNode.next.data, mainNode.prev.data], this.plane);
         // Now test whether any reflex vertices lie within the ear
@@ -375,6 +380,8 @@ export class Polygon {
           if (node.data !== mainNode.prev.data && node.data !== mainNode.next.data) {
             return trig.contains(node.data) || trig.hasEdgeContaining(node.data);
           }
+
+          return false;
         });
       }
 
@@ -382,8 +389,8 @@ export class Polygon {
         throw new Error('Could not find any candidate veritices, this is a bug');
       }
 
-      triangles.push(trig);
-      poly = poly.removeVertex(mainNode.data);
+      triangles.push(trig!);
+      poly = poly.removeVertex(mainNode!.data);
     }
     // Need to do this to renumber the remaining vertices
     triangles.push(poly);
@@ -391,27 +398,11 @@ export class Polygon {
   }
 
   /**
-   * Constructs lists of convex and reflex vertices based
-   * on the main vertex list.
-   */
-  populateVertexTypeLists() {
-    this.convexVertices = new CircularLinkedList();
-    this.reflexVertices = new CircularLinkedList();
-    this.vertices.forEach(node => {
-      if (node.data.isConvex(this)) {
-        this.convexVertices.append(new Node(node.data));
-      } else {
-        this.reflexVertices.append(new Node(node.data));
-      }
-    });
-  }
-
-  /**
    * Returns a string representation of the polygon's vertices.
    * @returns {String}
    */
-  inspect() {
-    const points = [];
+  public inspect() {
+    const points: string[] = [];
     this.vertices.forEach(node => {
       points.push(node.data.inspect());
     });
@@ -420,18 +411,16 @@ export class Polygon {
 }
 
 export class Vertex extends Vector {
-  constructor(point) {
+  constructor(point: VectorOrList) {
     super(Vector.toElements(point, 3));
   }
 
   /**
    * Returns true iff the vertex's internal angle is 0 <= x < 180
    * in the context of the given polygon object.
-   * @param {Polygon} polygon
    * @throws {InvalidOperationError} if the vertex is not in the polygon
-   * @returns {Boolean}
    */
-  isConvex(polygon) {
+  public isConvex(polygon: Polygon, epsilon = Sylvester.precision): boolean {
     const node = polygon.nodeFor(this);
     if (node === null) {
       throw new InvalidOperationError('Provided vertex is not in the polygon');
@@ -441,10 +430,10 @@ export class Vertex extends Vector {
     const A = next.subtract(this);
     const B = prev.subtract(this);
     const theta = A.angleFrom(B);
-    if (theta <= Sylvester.precision) {
+    if (theta <= epsilon) {
       return true;
     }
-    if (Math.abs(theta - Math.PI) <= Sylvester.precision) {
+    if (Math.abs(theta - Math.PI) <= epsilon) {
       return false;
     }
     return A.cross(B).dot(polygon.plane.normal) > 0;
@@ -452,14 +441,10 @@ export class Vertex extends Vector {
 
   /**
    * Returns true iff the vertex's internal angle is 180 <= x < 360.
-   * @param {Polygon} polygon
    * @throws {InvalidOperationError} if the vertex is not in the polygon
-   * @returns {Boolean}
    */
-  isReflex(polygon) {
+  isReflex(polygon: Polygon) {
     const result = this.isConvex(polygon);
     return !result;
   }
 }
-
-Polygon.Vertex = Vertex;

@@ -10,10 +10,12 @@
     "build:dist": "babel src -d dist",
     "build:doc": "rimraf doc-output && esdoc -c esdoc.json",
     "test:cover": "nyc mocha --opts mocha.opts",
-    "test:fmt": "prettier --list-different \"{src,test}/**/*.js\" \"*.md\"",
+    "test:fmt": "prettier --list-different \"{src,test}/**/*.{js,ts}\" \"*.md\"",
     "test:unit": "mocha --opts mocha.opts",
     "test:lint": "echo todo",
-    "test": "npm-run-all --parallel --silent test:unit test:lint test:fmt",
+    "build": "rimraf dist && tsc",
+    "watch": "npm run build -- --watch",
+    "test": "npm run build && npm-run-all --parallel --silent test:unit test:lint test:fmt",
     "fmt": "prettier --write \"{src,test}/**/*.js\" \"*.md\" && npm run test:lint -- --fix"
   },
   "author": "Chris Umbel <chris@chrisumbel.com>",
@@ -26,7 +28,7 @@
     "algebra",
     "matrices"
   ],
-  "main": "./dist/index.js",
+  "main": "./dist/src/index.js",
   "maintainers": [
     {
       "name": "Chris Umbel",
@@ -43,12 +45,9 @@
     }
   ],
   "devDependencies": {
-    "@babel/cli": "^7.7.5",
-    "@babel/core": "^7.7.5",
-    "@babel/register": "^7.7.4",
-    "@istanbuljs/nyc-config-babel": "^2.1.1",
-    "babel-plugin-istanbul": "^5.2.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.12.20",
     "bluebird": "^3.4.7",
     "chai": "^3.5.0",
     "esdoc": "^0.5.2",
@@ -56,10 +55,9 @@
     "npm-run-all": "^4.0.0",
     "nyc": "^14.1.1",
     "prettier": "^1.19.1",
-    "rimraf": "^2.5.4"
-  },
-  "optionalDependencies": {
-    "lapack": "^0.1.0"
+    "rimraf": "^3.0.0",
+    "source-map-support": "^0.5.16",
+    "typescript": "^3.7.3"
   },
   "browser": {
     "lapack": false

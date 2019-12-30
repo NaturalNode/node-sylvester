@@ -15,11 +15,11 @@ describe('linked list', () => {
 
   it('appends and prepends elements', () => {
     const ll = new CircularLinkedList();
-    ll.append(new Node(1));
-    ll.append(new Node(2));
-    ll.append(new Node(3));
-    ll.prepend(new Node(4));
-    ll.prepend(new Node(5));
+    ll.append(1);
+    ll.append(2);
+    ll.append(3);
+    ll.prepend(4);
+    ll.prepend(5);
     expect(ll.toArray()).to.deep.equal([5, 4, 1, 2, 3]);
   });
 

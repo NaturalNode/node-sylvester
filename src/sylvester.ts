@@ -1,6 +1,5 @@
 /**
  * Default Sylvester configurations.
- * @type {Object}
  */
 export const Sylvester = {
   precision: 1e-6,
