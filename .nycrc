@@ -1,8 +1,0 @@
-{
-    "extends": "@istanbuljs/nyc-config-babel",
-    "reporter": [
-      "cobertura",
-      "text-summary",
-      "html"
-    ]
-}

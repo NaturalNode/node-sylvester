@@ -1,0 +1,15 @@
+name: Run Tests
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        node-version: '12.x'
+    - uses: borales/actions-yarn@v2.0.0
+      with:
+        cmd: install
+    - uses: borales/actions-yarn@v2.0.0
+      with:
+        cmd: test
