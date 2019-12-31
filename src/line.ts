@@ -70,7 +70,9 @@ export class Line {
    * @param epsilon - Precision at which to calculate equality
    */
   public eql(line: unknown, epsilon = Sylvester.precision) {
-    return isLineLike(line) &&  this.isParallelTo(line, epsilon) && this.contains(line.anchor, epsilon);
+    return (
+      isLineLike(line) && this.isParallelTo(line, epsilon) && this.contains(line.anchor, epsilon)
+    );
   }
 
   /**
@@ -433,8 +435,8 @@ export class Line {
    * Returns a textual representation of the object.
    * @returns {String}
    */
-  inspect() {
-    return `Line<${this.anchor.inspect()} @ ${this.direction.inspect()}>`;
+  toString() {
+    return `Line<${this.anchor.toString()} @ ${this.direction.toString()}>`;
   }
 }
 
@@ -472,10 +474,10 @@ export class Segment {
    * Returns true iff the line segment is equal to the argument
    */
   public eql(segment: unknown) {
-    return segment instanceof Segment && (
-
-      (this.start.eql(segment.start) && this.end.eql(segment.end)) ||
-      (this.start.eql(segment.end) && this.end.eql(segment.start))
+    return (
+      segment instanceof Segment &&
+      ((this.start.eql(segment.start) && this.end.eql(segment.end)) ||
+        (this.start.eql(segment.end) && this.end.eql(segment.start)))
     );
   }
 
@@ -564,7 +566,7 @@ export class Segment {
    * Returns true iff the given point lies on the segment
    * @param {Segment|Vector} obj
    */
-  contains(obj: Line | Segment | Plane | VectorOrList, epsilon = Sylvester.precision): boolean {
+  public contains(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isSegmentLike(obj)) {
       return this.contains(obj.start, epsilon) && this.contains(obj.end, epsilon);
     }
@@ -642,7 +644,7 @@ export class Segment {
    * Returns a textual representation of the object.
    * @returns {String}
    */
-  inspect() {
-    return `Line.Segment<${this.start.inspect()} -> ${this.end.inspect()}>`;
+  toString() {
+    return `Line.Segment<${this.start.toString()} -> ${this.end.toString()}>`;
   }
 }

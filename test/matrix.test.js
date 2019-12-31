@@ -720,8 +720,8 @@ describe('matrix', () => {
     ]);
   });
 
-  it('inspect', () => {
-    expect(A.inspect()).to.equal('Matrix<\n  [1, 2, 3]\n  [4, 5, 6]\n>');
+  it('toString', () => {
+    expect(A.toString()).to.equal('Matrix<\n  [1, 2, 3]\n  [4, 5, 6]\n>');
   });
 
   it('toArray', () => {

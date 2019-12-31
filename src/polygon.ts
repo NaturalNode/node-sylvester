@@ -38,25 +38,25 @@ export class Polygon {
       throw new InvalidOperationError('Cannot create a polygon with zero points');
     }
 
-      const pointsArray = 'toArray' in points ? points.toArray() : points;
-      const ll = new CircularLinkedList<Vertex>();
-      for (const point of pointsArray) {
-        const newVertex = point instanceof Vertex ? point : new Vertex(point);
-        ll.append(newVertex);
+    const pointsArray = 'toArray' in points ? points.toArray() : points;
+    const ll = new CircularLinkedList<Vertex>();
+    for (const point of pointsArray) {
+      const newVertex = point instanceof Vertex ? point : new Vertex(point);
+      ll.append(newVertex);
+    }
+
+    this.plane = plane || Plane.fromPoints(...pointsArray);
+    this.vertices = ll;
+
+    this.convexVertices = new CircularLinkedList();
+    this.reflexVertices = new CircularLinkedList();
+    this.vertices.forEach(node => {
+      if (node.data.isConvex(this)) {
+        this.convexVertices.append(node.data);
+      } else {
+        this.reflexVertices.append(node.data);
       }
-
-      this.plane = plane || Plane.fromPoints(...pointsArray);
-      this.vertices = ll;
-
-      this.convexVertices = new CircularLinkedList();
-      this.reflexVertices = new CircularLinkedList();
-      this.vertices.forEach(node => {
-        if (node.data.isConvex(this)) {
-          this.convexVertices.append(node.data);
-        } else {
-          this.reflexVertices.append(node.data);
-        }
-      });
+    });
   }
 
   /**
@@ -339,7 +339,9 @@ export class Polygon {
    */
   public hasEdgeContaining(point: VectorOrList, epsilon = Sylvester.precision): boolean {
     const P = Vector.toElements(point);
-    return this.vertices.some(node => new Line.Segment(node.data, node.next.data).contains(P, epsilon));
+    return this.vertices.some(node =>
+      new Line.Segment(node.data, node.next.data).contains(P, epsilon),
+    );
   }
 
   /**
@@ -404,10 +406,10 @@ export class Polygon {
    * Returns a string representation of the polygon's vertices.
    * @returns {String}
    */
-  public inspect() {
+  public toString() {
     const points: string[] = [];
     this.vertices.forEach(node => {
-      points.push(node.data.inspect());
+      points.push(node.data.toString());
     });
     return `Polygon<${points.join(' -> ')}>`;
   }

@@ -1,6 +1,6 @@
 import { Polygon, Vertex } from '../src/polygon';
 import { expect } from 'chai';
-import { asDiagram } from './_as-diagram';
+import { record } from './docs/record';
 import { Line, Plane, Vector } from '../src';
 
 describe('polygon', () => {
@@ -17,19 +17,19 @@ describe('polygon', () => {
     [5, 6],
   ]);
 
-  asDiagram('Polygon.v').it(expectCall => {
-    expectCall(simple)
+  it('Polygon.v', () => {
+    record(simple)
       .v(1)
       .to.vector.equal([0, 0, 0]);
     expect(simple.v(2)).to.vector.equal([1, 0, 0]);
     expect(simple.v(3)).to.vector.equal([0, 1, 0]);
-    expectCall(simple)
+    record(simple)
       .v(4)
       .to.vector.equal([0, 0, 0]);
   });
 
-  asDiagram('Polygon.translate').it(expectCall => {
-    expectCall(simple)
+  it('Polygon.translate', () => {
+    record(simple)
       .translate([1, 2, 3])
       .to.geo.equal(
         new Polygon([
@@ -40,8 +40,8 @@ describe('polygon', () => {
       );
   });
 
-  asDiagram('Polygon.rotate').it(expectCall => {
-    expectCall(simple)
+  it('Polygon.rotate', () => {
+    record(simple)
       .rotate(Math.PI / 2, Line.Z)
       .to.geo.equal(
         new Polygon([
@@ -52,8 +52,8 @@ describe('polygon', () => {
       );
   });
 
-  asDiagram('Polygon.scale').it(expectCall => {
-    expectCall(simple)
+  it('Polygon.scale', () => {
+    record(simple)
       .scale(2, [-1, -1, 0])
       .to.geo.equal(
         new Polygon([
@@ -62,7 +62,7 @@ describe('polygon', () => {
           [1, 3, 0],
         ]),
       );
-    expectCall(simple)
+    record(simple)
       .scale(2)
       .to.geo.equal(
         new Polygon([
@@ -73,9 +73,9 @@ describe('polygon', () => {
       );
   });
 
-  asDiagram('Polygon.isTriangle').it(expectCall => {
-    expectCall(simple).isTriangle().to.be.true;
-    expectCall(
+  it('Polygon.isTriangle', () => {
+    record(simple).isTriangle().to.be.true;
+    record(
       new Polygon([
         [0, 0],
         [1, 0],
@@ -85,11 +85,11 @@ describe('polygon', () => {
     ).isTriangle().to.be.false;
   });
 
-  asDiagram('Polygon.area').it(expectCall => {
-    expectCall(simple)
+  it('Polygon.area', () => {
+    record(simple)
       .area()
       .to.approx.equal(0.5);
-    expectCall(
+    record(
       new Polygon([
         [0, 0],
         [1, 0],
@@ -99,7 +99,7 @@ describe('polygon', () => {
     )
       .area()
       .to.approx.equal(1);
-    expectCall(
+    record(
       new Polygon([
         [0, 0],
         [0.5, 0],
@@ -110,22 +110,22 @@ describe('polygon', () => {
     )
       .area()
       .to.approx.equal(1);
-    expectCall(complex)
+    record(complex)
       .area()
       .to.approx.equal(30);
   });
 
-  asDiagram('Polygon.centroid').it(expectCall => {
-    expectCall(simple)
+  it('Polygon.centroid', () => {
+    record(simple)
       .centroid()
       .to.vector.equal([1 / 3, 1 / 3, 0]);
-    expectCall(complex)
+    record(complex)
       .centroid()
       .to.vector.equal([7.166667, 7.611111, 0]);
   });
 
-  asDiagram('Polygon.projectionOn').it(expectCall => {
-    expectCall(simple)
+  it('Polygon.projectionOn', () => {
+    record(simple)
       .projectionOn(new Plane([0, 0, 1], [1, 0, 2]))
       .to.geo.equal(
         new Polygon([
@@ -136,7 +136,7 @@ describe('polygon', () => {
       );
   });
 
-  asDiagram('Polygon.removeVertex').it(expectCall => {
+  it('Polygon.removeVertex', () => {
     const p1 = new Polygon([
       [0, 0],
       [1, 0],
@@ -144,7 +144,7 @@ describe('polygon', () => {
       [0, 1],
     ]);
     const p2 = p1.removeVertex(p1.v(2));
-    expectCall(p1).removeVertex(p1.v(2)); // for docs
+    record(p1).removeVertex(p1.v(2)); // for docs
     expect(p2).to.geo.equal(
       new Polygon([
         [0, 0],
@@ -156,16 +156,16 @@ describe('polygon', () => {
     expect(p2.removeVertex(p2.v(1))).to.geo.equal(p2);
   });
 
-  asDiagram('Polygon.contains').it(expectCall => {
-    expectCall(complex).contains([7, 8, 1]).to.be.false;
-    expectCall(complex).contains([7, 8, 0]).to.be.true;
+  it('Polygon.contains', () => {
+    record(complex).contains([7, 8, 1]).to.be.false;
+    record(complex).contains([7, 8, 0]).to.be.true;
     expect(complex.contains([3, 4, 0])).to.be.false;
     expect(complex.contains([4, 7.5, 0])).to.be.false; // edge
   });
 
-  asDiagram('Polygon.toTriangles').it(expectCall => {
+  it('Polygon.toTriangles', () => {
     const result = complex.toTriangles();
-    expectCall(complex).toTriangles(); // for docs
+    record(complex).toTriangles(); // for docs
 
     for (const triangle of result) {
       expect(triangle.isTriangle()).to.be.true;
@@ -183,7 +183,7 @@ describe('polygon', () => {
   });
 
   it('inspects', () => {
-    expect(complex.inspect()).to.equal(
+    expect(complex.toString()).to.equal(
       'Polygon<Vector<[3, 4, 0]> -> Vector<[5, 11, 0]> -> Vector<[12, 8, 0]> -> Vector<[9, 5, 0]> -> Vector<[5, 6, 0]>>',
     );
   });

@@ -2,7 +2,7 @@
  * One Node in a linked list.
  */
 export class Node<T> {
-  constructor(public readonly data: T, public prev: Node<T>, public  next: Node<T>) {}
+  constructor(public readonly data: T, public prev: Node<T>, public next: Node<T>) {}
 }
 
 /**
@@ -116,7 +116,7 @@ export class CircularLinkedList<T> implements IImmutableList<T> {
       const node = new Node(data, null as any, null as any);
       this.first = this.last = node.next = node.prev = node;
     } else {
-      const node = new Node(data, this.last, this.first)
+      const node = new Node(data, this.last, this.first);
       this.last.next = node;
       this.first.prev = node;
       this.last = node;
@@ -133,7 +133,6 @@ export class CircularLinkedList<T> implements IImmutableList<T> {
       this.append(data);
       return;
     }
-
 
     const node = new Node(data, this.last, this.first);
     this.first.prev = node;

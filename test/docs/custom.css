@@ -1,0 +1,8 @@
+.tex + .tex {
+  margin-top: 2em;
+}
+
+.tex {
+  margin: 8px;
+  text-align: center;
+}

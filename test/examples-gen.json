@@ -1,0 +1,6744 @@
+{
+  "Line.eql-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          1,
+          1,
+          0
+        ],
+        "direction": [
+          -0.7071067811865475,
+          -0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "eql",
+    "retValue": true
+  },
+  "Line.eql-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          -0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "eql",
+    "retValue": false
+  },
+  "Line.translate-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        2,
+        3
+      ]
+    ],
+    "method": "translate",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        2,
+        3,
+        0
+      ],
+      "direction": [
+        0.7071067811865476,
+        0.7071067811865476,
+        0
+      ]
+    }
+  },
+  "Line.isParallelTo-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          1,
+          1,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Line.isParallelTo-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          1,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Line.isParallelTo-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Line.isParallelTo-3": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          2,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Line.isParallelTo-4": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          0,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Line.isParallelTo-5": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          0,
+          1
+        ],
+        "normal": [
+          0.5773502691896258,
+          -0.5773502691896258,
+          -0.5773502691896258
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Line.isParallelTo-6": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      [
+        6,
+        8
+      ]
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Line.isParallelTo-7": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      [
+        7,
+        8
+      ]
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Line.isPerpendicularTo-0": {
+    "callee": [
+      6,
+      8
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Line.isPerpendicularTo-1": {
+    "callee": [
+      -4,
+      3
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Line.isPerpendicularTo-2": {
+    "callee": [
+      6,
+      8
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          3,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Line.isPerpendicularTo-3": {
+    "callee": [
+      -4,
+      3
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          3,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Line.isPerpendicularTo-4": {
+    "callee": [
+      4,
+      5,
+      6
+    ],
+    "args": [
+      {
+        "anchor": [
+          1,
+          2,
+          3
+        ],
+        "normal": [
+          0.4558423058385518,
+          0.5698028822981898,
+          0.6837634587578276
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Line.isPerpendicularTo-5": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        -4,
+        3
+      ]
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Line.isPerpendicularTo-6": {
+    "callee": [
+      4,
+      4
+    ],
+    "args": [
+      [
+        1,
+        2
+      ]
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Line.distanceFrom-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        1,
+        2
+      ]
+    ],
+    "method": "distanceFrom",
+    "retValue": 0.7071067811865487
+  },
+  "Line.distanceFrom-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        2,
+        2
+      ]
+    ],
+    "method": "distanceFrom",
+    "retValue": 4.2146848510894035e-8
+  },
+  "Line.distanceFrom-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          -0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Line.distanceFrom-3": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          1,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0.7071067811865476
+  },
+  "Line.distanceFrom-4": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0.7071067811865475,
+          0,
+          0.7071067811865475
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Line.distanceFrom-5": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 1
+  },
+  "Line.distanceFrom-6": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        3,
+        0,
+        0
+      ],
+      "direction": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Line.distanceFrom-7": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        1,
+        1
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 1
+  },
+  "Line.distanceFrom-8": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        1,
+        1,
+        0
+      ],
+      "direction": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0.5999999999999999
+  },
+  "Line.contains-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        1,
+        2
+      ]
+    ],
+    "method": "contains",
+    "retValue": false
+  },
+  "Line.contains-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        3,
+        3
+      ]
+    ],
+    "method": "contains",
+    "retValue": true
+  },
+  "Line.contains-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          1,
+          0
+        ],
+        "end": [
+          4,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "contains",
+    "retValue": true
+  },
+  "Line.contains-3": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          1,
+          0
+        ],
+        "end": [
+          1,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "contains",
+    "retValue": false
+  },
+  "Line.positionOf-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        2,
+        2
+      ]
+    ],
+    "method": "positionOf",
+    "retValue": 2.82842712474619
+  },
+  "Line.positionOf-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        -2,
+        -2
+      ]
+    ],
+    "method": "positionOf",
+    "retValue": -2.82842712474619
+  },
+  "Line.positionOf-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        3,
+        1
+      ]
+    ],
+    "method": "positionOf",
+    "retValue": null
+  },
+  "Line.liesIn-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          -1,
+          -1,
+          0
+        ],
+        "normal": [
+          0.4082482904638631,
+          -0.4082482904638631,
+          -0.8164965809277261
+        ]
+      }
+    ],
+    "method": "liesIn",
+    "retValue": true
+  },
+  "Line.liesIn-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          -1,
+          -1,
+          -1
+        ],
+        "normal": [
+          0,
+          0.8944271909999159,
+          -0.4472135954999579
+        ]
+      }
+    ],
+    "method": "liesIn",
+    "retValue": false
+  },
+  "Line.intersects-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          1,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersects",
+    "retValue": false
+  },
+  "Line.intersects-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          -0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersects",
+    "retValue": true
+  },
+  "Line.intersects-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "intersects",
+    "retValue": false
+  },
+  "Line.intersects-3": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          -0.7071067811865475,
+          0.7071067811865475
+        ]
+      }
+    ],
+    "method": "intersects",
+    "retValue": true
+  },
+  "Line.intersectionWith-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          -0.7071067811865475,
+          -0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Line.intersectionWith-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        1,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Line.intersectionWith-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        1,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        -0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": [
+      0.5,
+      0.5,
+      0
+    ]
+  },
+  "Line.intersectionWith-3": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        1,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        -0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          1,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": [
+      0.5,
+      0.5,
+      0
+    ]
+  },
+  "Line.intersectionWith-4": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        1,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        -0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          -1,
+          -1,
+          0
+        ],
+        "end": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Line.intersectionWith-5": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Line.intersectionWith-6": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Line.intersectionWith-7": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0.4472135954999579,
+          0,
+          0.8944271909999159
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": [
+      3,
+      3,
+      0
+    ]
+  },
+  "Line.pointClosestTo-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        3,
+        1
+      ]
+    ],
+    "method": "pointClosestTo",
+    "retValue": [
+      1.9999999999999991,
+      2.000000000000001,
+      0
+    ]
+  },
+  "Line.pointClosestTo-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        1,
+        1
+      ]
+    ],
+    "method": "pointClosestTo",
+    "retValue": [
+      1,
+      1,
+      0
+    ]
+  },
+  "Line.pointClosestTo-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          -2,
+          2,
+          0
+        ],
+        "end": [
+          1,
+          2,
+          0
+        ]
+      }
+    ],
+    "method": "pointClosestTo",
+    "retValue": [
+      1.5000000000000009,
+      1.4999999999999991,
+      0
+    ]
+  },
+  "Line.pointClosestTo-3": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          1,
+          0
+        ],
+        "end": [
+          -1,
+          -1,
+          0
+        ]
+      }
+    ],
+    "method": "pointClosestTo",
+    "retValue": null
+  },
+  "Line.pointClosestTo-4": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          1,
+          0
+        ],
+        "direction": [
+          0.7071067811865476,
+          -0.7071067811865476,
+          0
+        ]
+      }
+    ],
+    "method": "pointClosestTo",
+    "retValue": [
+      0.5,
+      0.5,
+      0
+    ]
+  },
+  "Line.pointClosestTo-5": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          1,
+          0
+        ],
+        "direction": [
+          0.7071067811865476,
+          0.7071067811865476,
+          0
+        ]
+      }
+    ],
+    "method": "pointClosestTo",
+    "retValue": null
+  },
+  "Line.pointClosestTo-6": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          1,
+          1
+        ],
+        "direction": [
+          0.30151134457776363,
+          0.30151134457776363,
+          0.9045340337332909
+        ]
+      }
+    ],
+    "method": "pointClosestTo",
+    "retValue": [
+      0.16666666666666666,
+      0.16666666666666666,
+      0
+    ]
+  },
+  "Line.pointClosestTo-7": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          -1,
+          -1,
+          -1
+        ],
+        "normal": [
+          0,
+          0.8944271909999159,
+          -0.4472135954999579
+        ]
+      }
+    ],
+    "method": "pointClosestTo",
+    "retValue": [
+      -0.5,
+      -0.5,
+      0
+    ]
+  },
+  "Line.pointClosestTo-8": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "pointClosestTo",
+    "retValue": null
+  },
+  "Line.rotate-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      1.5707963267948966,
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          1,
+          0,
+          0
+        ]
+      }
+    ],
+    "method": "rotate",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865476,
+        4.3297802811774664e-17,
+        0.7071067811865476
+      ]
+    }
+  },
+  "Line.rotate-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      1.5707963267948966,
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "rotate",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        4.3297802811774664e-17,
+        0.7071067811865476,
+        -0.7071067811865476
+      ]
+    }
+  },
+  "Line.rotate-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      1.5707963267948966,
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "rotate",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        -0.7071067811865476,
+        0.7071067811865476,
+        0
+      ]
+    }
+  },
+  "Line.rotate-3": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      1.5707963267948966,
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.5773502691896258,
+          0.5773502691896258,
+          0.5773502691896258
+        ]
+      }
+    ],
+    "method": "rotate",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.06315623032716872,
+        0.8796528112548948,
+        0.47140452079103173
+      ]
+    }
+  },
+  "Line.rotate-4": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      3.141592653589793,
+      [
+        0,
+        1
+      ]
+    ],
+    "method": "rotate",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        1.2246467991473532e-16,
+        2,
+        0
+      ],
+      "direction": [
+        -0.7071067811865477,
+        -0.7071067811865475,
+        0
+      ]
+    }
+  },
+  "Line.reverse-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [],
+    "method": "reverse",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        -0.7071067811865476,
+        -0.7071067811865476,
+        0
+      ]
+    }
+  },
+  "Line.reflectionIn-0": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      [
+        -1,
+        1
+      ]
+    ],
+    "method": "reflectionIn",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        -2,
+        2,
+        0
+      ],
+      "direction": [
+        0.7071067811865476,
+        0.7071067811865476,
+        0
+      ]
+    }
+  },
+  "Line.reflectionIn-1": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "reflectionIn",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        -0.7071067811865476,
+        0.7071067811865476,
+        -8.659560562354933e-17
+      ]
+    }
+  },
+  "Line.reflectionIn-2": {
+    "callee": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        0.7071067811865475,
+        0.7071067811865475,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "reflectionIn",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        0,
+        0,
+        2
+      ],
+      "direction": [
+        0.7071067811865476,
+        0.7071067811865476,
+        0
+      ]
+    }
+  },
+  "Segment.eql-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "eql",
+    "retValue": true
+  },
+  "Segment.eql-1": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          4,
+          6,
+          0
+        ],
+        "end": [
+          1,
+          2,
+          0
+        ]
+      }
+    ],
+    "method": "eql",
+    "retValue": true
+  },
+  "Segment.eql-2": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "eql",
+    "retValue": false
+  },
+  "Segment.eql-3": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          2,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "eql",
+    "retValue": false
+  },
+  "Segment.length-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [],
+    "method": "toVector",
+    "retValue": [
+      3,
+      4,
+      0
+    ]
+  },
+  "Segment.midpoint-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [],
+    "method": "midpoint",
+    "retValue": [
+      2.5,
+      4,
+      0
+    ]
+  },
+  "Segment.bisectingPlane-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [],
+    "method": "bisectingPlane",
+    "retValue": {
+      "anchor": [
+        2.5,
+        4,
+        0
+      ],
+      "normal": [
+        0.6,
+        0.8,
+        0
+      ]
+    }
+  },
+  "Segment.translate-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      [
+        -2,
+        -4
+      ]
+    ],
+    "method": "translate",
+    "retValue": {
+      "type": "Segment",
+      "start": [
+        -1,
+        -2,
+        0
+      ],
+      "end": [
+        2,
+        2,
+        0
+      ]
+    }
+  },
+  "Segment.isParallelTo-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Segment.isParallelTo-1": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        2,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Segment.isParallelTo-2": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          2,
+          3,
+          0
+        ],
+        "end": [
+          5,
+          7,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Segment.isParallelTo-3": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          2,
+          3,
+          0
+        ],
+        "end": [
+          2,
+          7,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Segment.isParallelTo-4": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          0,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Segment.isParallelTo-5": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          0,
+          1
+        ],
+        "normal": [
+          0.5773502691896258,
+          -0.5773502691896258,
+          -0.5773502691896258
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Segment.isParallelTo-6": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      [
+        6,
+        8
+      ]
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Segment.isParallelTo-7": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      [
+        7,
+        8
+      ]
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Segment.isPerpendicularTo-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Segment.isPerpendicularTo-1": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        2,
+        2,
+        0
+      ],
+      "end": [
+        -2,
+        5,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Segment.isPerpendicularTo-2": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        3,
+        4,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          1,
+          0
+        ],
+        "end": [
+          6,
+          8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Segment.isPerpendicularTo-3": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        3,
+        4,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          -4,
+          3,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Segment.isPerpendicularTo-4": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        3,
+        4,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          2,
+          3,
+          1
+        ],
+        "normal": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Segment.isPerpendicularTo-5": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        3,
+        4,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "normal": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Segment.isPerpendicularTo-6": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        3,
+        4,
+        0
+      ]
+    },
+    "args": [
+      [
+        6,
+        8
+      ]
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Segment.isPerpendicularTo-7": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        3,
+        4,
+        0
+      ]
+    },
+    "args": [
+      [
+        -4,
+        3
+      ]
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Segment.distanceFrom-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      [
+        0,
+        0
+      ]
+    ],
+    "method": "distanceFrom",
+    "retValue": 2.23606797749979
+  },
+  "Segment.distanceFrom-1": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      [
+        2,
+        3.333333333333333
+      ]
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Segment.distanceFrom-2": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      [
+        2,
+        2
+      ]
+    ],
+    "method": "distanceFrom",
+    "retValue": 0.8
+  },
+  "Segment.distanceFrom-3": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          3,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Segment.distanceFrom-4": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          1,
+          1
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 1
+  },
+  "Segment.distanceFrom-5": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          1,
+          1,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0.5999999999999999
+  },
+  "Segment.distanceFrom-6": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        1,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0.5,
+          1,
+          1
+        ],
+        "normal": [
+          1,
+          0,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Segment.distanceFrom-7": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        1,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 1
+  },
+  "Segment.contains-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          2,
+          3.333333333333333,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "contains",
+    "retValue": true
+  },
+  "Segment.contains-1": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0.6666666666666667,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "contains",
+    "retValue": false
+  },
+  "Segment.contains-2": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      [
+        2,
+        3.333333333333333
+      ]
+    ],
+    "method": "contains",
+    "retValue": true
+  },
+  "Segment.contains-3": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      [
+        2,
+        2
+      ]
+    ],
+    "method": "contains",
+    "retValue": false
+  },
+  "Segment.intersects-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersects",
+    "retValue": false
+  },
+  "Segment.intersects-1": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          3,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "intersects",
+    "retValue": true
+  },
+  "Segment.intersects-2": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "intersects",
+    "retValue": false
+  },
+  "Segment.intersects-3": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        2,
+        0
+      ],
+      "end": [
+        4,
+        6,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          -0.4472135954999579,
+          -0.8944271909999159
+        ]
+      }
+    ],
+    "method": "intersects",
+    "retValue": true
+  },
+  "Segment.intersectionWith-0": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "end": [
+        1,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          1,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          -0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": [
+      0.5,
+      0.5,
+      0
+    ]
+  },
+  "Segment.intersectionWith-1": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        -1,
+        -1,
+        0
+      ],
+      "end": [
+        0,
+        0,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          1,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          -0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Segment.intersectionWith-2": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        0,
+        0
+      ],
+      "end": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          -1,
+          -1,
+          0
+        ],
+        "end": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Segment.intersectionWith-3": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        0,
+        0
+      ],
+      "end": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          1,
+          0
+        ],
+        "end": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": [
+      0.5,
+      0.5,
+      0
+    ]
+  },
+  "Segment.intersectionWith-4": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        0,
+        0
+      ],
+      "end": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Segment.intersectionWith-5": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        0,
+        0
+      ],
+      "end": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          0,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Segment.intersectionWith-6": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        1,
+        0,
+        0
+      ],
+      "end": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          0,
+          1
+        ],
+        "normal": [
+          0,
+          0.4472135954999579,
+          0.8944271909999159
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Segment.intersectionWith-7": {
+    "callee": {
+      "type": "Segment",
+      "start": [
+        2,
+        0,
+        0
+      ],
+      "end": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          0,
+          1
+        ],
+        "normal": [
+          0.7071067811865475,
+          0,
+          0.7071067811865475
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": [
+      1,
+      0.5,
+      0
+    ]
+  },
+  "Plane.isPerpendicularTo-0": {
+    "callee": {
+      "anchor": [
+        2,
+        3,
+        1
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Plane.isPerpendicularTo-1": {
+    "callee": {
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Plane.isPerpendicularTo-2": {
+    "callee": {
+      "anchor": [
+        2,
+        3,
+        1
+      ],
+      "normal": [
+        0,
+        1,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          3,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Plane.isPerpendicularTo-3": {
+    "callee": {
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0.6,
+        0.8,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          3,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Plane.isPerpendicularTo-4": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.4558423058385518,
+        0.5698028822981898,
+        0.6837634587578276
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          2,
+          3,
+          1
+        ],
+        "normal": [
+          -0.7808688094430304,
+          0.6246950475544243,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Plane.isPerpendicularTo-5": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.4558423058385518,
+        0.5698028822981898,
+        0.6837634587578276
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          2,
+          3,
+          1
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Plane.isPerpendicularTo-6": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.4558423058385518,
+        0.5698028822981898,
+        0.6837634587578276
+      ]
+    },
+    "args": [
+      [
+        4,
+        5,
+        6
+      ]
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Plane.isParallelTo-0": {
+    "callee": {
+      "anchor": [
+        1,
+        0,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Plane.isParallelTo-1": {
+    "callee": {
+      "anchor": [
+        1,
+        0,
+        1
+      ],
+      "normal": [
+        0.5773502691896258,
+        -0.5773502691896258,
+        -0.5773502691896258
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Plane.isParallelTo-2": {
+    "callee": {
+      "anchor": [
+        1,
+        0,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Plane.isParallelTo-3": {
+    "callee": {
+      "anchor": [
+        1,
+        0,
+        1
+      ],
+      "normal": [
+        0.5773502691896258,
+        -0.5773502691896258,
+        -0.5773502691896258
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Plane.isParallelTo-4": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        -0.7071067811865476,
+        0.7071067811865476
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          2
+        ],
+        "normal": [
+          0,
+          -0.7071067811865476,
+          0.7071067811865476
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Plane.isParallelTo-5": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        -0.7071067811865476,
+        0.7071067811865476
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          -0.8944271909999159,
+          0,
+          0.4472135954999579
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Plane.isParallelTo-6": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      [
+        3,
+        4,
+        0
+      ]
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Plane.isParallelTo-7": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        -0.7071067811865476,
+        0.7071067811865476
+      ]
+    },
+    "args": [
+      [
+        3,
+        4,
+        1
+      ]
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Plane.intersectionWith-0": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Plane.intersectionWith-1": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Plane.intersectionWith-2": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0.4472135954999579,
+        0,
+        0.8944271909999159
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": [
+      3,
+      3,
+      0
+    ]
+  },
+  "Plane.intersectionWith-3": {
+    "callee": {
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          0,
+          0
+        ],
+        "end": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Plane.intersectionWith-4": {
+    "callee": {
+      "anchor": [
+        0,
+        0,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          0,
+          0
+        ],
+        "end": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Plane.intersectionWith-5": {
+    "callee": {
+      "anchor": [
+        0,
+        0,
+        1
+      ],
+      "normal": [
+        0,
+        0.4472135954999579,
+        0.8944271909999159
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          0,
+          0
+        ],
+        "end": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Plane.intersectionWith-6": {
+    "callee": {
+      "anchor": [
+        0,
+        0,
+        1
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          2,
+          0,
+          0
+        ],
+        "end": [
+          0,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": [
+      1,
+      0.5,
+      0
+    ]
+  },
+  "Plane.intersectionWith-7": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": null
+  },
+  "Plane.intersectionWith-8": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "normal": [
+          0.5773502691896258,
+          0.5773502691896258,
+          0.5773502691896258
+        ]
+      }
+    ],
+    "method": "intersectionWith",
+    "retValue": {
+      "type": "Line",
+      "anchor": [
+        0,
+        -1.0000000000000007,
+        1.0000000000000002
+      ],
+      "direction": [
+        -0.7071067811865476,
+        0.7071067811865476,
+        0
+      ]
+    }
+  },
+  "Plane.distanceFrom-0": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Plane.distanceFrom-1": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 1
+  },
+  "Plane.distanceFrom-2": {
+    "callee": {
+      "anchor": [
+        0.5,
+        1,
+        1
+      ],
+      "normal": [
+        1,
+        0,
+        0
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          1,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Plane.distanceFrom-3": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ]
+    },
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          1,
+          1,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 1
+  },
+  "Plane.distanceFrom-4": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0.7071067811865475,
+          0,
+          0.7071067811865475
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Plane.distanceFrom-5": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          1,
+          1
+        ],
+        "normal": [
+          0.7071067811865475,
+          0,
+          0.7071067811865475
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0.7071067811865475
+  },
+  "Plane.distanceFrom-6": {
+    "callee": {
+      "anchor": [
+        1,
+        1,
+        1
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Plane.translate-0": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "method": "translate",
+    "retValue": {
+      "anchor": [
+        4,
+        6,
+        8
+      ],
+      "normal": [
+        0.7071067811865476,
+        0,
+        0.7071067811865476
+      ]
+    }
+  },
+  "Plane.rotate-0": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      1.5707963267948966,
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "rotate",
+    "retValue": {
+      "anchor": [
+        -1.9999999999999993,
+        1.0000000000000004,
+        3
+      ],
+      "normal": [
+        4.3297802811774664e-17,
+        0.7071067811865476,
+        0.7071067811865476
+      ]
+    }
+  },
+  "Plane.rotate-1": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      {
+        "type": "Matrix",
+        "elements": [
+          [
+            6.123233995736766e-17,
+            -1,
+            0
+          ],
+          [
+            1,
+            6.123233995736766e-17,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "rotate",
+    "retValue": {
+      "anchor": [
+        -1.9999999999999993,
+        1.0000000000000004,
+        3
+      ],
+      "normal": [
+        4.3297802811774664e-17,
+        0.7071067811865476,
+        0.7071067811865476
+      ]
+    }
+  },
+  "Plane.reflectionIn-0": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    "method": "reflectionIn",
+    "retValue": {
+      "anchor": [
+        -1,
+        -2,
+        -3
+      ],
+      "normal": [
+        0.7071067811865476,
+        0,
+        0.7071067811865476
+      ]
+    }
+  },
+  "Plane.reflectionIn-1": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "reflectionIn",
+    "retValue": {
+      "anchor": [
+        -0.9999999999999998,
+        -1.999999999999999,
+        3
+      ],
+      "normal": [
+        -0.7071067811865476,
+        8.659560562354933e-17,
+        0.7071067811865476
+      ]
+    }
+  },
+  "Plane.reflectionIn-2": {
+    "callee": {
+      "anchor": [
+        1,
+        2,
+        3
+      ],
+      "normal": [
+        0.7071067811865475,
+        0,
+        0.7071067811865475
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "reflectionIn",
+    "retValue": {
+      "anchor": [
+        2.220446049250313e-16,
+        1,
+        3
+      ],
+      "normal": [
+        0,
+        -0.7071067811865474,
+        0.7071067811865478
+      ]
+    }
+  },
+  "Plane.fromPoints-0": {
+    "args": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        0,
+        1
+      ]
+    ],
+    "method": "fromPoints",
+    "retValue": {
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0.7071067811865476,
+        0,
+        -0.7071067811865476
+      ]
+    }
+  },
+  "Plane.fromPoints-1": {
+    "args": [
+      [
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        0,
+        2
+      ]
+    ],
+    "method": "fromPoints",
+    "retValue": {
+      "anchor": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0.7071067811865476,
+        0,
+        -0.7071067811865476
+      ]
+    }
+  },
+  "Polygon.v-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [
+      1
+    ],
+    "method": "v",
+    "retValue": [
+      0,
+      0,
+      0
+    ]
+  },
+  "Polygon.v-1": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [
+      4
+    ],
+    "method": "v",
+    "retValue": [
+      0,
+      0,
+      0
+    ]
+  },
+  "Polygon.translate-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [
+      [
+        1,
+        2,
+        3
+      ]
+    ],
+    "method": "translate",
+    "retValue": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          1,
+          2,
+          3
+        ],
+        [
+          2,
+          2,
+          3
+        ],
+        [
+          1,
+          3,
+          3
+        ]
+      ]
+    }
+  },
+  "Polygon.rotate-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [
+      1.5707963267948966,
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "rotate",
+    "retValue": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          6.123233995736766e-17,
+          1,
+          0
+        ],
+        [
+          -1,
+          6.123233995736766e-17,
+          0
+        ]
+      ]
+    }
+  },
+  "Polygon.scale-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [
+      2,
+      [
+        -1,
+        -1,
+        0
+      ]
+    ],
+    "method": "scale",
+    "retValue": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          3,
+          1,
+          0
+        ],
+        [
+          1,
+          3,
+          0
+        ]
+      ]
+    }
+  },
+  "Polygon.scale-1": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [
+      2
+    ],
+    "method": "scale",
+    "retValue": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          2,
+          0
+        ]
+      ]
+    }
+  },
+  "Polygon.isTriangle-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "isTriangle",
+    "retValue": true
+  },
+  "Polygon.isTriangle-1": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "isTriangle",
+    "retValue": false
+  },
+  "Polygon.area-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "area",
+    "retValue": 0.5
+  },
+  "Polygon.area-1": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "area",
+    "retValue": 1
+  },
+  "Polygon.area-2": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0.5,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "area",
+    "retValue": 1
+  },
+  "Polygon.area-3": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          3,
+          4,
+          0
+        ],
+        [
+          5,
+          11,
+          0
+        ],
+        [
+          12,
+          8,
+          0
+        ],
+        [
+          9,
+          5,
+          0
+        ],
+        [
+          5,
+          6,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "area",
+    "retValue": 30
+  },
+  "Polygon.centroid-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "centroid",
+    "retValue": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0
+    ]
+  },
+  "Polygon.centroid-1": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          3,
+          4,
+          0
+        ],
+        [
+          5,
+          11,
+          0
+        ],
+        [
+          12,
+          8,
+          0
+        ],
+        [
+          9,
+          5,
+          0
+        ],
+        [
+          5,
+          6,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "centroid",
+    "retValue": [
+      7.166666666666667,
+      7.611111111111112,
+      0
+    ]
+  },
+  "Polygon.projectionOn-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [
+      {
+        "anchor": [
+          0,
+          0,
+          1
+        ],
+        "normal": [
+          0.4472135954999579,
+          0,
+          0.8944271909999159
+        ]
+      }
+    ],
+    "method": "projectionOn",
+    "retValue": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0.39999999999999997,
+          0,
+          0.7999999999999999
+        ],
+        [
+          1.2,
+          0,
+          0.39999999999999997
+        ],
+        [
+          0.39999999999999997,
+          1,
+          0.7999999999999999
+        ]
+      ]
+    }
+  },
+  "Polygon.removeVertex-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    },
+    "args": [
+      [
+        1,
+        0,
+        0
+      ]
+    ],
+    "method": "removeVertex",
+    "retValue": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ]
+    }
+  },
+  "Polygon.contains-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          3,
+          4,
+          0
+        ],
+        [
+          5,
+          11,
+          0
+        ],
+        [
+          12,
+          8,
+          0
+        ],
+        [
+          9,
+          5,
+          0
+        ],
+        [
+          5,
+          6,
+          0
+        ]
+      ]
+    },
+    "args": [
+      [
+        7,
+        8,
+        1
+      ]
+    ],
+    "method": "contains",
+    "retValue": false
+  },
+  "Polygon.contains-1": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          3,
+          4,
+          0
+        ],
+        [
+          5,
+          11,
+          0
+        ],
+        [
+          12,
+          8,
+          0
+        ],
+        [
+          9,
+          5,
+          0
+        ],
+        [
+          5,
+          6,
+          0
+        ]
+      ]
+    },
+    "args": [
+      [
+        7,
+        8,
+        0
+      ]
+    ],
+    "method": "contains",
+    "retValue": true
+  },
+  "Polygon.toTriangles-0": {
+    "callee": {
+      "type": "Polygon",
+      "verticies": [
+        [
+          3,
+          4,
+          0
+        ],
+        [
+          5,
+          11,
+          0
+        ],
+        [
+          12,
+          8,
+          0
+        ],
+        [
+          9,
+          5,
+          0
+        ],
+        [
+          5,
+          6,
+          0
+        ]
+      ]
+    },
+    "args": [],
+    "method": "toTriangles",
+    "retValue": [
+      {
+        "type": "Polygon",
+        "verticies": [
+          [
+            12,
+            8,
+            0
+          ],
+          [
+            9,
+            5,
+            0
+          ],
+          [
+            5,
+            11,
+            0
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "verticies": [
+          [
+            9,
+            5,
+            0
+          ],
+          [
+            5,
+            6,
+            0
+          ],
+          [
+            5,
+            11,
+            0
+          ]
+        ]
+      },
+      {
+        "type": "Polygon",
+        "verticies": [
+          [
+            3,
+            4,
+            0
+          ],
+          [
+            5,
+            11,
+            0
+          ],
+          [
+            5,
+            6,
+            0
+          ]
+        ]
+      }
+    ]
+  },
+  "Vector.magnitude-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "magnitude",
+    "retValue": 5
+  },
+  "Vector.e-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      0
+    ],
+    "method": "e",
+    "retValue": null
+  },
+  "Vector.e-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      1
+    ],
+    "method": "e",
+    "retValue": 3
+  },
+  "Vector.e-2": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      3
+    ],
+    "method": "e",
+    "retValue": null
+  },
+  "Vector.toUnitVector-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "toUnitVector",
+    "retValue": [
+      0.6,
+      0.8
+    ]
+  },
+  "Vector.toUnitVector-1": {
+    "callee": [
+      0,
+      0
+    ],
+    "args": [],
+    "method": "toUnitVector",
+    "retValue": [
+      0,
+      0
+    ]
+  },
+  "Vector.dimensions-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "dimensions",
+    "retValue": {
+      "rows": 1,
+      "cols": 2
+    }
+  },
+  "Vector.rows-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "rows",
+    "retValue": 1
+  },
+  "Vector.cols-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "cols",
+    "retValue": 2
+  },
+  "Vector.product-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "product",
+    "retValue": 12
+  },
+  "Vector.eql-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        3,
+        4
+      ]
+    ],
+    "method": "eql",
+    "retValue": true
+  },
+  "Vector.eql-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        5,
+        6
+      ]
+    ],
+    "method": "eql",
+    "retValue": false
+  },
+  "Vector.eql-2": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        7
+      ]
+    ],
+    "method": "eql",
+    "retValue": false
+  },
+  "Vector.angleFrom-0": {
+    "callee": [
+      1,
+      1
+    ],
+    "args": [
+      [
+        1,
+        0
+      ]
+    ],
+    "method": "angleFrom",
+    "retValue": 0.7853981633974484
+  },
+  "Vector.angleFrom-1": {
+    "callee": [
+      1,
+      1
+    ],
+    "args": [
+      [
+        -1,
+        0
+      ]
+    ],
+    "method": "angleFrom",
+    "retValue": 2.356194490192345
+  },
+  "Vector.isParallelTo-0": {
+    "callee": [
+      6,
+      8
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Vector.isParallelTo-1": {
+    "callee": [
+      7,
+      8
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Vector.isParallelTo-2": {
+    "callee": [
+      6,
+      8
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Vector.isParallelTo-3": {
+    "callee": [
+      7,
+      8
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Vector.isParallelTo-4": {
+    "callee": [
+      3,
+      4,
+      0
+    ],
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Vector.isParallelTo-5": {
+    "callee": [
+      3,
+      4,
+      1
+    ],
+    "args": [
+      {
+        "anchor": [
+          1,
+          1,
+          1
+        ],
+        "normal": [
+          0,
+          -0.7071067811865476,
+          0.7071067811865476
+        ]
+      }
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Vector.isParallelTo-6": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        6,
+        8
+      ]
+    ],
+    "method": "isParallelTo",
+    "retValue": true
+  },
+  "Vector.isParallelTo-7": {
+    "callee": [
+      4,
+      4
+    ],
+    "args": [
+      [
+        6,
+        8
+      ]
+    ],
+    "method": "isParallelTo",
+    "retValue": false
+  },
+  "Vector.isAntiparallelTo-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        -3,
+        -4
+      ]
+    ],
+    "method": "isAntiparallelTo",
+    "retValue": true
+  },
+  "Vector.isAntiparallelTo-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        3,
+        4
+      ]
+    ],
+    "method": "isAntiparallelTo",
+    "retValue": false
+  },
+  "Vector.isPerpendicularTo-0": {
+    "callee": [
+      6,
+      8
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Vector.isPerpendicularTo-1": {
+    "callee": [
+      -4,
+      3
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.6,
+          0.8,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Vector.isPerpendicularTo-2": {
+    "callee": [
+      6,
+      8
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          3,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Vector.isPerpendicularTo-3": {
+    "callee": [
+      -4,
+      3
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          0,
+          0,
+          0
+        ],
+        "end": [
+          3,
+          4,
+          0
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Vector.isPerpendicularTo-4": {
+    "callee": [
+      4,
+      5,
+      6
+    ],
+    "args": [
+      {
+        "anchor": [
+          1,
+          2,
+          3
+        ],
+        "normal": [
+          0.4558423058385518,
+          0.5698028822981898,
+          0.6837634587578276
+        ]
+      }
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Vector.isPerpendicularTo-5": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        -4,
+        3
+      ]
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": true
+  },
+  "Vector.isPerpendicularTo-6": {
+    "callee": [
+      4,
+      4
+    ],
+    "args": [
+      [
+        1,
+        2
+      ]
+    ],
+    "method": "isPerpendicularTo",
+    "retValue": false
+  },
+  "Vector.dot-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        2,
+        3
+      ]
+    ],
+    "method": "dot",
+    "retValue": 18
+  },
+  "Vector.add-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      2
+    ],
+    "method": "add",
+    "retValue": [
+      5,
+      6
+    ]
+  },
+  "Vector.add-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        3,
+        2
+      ]
+    ],
+    "method": "add",
+    "retValue": [
+      6,
+      6
+    ]
+  },
+  "Vector.subtract-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      2
+    ],
+    "method": "subtract",
+    "retValue": [
+      1,
+      2
+    ]
+  },
+  "Vector.subtract-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        3,
+        2
+      ]
+    ],
+    "method": "subtract",
+    "retValue": [
+      0,
+      2
+    ]
+  },
+  "Vector.multiply-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      2
+    ],
+    "method": "multiply",
+    "retValue": [
+      6,
+      8
+    ]
+  },
+  "Vector.multiply-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        3,
+        2
+      ]
+    ],
+    "method": "multiply",
+    "retValue": [
+      9,
+      8
+    ]
+  },
+  "Vector.sum-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "sum",
+    "retValue": 7
+  },
+  "Vector.chomp-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      1
+    ],
+    "method": "chomp",
+    "retValue": [
+      4
+    ]
+  },
+  "Vector.top-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      1
+    ],
+    "method": "top",
+    "retValue": [
+      3
+    ]
+  },
+  "Vector.augment-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        4,
+        5
+      ]
+    ],
+    "method": "augment",
+    "retValue": [
+      3,
+      4,
+      4,
+      5
+    ]
+  },
+  "Vector.log-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "log",
+    "retValue": [
+      1.0986122886681096,
+      1.3862943611198906
+    ]
+  },
+  "Vector.log-1": {
+    "callee": [
+      2,
+      8
+    ],
+    "args": [
+      2
+    ],
+    "method": "log",
+    "retValue": [
+      1,
+      3
+    ]
+  },
+  "Vector.cross-0": {
+    "callee": [
+      2,
+      3,
+      4
+    ],
+    "args": [
+      [
+        5,
+        6,
+        7
+      ]
+    ],
+    "method": "cross",
+    "retValue": [
+      -3,
+      6,
+      -3
+    ]
+  },
+  "Vector.max-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "max",
+    "retValue": 4
+  },
+  "Vector.maxIndex-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "maxIndex",
+    "retValue": 2
+  },
+  "Vector.indexOf-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      4
+    ],
+    "method": "indexOf",
+    "retValue": 2
+  },
+  "Vector.round-0": {
+    "callee": [
+      1.5,
+      2.6,
+      3.1
+    ],
+    "args": [],
+    "method": "round",
+    "retValue": [
+      2,
+      3,
+      3
+    ]
+  },
+  "Vector.snapTo-0": {
+    "callee": [
+      0.4000000000001,
+      0.5
+    ],
+    "args": [
+      0.4
+    ],
+    "method": "snapTo",
+    "retValue": [
+      0.4,
+      0.5
+    ]
+  },
+  "Vector.snapTo-1": {
+    "callee": [
+      -1,
+      0.25,
+      0.5,
+      0.75,
+      1
+    ],
+    "args": [
+      0.3,
+      0.5
+    ],
+    "method": "snapTo",
+    "retValue": [
+      -1,
+      0.3,
+      0.3,
+      0.3,
+      1
+    ]
+  },
+  "Vector.transpose-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [],
+    "method": "transpose",
+    "retValue": {
+      "type": "Matrix",
+      "elements": [
+        [
+          3
+        ],
+        [
+          4
+        ]
+      ]
+    }
+  },
+  "Vector.distanceFrom-0": {
+    "callee": [
+      1,
+      2
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0.7071067811865487
+  },
+  "Vector.distanceFrom-1": {
+    "callee": [
+      2,
+      2
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 4.2146848510894035e-8
+  },
+  "Vector.distanceFrom-2": {
+    "callee": [
+      0,
+      0
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 2.23606797749979
+  },
+  "Vector.distanceFrom-3": {
+    "callee": [
+      2,
+      3.333333333333333
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0
+  },
+  "Vector.distanceFrom-4": {
+    "callee": [
+      2,
+      2
+    ],
+    "args": [
+      {
+        "type": "Segment",
+        "start": [
+          1,
+          2,
+          0
+        ],
+        "end": [
+          4,
+          6,
+          0
+        ]
+      }
+    ],
+    "method": "distanceFrom",
+    "retValue": 0.8
+  },
+  "Vector.liesOn-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          -1,
+          0,
+          0
+        ]
+      }
+    ],
+    "method": "liesOn",
+    "retValue": false
+  },
+  "Vector.liesOn-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          7,
+          0,
+          0
+        ],
+        "direction": [
+          -0.7071067811865475,
+          0.7071067811865475,
+          0
+        ]
+      }
+    ],
+    "method": "liesOn",
+    "retValue": true
+  },
+  "Vector.liesIn-0": {
+    "callee": [
+      2,
+      -0.5,
+      2
+    ],
+    "args": [
+      {
+        "anchor": [
+          1,
+          -2,
+          0
+        ],
+        "normal": [
+          0.20739033894608505,
+          -0.8295613557843402,
+          0.5184758473652127
+        ]
+      }
+    ],
+    "method": "liesIn",
+    "retValue": true
+  },
+  "Vector.liesIn-1": {
+    "callee": [
+      3,
+      4,
+      5
+    ],
+    "args": [
+      {
+        "anchor": [
+          1,
+          -2,
+          0
+        ],
+        "normal": [
+          0.20739033894608505,
+          -0.8295613557843402,
+          0.5184758473652127
+        ]
+      }
+    ],
+    "method": "liesIn",
+    "retValue": false
+  },
+  "Vector.rotate2D-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      1.5707963267948966,
+      [
+        1,
+        1
+      ]
+    ],
+    "method": "rotate2D",
+    "retValue": [
+      -1.9999999999999998,
+      3
+    ]
+  },
+  "Vector.rotate2D-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      {
+        "type": "Matrix",
+        "elements": [
+          [
+            6.123233995736766e-17,
+            -1
+          ],
+          [
+            1,
+            6.123233995736766e-17
+          ]
+        ]
+      },
+      [
+        1,
+        1
+      ]
+    ],
+    "method": "rotate2D",
+    "retValue": [
+      -1.9999999999999998,
+      3
+    ]
+  },
+  "Vector.rotate2D-2": {
+    "callee": [
+      1,
+      2,
+      3
+    ],
+    "args": [
+      1.5707963267948966,
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.5773502691896258,
+          0.5773502691896258,
+          -0.5773502691896258
+        ]
+      }
+    ],
+    "method": "rotate3D",
+    "retValue": [
+      2.886751345948129,
+      -2.3094010767585034,
+      0.577350269189626
+    ]
+  },
+  "Vector.rotate2D-3": {
+    "callee": [
+      1,
+      2,
+      3
+    ],
+    "args": [
+      {
+        "type": "Matrix",
+        "elements": [
+          [
+            6.123233995736766e-17,
+            -1,
+            0
+          ],
+          [
+            1,
+            6.123233995736766e-17,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0,
+          0,
+          1
+        ]
+      }
+    ],
+    "method": "rotate3D",
+    "retValue": [
+      -1.9999999999999993,
+      1.0000000000000004,
+      3
+    ]
+  },
+  "Vector.reflectionIn-0": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      [
+        1,
+        1
+      ]
+    ],
+    "method": "reflectionIn",
+    "retValue": [
+      -1,
+      -2
+    ]
+  },
+  "Vector.reflectionIn-1": {
+    "callee": [
+      3,
+      4
+    ],
+    "args": [
+      {
+        "type": "Line",
+        "anchor": [
+          0,
+          0,
+          0
+        ],
+        "direction": [
+          0.4472135954999579,
+          0.8944271909999159,
+          0
+        ]
+      }
+    ],
+    "method": "reflectionIn",
+    "retValue": [
+      1.3999999999999995,
+      4.800000000000001
+    ]
+  }
+}

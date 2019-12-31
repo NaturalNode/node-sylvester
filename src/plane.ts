@@ -2,7 +2,15 @@ import { Line } from './line';
 import { Matrix } from './matrix';
 import { Sylvester, OutOfRangeError, InvalidOperationError } from './sylvester';
 import { Vector } from './vector';
-import { isPlaneLike, isLineLike, isSegmentLike, isVectorOrListLike, isGeometry, VectorOrList, Geometry } from './likeness';
+import {
+  isPlaneLike,
+  isLineLike,
+  isSegmentLike,
+  isVectorOrListLike,
+  isGeometry,
+  VectorOrList,
+  Geometry,
+} from './likeness';
 
 export class Plane {
   /**
@@ -76,7 +84,9 @@ export class Plane {
    * @param epsilon - precision used for comparing angles
    */
   public eql(plane: unknown, epsilon = Sylvester.precision): boolean {
-    return plane instanceof Plane && this.contains(plane.anchor) && this.isParallelTo(plane, epsilon);
+    return (
+      plane instanceof Plane && this.contains(plane.anchor) && this.isParallelTo(plane, epsilon)
+    );
   }
 
   /**
@@ -360,8 +370,8 @@ export class Plane {
    * Returns a textual representation of the object.
    * @returns {String}
    */
-  public inspect() {
-    return `Plane<${this.anchor.inspect()}, ${this.normal.inspect()}>`;
+  public toString() {
+    return `Plane<${this.anchor.toString()}, ${this.normal.toString()}>`;
   }
 
   /**

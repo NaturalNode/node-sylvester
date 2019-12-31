@@ -1,15 +1,17 @@
-import { Line, Plane, Vector, InvalidOperationError } from '../src';
-import { expect, assert } from 'chai';
+import { Line, Plane, Vector } from '../src';
+import { assert } from 'chai';
+import { record } from './docs/record';
+import { Geometry } from '../src/likeness';
 
-const testCommunitiveCases = (method, testCases) => (ForType, expectCall) => {
-  const compare = (a, b) =>
+const testCommunitiveCases = (method: string, testCases: [Geometry, Geometry, any][]) => (ForType: {
+  new (...args: any[]): Geometry;
+}) => {
+  const compare = (a: Geometry | number, b: Geometry | number) =>
     a && typeof a === 'object' && 'eql' in a
       ? a.eql(b)
       : typeof a === 'number' && typeof b === 'number'
       ? Math.abs(a - b) < 0.0001
       : a === b;
-
-  const inspect = v => (v && typeof v === 'object' && 'inspect' in v ? v.inspect() : v);
 
   for (let [a, b, expected] of testCases) {
     if (b instanceof ForType && !(a instanceof ForType)) {
@@ -17,34 +19,17 @@ const testCommunitiveCases = (method, testCases) => (ForType, expectCall) => {
     }
 
     if (a instanceof ForType) {
-      const v =
-        expected && typeof expected === 'object' && 'inspect' in expected
-          ? expected.inspect()
-          : expected;
-
-      if (!compare(a[method](b), expected)) {
-        const actual = a[method](b);
-        assert.fail(
-          actual,
-          expected,
-          `Expected ${a.inspect()}.${method}(${b.inspect()}) = ${inspect(v)}, got ${inspect(
-            actual,
-          )}`,
-        );
+      if (!compare((a as any)[method](b), expected)) {
+        const actual = (a as any)[method](b);
+        assert.fail(actual, expected, `Expected ${a}.${method}(${b}) = ${expected}, got ${actual}`);
       }
 
-      if (!compare(b[method](a), expected)) {
-        const actual = b[method](a);
-        assert.fail(
-          actual,
-          expected,
-          `Expected ${b.inspect()}.${method}(${a.inspect()}) = ${inspect(v)}, got ${inspect(
-            actual,
-          )}`,
-        );
+      if (!compare((b as any)[method](a), expected)) {
+        const actual = (b as any)[method](a);
+        assert.fail(actual, expected, `Expected ${b}.${method}(${a}) = ${expected}, got ${actual}`);
       }
 
-      expectCall(a)[method](b); // just for the docs
+      record(a as any)[method](b); // just for the docs
     }
   }
 };

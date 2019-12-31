@@ -909,7 +909,7 @@ export class Matrix {
   /**
    * Returns a string representation of the matrix.
    */
-  public inspect(): string {
+  public toString(): string {
     const matrixRows = ['Matrix<'];
     for (let i = 0; i < this.elements.length; i++) {
       matrixRows.push(`  [${this.elements[i].join(', ')}]`);

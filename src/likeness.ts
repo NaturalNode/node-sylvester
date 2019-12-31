@@ -8,6 +8,11 @@ import { Matrix } from './matrix';
 export type Geometry = Plane | Vector | Line | Segment | ReadonlyArray<number>;
 
 /**
+ * Common interface implemented by geometric objects.
+ */
+export interface IGeometry {}
+
+/**
  * Gets whether the object is any recognizable geometry object.
  * @param {*} obj
  * @returns {Boolean}

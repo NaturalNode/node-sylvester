@@ -83,7 +83,7 @@ export class Vector {
    * Returns the magnitude (also: euclidean norm, magnitude) of the vector.
    *
    * @see https://en.wikipedia.org/wiki/Euclidean_distance
-   * @return {Number}
+   * @diagram Vector.magnitude
    */
   public magnitude() {
     let sum = 0;
@@ -97,6 +97,7 @@ export class Vector {
   /**
    * Returns the `ith` element if the vector. Returns null if `i` is out
    * of bounds, indexing starts from 1.
+   * @diagram Vector.e
    */
   public e(i: number) {
     return i < 1 || i > this.elements.length ? null : this.elements[i - 1];
@@ -104,8 +105,7 @@ export class Vector {
 
   /**
    * Returns the number of rows and columns the vector has.
-   *
-   * $example Vector.dimensions
+   * @diagram Vector.dimensions
    * @return {IDimensions} the "rows" will always equal zero
    */
   public dimensions() {
@@ -117,8 +117,7 @@ export class Vector {
 
   /**
    * Returns the number of rows the vector has.
-   *
-   * $example Vector.rows
+   * @diagram Vector.rows
    * @return {Number} always `1`
    */
   public rows() {
@@ -127,8 +126,7 @@ export class Vector {
 
   /**
    * Returns the number of columns the vector has.
-   *
-   * $example Vector.cols
+   * @diagram Vector.cols
    * @return {Number}
    */
   public cols() {
@@ -138,6 +136,7 @@ export class Vector {
   /**
    * Returns if the Vector is equal to the input vector.
    * @param epsilon - The precision to compare each number.
+   * @diagram Vector.eql
    */
   public eql(other: unknown, precision = Sylvester.approxPrecision) {
     if (!isGeometry(other)) {
@@ -190,6 +189,7 @@ export class Vector {
   /**
    * Returns a new vector created by normalizing this one to a have a
    * magnitude of `1`. If the vector is the zero vector, it will not be modified.
+   * @diagram Vector.toUnitVector
    */
   public toUnitVector() {
     const r = this.magnitude();
@@ -206,6 +206,7 @@ export class Vector {
    *
    * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
+   * @diagram Vector.angleFrom
    */
   public angleFrom(vector: VectorOrList) {
     const V = getElements(vector);
@@ -244,6 +245,7 @@ export class Vector {
   /**
    * Returns whether the vectors are parallel to each other.
    * @param epsilon - precision used for comparing angles
+   * @diagram Vector.isParallelTo
    */
   public isParallelTo(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isVectorOrListLike(obj)) {
@@ -258,6 +260,7 @@ export class Vector {
   /**
    * Returns whether the vectors are antiparallel to each other.
    * @param epsilon - precision used for comparing angles
+   * @diagram Vector.isAntiparallelTo
    */
   public isAntiparallelTo(vector: VectorOrList, epsilon = Sylvester.precision) {
     const angle = this.angleFrom(vector);
@@ -267,7 +270,7 @@ export class Vector {
   /**
    * Returns whether the vectors are perpendicular to each other.
    * @param epsilon - precision used for comparing angles
-   * @return {Boolean}
+   * @diagram Vector.isPerpendicularTo
    */
   public isPerpendicularTo(obj: Geometry, epsilon = Sylvester.precision) {
     if (isVectorOrListLike(obj)) {
@@ -297,6 +300,7 @@ export class Vector {
    * all cevtor elements. When it's a vector, the vectors will be added.
    * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
+   * @diagram Vector.add
    */
   public add(value: VectorOrList | number) {
     return this._runBinaryOp(value, (a, b) => a + b);
@@ -307,6 +311,7 @@ export class Vector {
    * from all vector elements. When it's a vector, the vectors will be subtracted.
    * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
+   * @diagram Vector.subtract
    */
   public subtract(value: VectorOrList | number) {
     return this._runBinaryOp(value, (a, b) => a - b);
@@ -318,6 +323,7 @@ export class Vector {
    * element-wise multiplied.
    * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
+   * @diagram Vector.multiply
    */
   public multiply(value: VectorOrList | number) {
     return this._runBinaryOp(value, (a, b) => a * b);
@@ -325,6 +331,7 @@ export class Vector {
 
   /**
    * @alias Vector#multiply
+   * @diagram Vector.multiply
    */
   x(value: VectorOrList | number) {
     return this.multiply(value);
@@ -332,6 +339,7 @@ export class Vector {
 
   /**
    * Returns the sum of all elements in the Vector.
+   * @diagram Vector.sum
    */
   public sum() {
     let sum = 0;
@@ -343,6 +351,7 @@ export class Vector {
 
   /**
    * Returns a new vector with the first `n` elements removed from the beginning.
+   * @diagram Vector.chomp
    */
   public chomp(n: number) {
     const elements = [];
@@ -355,6 +364,7 @@ export class Vector {
 
   /**
    * Returns a new vector consisting only of the first `n` elements.
+   * @diagram Vector.top
    */
   public top(n: number) {
     const elements = [];
@@ -367,7 +377,7 @@ export class Vector {
 
   /**
    * Returns a new vector with the provided `elements` concatenated on the end.
-   * $example Vector.augment
+   * @diagram Vector.augment
    */
   public augment(elements: VectorOrList) {
     return new Vector(this.elements.concat(getElements(elements)));
@@ -375,6 +385,7 @@ export class Vector {
 
   /**
    * Returns the product of all elements in the vector.
+   * @diagram Vector.product
    */
   public product() {
     let p = 1;
@@ -390,6 +401,7 @@ export class Vector {
    * @see https://en.wikipedia.org/wiki/Scalar_product
    * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
+   * @diagram Vector.dot
    */
   public dot(vector: VectorOrList) {
     const V = getElements(vector);
@@ -411,6 +423,7 @@ export class Vector {
    * Returns the vector product of the vector with the argument.
    * @throws A {@link DimensionalityMismatchError} if either this or the other vector
    *   is not three-dimensional.
+   * @diagram Vector.cross
    */
   public cross(vector: VectorOrList) {
     const B = getElements(vector);
@@ -430,6 +443,7 @@ export class Vector {
 
   /**
    * Returns the (absolute) largest element of the vector
+   * @diagram Vector.max
    */
   public max() {
     let m = 0;
@@ -445,6 +459,7 @@ export class Vector {
   /**
    * Returns the index of the absolute largest element of the vector.
    * @returns Will be -1 if the vector is empty
+   * @diagram Vector.maxIndex
    */
   public maxIndex() {
     let m = -1;
@@ -463,6 +478,7 @@ export class Vector {
 
   /**
    * Returns the index of the first instance of the value in the vector, or -1.
+   * @diagram Vector.indexOf
    */
   public indexOf(x: number) {
     for (let i = 0; this.elements.length; i++) {
@@ -485,6 +501,7 @@ export class Vector {
   /**
    * Returns the result of rounding the elements of the vector
    * @returns {Vector}
+   * @diagram Vector.round
    */
   public round() {
     return this.map(x => Math.round(x));
@@ -493,6 +510,7 @@ export class Vector {
   /**
    * Transpose a Vector, return a 1xn Matrix.
    * @returns {Matrix}
+   * @diagram Vector.transpose
    */
   public transpose() {
     const rows = this.elements.length;
@@ -507,9 +525,7 @@ export class Vector {
   /**
    * Returns a copy of the vector with elements set to the given value if they
    * differ from it by less than the epislon.
-   * @param {Number} target
-   * @param {Number} epsilon
-   * @return {Matrix}
+   * @diagram Vector.snapTo
    */
   public snapTo(target: number, epsilon = Sylvester.precision) {
     return this.map(p => (Math.abs(p - target) <= epsilon ? target : p));
@@ -518,6 +534,7 @@ export class Vector {
   /**
    * Returns the vector's distance from the argument, when considered as a point in space
    * @param {Vector|Line|Plane} obj
+   * @diagram Vector.distanceFrom
    */
   public distanceFrom(obj: Geometry): number {
     if (!isVectorOrListLike(obj)) {
@@ -537,6 +554,7 @@ export class Vector {
 
   /**
    * Returns true if the vector is point on the given line
+   * @diagram Vector.liesOn
    */
   public liesOn(line: Line) {
     return line.contains(this);
@@ -544,6 +562,7 @@ export class Vector {
 
   /**
    * Returns true if the vector is point on the given plane
+   * @diagram Vector.liesIn
    */
   public liesIn(plane: Plane) {
     return plane.contains(this);
@@ -552,6 +571,7 @@ export class Vector {
   /**
    * Rotates the 2D vector about the given point.
    * @param t - Radians or rotation matrix to use
+   * @diagram Vector.rotate2D
    */
   public rotate2D(t: number | Matrix, obj: VectorOrList) {
     const V = Vector.toElements(obj, 2);
@@ -582,7 +602,7 @@ export class Vector {
 
   /**
    * Returns the result of reflecting the point in the given point, line or plane.
-   * @param {Vector|Line|Plane} obj
+   * @diagram Vector.reflectionIn
    */
   public reflectionIn(obj: VectorOrList | Line | Plane) {
     if (isPlaneLike(obj) || isLineLike(obj)) {
@@ -604,6 +624,7 @@ export class Vector {
 
   /**
    * Runs an element-wise logarithm on the vector.
+   * @diagram Vector.log
    */
   public log(base = Math.E) {
     const logBase = Math.log(base); // change of base
@@ -640,7 +661,7 @@ export class Vector {
   /**
    * Returns a string representation of the vector
    */
-  public inspect() {
+  public toString() {
     return `Vector<[${this.elements.join(', ')}]>`;
   }
 
