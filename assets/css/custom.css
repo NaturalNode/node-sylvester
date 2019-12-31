@@ -1,0 +1,69 @@
+dd > .example:first-child {
+  margin-top: 32px;
+}
+
+.example {
+  position: relative;
+  margin: 8px;
+  background: #f0f0f0;
+}
+
+.example .speed {
+  position: absolute;
+  bottom: 0;
+  right: 4px;
+  font-size: 0.7em;
+  color: #999;
+}
+
+.example button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ccc;
+  border: 0;
+  color: #666;
+  font-size: 0.7em;
+  cursor: pointer;
+}
+
+.example button:hover {
+  background: #fff;
+  color: #000;
+}
+
+.example .button-tex,
+.example pre {
+  display: none;
+}
+
+.example.show-code pre {
+  display: block;
+}
+
+.example.show-code .button-tex {
+  display: inline;
+}
+
+.example.show-code .button-code,
+.example.show-code .tex,
+.example.show-code .speed {
+  display: none;
+}
+
+.example pre {
+  padding: 8px;
+}
+
+.example .tex {
+  padding: 8px 8px 12px;
+}
+
+.example code,
+.example pre {
+  background: none;
+}
+
+.example .tex {
+  text-align: center;
+}
