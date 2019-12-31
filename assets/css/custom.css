@@ -67,3 +67,8 @@ dd > .example:first-child {
 .example .tex {
   text-align: center;
 }
+
+/* https://github.com/TypeStrong/typedoc/issues/506 */
+.tsd-is-private {
+  display: none;
+}

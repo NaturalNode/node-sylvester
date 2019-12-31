@@ -71,113 +71,95 @@
 				</a>
 				<p><a href="https://github.com/NaturalNode/node-sylvester/actions"><img src="https://github.com/NaturalNode/node-sylvester/workflows/Run%20Tests/badge.svg" alt="Actions Status"></a></p>
 				<p>Modern and expanded implementation of James Coglan&#39;s &quot;Sylvester&quot; matrix math library. The original project can be found at <a href="http://sylvester.jcoglan.com/">http://sylvester.jcoglan.com/</a></p>
+				<pre><code>npm <span class="hljs-keyword">install</span> sylvester</code></pre>
 				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
 					<h1>Documentation</h1>
 				</a>
-				<p>The original documentation for &quot;Sylvester&quot; should help you through basic operations. An intro that contains node-specific features can also be found {on Chris Umbel&#39;s blog}[<a href="http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math%5D">http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math]</a>. We&#39;re looking for someone to help get the documentation situation under control.</p>
-				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
-					<h1>Installation</h1>
-				</a>
-				<pre><code>npm <span class="hljs-keyword">install</span> sylvester</code></pre>
-				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
-					<h1>Usage</h1>
-				</a>
-				<a href="#new-stuff" id="new-stuff" style="color: inherit; text-decoration: none;">
-					<h2>New Stuff</h2>
-				</a>
-				<p>First I&#39;d like to show some examples of features that aren&#39;t in the standard (non-node) Sylvester. I&#39;ll likely attempt to commit these back to Sylvester at some point soon.</p>
-				<p>Note that the decompositions are all available in pure JavaScript, but if the <a href="https://github.com/NaturalNode/node-lapack">lapack</a> NPM is installed with LAPACK built as a shared library then efficient native code will be used. The LAPACK integration is still <em>highly</em> experimental.</p>
-				<a href="#vector" id="vector" style="color: inherit; text-decoration: none;">
-					<h3>Vector</h3>
-				</a>
-				<pre><code><span class="hljs-keyword">require</span>(<span class="hljs-string">'sylvester'</span>);
+				<p>Updated documentation for version 0.3 can be found at <a href="https://naturalnode.github.io/node-sylvester">naturalnode.github.io/node-sylvester</a>.</p>
+				<details><summary>Documentation for versions prior to 0.3</summary>
+					<p>The original documentation for &quot;Sylvester&quot; should help you through basic operations. An intro that contains node-specific features can also be found {on Chris Umbel&#39;s blog}[<a href="http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math%5D">http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math]</a>. We&#39;re looking for someone to help get the documentation situation under control.</p>
+					<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+						<h1>Usage</h1>
+					</a>
+					<a href="#new-stuff" id="new-stuff" style="color: inherit; text-decoration: none;">
+						<h2>New Stuff</h2>
+					</a>
+					<p>First I&#39;d like to show some examples of features that aren&#39;t in the standard (non-node) Sylvester. I&#39;ll likely attempt to commit these back to Sylvester at some point soon.</p>
+					<p>Note that the decompositions are all available in pure JavaScript, but if the <a href="https://github.com/NaturalNode/node-lapack">lapack</a> NPM is installed with LAPACK built as a shared library then efficient native code will be used. The LAPACK integration is still <em>highly</em> experimental.</p>
+					<a href="#vector" id="vector" style="color: inherit; text-decoration: none;">
+						<h3>Vector</h3>
+					</a>
+					<pre><code><span class="hljs-keyword">require</span>(<span class="hljs-string">'sylvester'</span>);
 <span class="hljs-built_in">var</span> a = $V(<span class="hljs-meta">[</span><span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span><span class="hljs-meta">]</span>);</code></pre><p>element-wise log:</p>
-				<pre><code>console.<span class="hljs-built_in">log</span>(a.<span class="hljs-built_in">log</span>());</code></pre><p>norm computation:</p>
-				<pre><code><span class="hljs-selector-tag">console</span><span class="hljs-selector-class">.log</span>(<span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.norm</span>());</code></pre><p>element-wise multiplication:</p>
-				<pre><code>a.element<span class="hljs-constructor">Multiply(<span class="hljs-params">vector</span>)</span>;</code></pre><p>element-wise division:</p>
-				<pre><code>a.element<span class="hljs-constructor">Divide(<span class="hljs-params">vector</span>)</span>;</code></pre><p>remove first n nodes:</p>
-				<pre><code>a.chomp(n)<span class="hljs-comment">;</span></code></pre><p>return vector with first n nodes:</p>
-				<pre><code><span class="hljs-selector-tag">a</span>.<span class="hljs-attribute">top</span>(n);</code></pre><p>add all elements into a single scalar:</p>
-				<pre><code><span class="hljs-keyword">a</span>.<span class="hljs-built_in">sum</span>()</code></pre><p>multiply all elements into a single scalar:</p>
-				<pre><code><span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.product</span>()</code></pre><p>return a vector with the elements parameter on the bottom:</p>
-				<pre><code><span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.augment</span>(<span class="hljs-selector-tag">elements</span>)</code></pre>
-				<a href="#matrix" id="matrix" style="color: inherit; text-decoration: none;">
-					<h3>Matrix</h3>
-				</a>
-				<pre><code>var A = $M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>]]);</code></pre><p>return subset of rows, columns:</p>
-				<pre><code><span class="hljs-comment">// startRow, endRow, startCol, endCol</span>
+					<pre><code>console.<span class="hljs-built_in">log</span>(a.<span class="hljs-built_in">log</span>());</code></pre><p>norm computation:</p>
+					<pre><code><span class="hljs-selector-tag">console</span><span class="hljs-selector-class">.log</span>(<span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.norm</span>());</code></pre><p>element-wise multiplication:</p>
+					<pre><code>a.element<span class="hljs-constructor">Multiply(<span class="hljs-params">vector</span>)</span>;</code></pre><p>element-wise division:</p>
+					<pre><code>a.element<span class="hljs-constructor">Divide(<span class="hljs-params">vector</span>)</span>;</code></pre><p>remove first n nodes:</p>
+					<pre><code>a.chomp(n)<span class="hljs-comment">;</span></code></pre><p>return vector with first n nodes:</p>
+					<pre><code><span class="hljs-selector-tag">a</span>.<span class="hljs-attribute">top</span>(n);</code></pre><p>add all elements into a single scalar:</p>
+					<pre><code><span class="hljs-keyword">a</span>.<span class="hljs-built_in">sum</span>()</code></pre><p>multiply all elements into a single scalar:</p>
+					<pre><code><span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.product</span>()</code></pre><p>return a vector with the elements parameter on the bottom:</p>
+					<pre><code><span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.augment</span>(<span class="hljs-selector-tag">elements</span>)</code></pre>
+					<a href="#matrix" id="matrix" style="color: inherit; text-decoration: none;">
+						<h3>Matrix</h3>
+					</a>
+					<pre><code>var A = $M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>]]);</code></pre><p>return subset of rows, columns:</p>
+					<pre><code><span class="hljs-comment">// startRow, endRow, startCol, endCol</span>
 A.slice(<span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>);</code></pre><p>divide matricies:</p>
-				<pre><code>A.div($M([[<span class="hljs-number">0.5</span>, <span class="hljs-number">1</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">2</span>, <span class="hljs-number">3</span>]]));</code></pre><p>scalar addition/subtraction</p>
-				<pre><code><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">A</span>.</span></span>add(<span class="hljs-number">1</span>);
+					<pre><code>A.div($M([[<span class="hljs-number">0.5</span>, <span class="hljs-number">1</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">2</span>, <span class="hljs-number">3</span>]]));</code></pre><p>scalar addition/subtraction</p>
+					<pre><code><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">A</span>.</span></span>add(<span class="hljs-number">1</span>);
 <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">A</span>.</span></span>subtract(<span class="hljs-number">1</span>);</code></pre><p>element-wise log:</p>
-				<pre><code>console.<span class="hljs-built_in">log</span>(A.<span class="hljs-built_in">log</span>());</code></pre><p>element-wise multiplication:</p>
-				<pre><code><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">A</span>.</span></span>element<span class="hljs-constructor">Multiply(<span class="hljs-params">vector</span>)</span></code></pre><p>add all elements into a single scalar:</p>
-				<pre><code><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">A</span>.</span></span>sum<span class="hljs-literal">()</span></code></pre><p>returns a vector of the indexes of maximum values ([3 3]):</p>
-				<pre><code>$M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]]).maxColumnIndexes()</code></pre><p>returns a vector of minimum column indexes ([1 2]):</p>
-				<pre><code>$M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]]).minColumnIndexes();</code></pre><p>returns a vector of max values ([3 6]):</p>
-				<pre><code>$M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]]).maxColumns()</code></pre><p>returns a vector of minimum values ([1 4]):</p>
-				<pre><code>$M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]]).minColumns()</code></pre><p>create a 2x3 matrix of ones:</p>
-				<pre><code><span class="hljs-keyword">var</span> Ones = <span class="hljs-keyword">Matrix</span>.<span class="hljs-keyword">One</span>(2, 3);</code></pre><p>LU decomposition (with partial pivoting)</p>
-				<p>var lu = A.lu();
-					console.log(lu.L);
-					console.log(lu.U);
-				console.log(lu.P);</p>
-				<p>QR decomposition (feature still inefficient and experimental, but uses pure javascript):</p>
-				<pre><code>var qr = A.<span class="hljs-string">qr()</span>;
+					<pre><code>console.<span class="hljs-built_in">log</span>(A.<span class="hljs-built_in">log</span>());</code></pre><p>element-wise multiplication:</p>
+					<pre><code><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">A</span>.</span></span>element<span class="hljs-constructor">Multiply(<span class="hljs-params">vector</span>)</span></code></pre><p>add all elements into a single scalar:</p>
+					<pre><code><span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">A</span>.</span></span>sum<span class="hljs-literal">()</span></code></pre><p>returns a vector of the indexes of maximum values ([3 3]):</p>
+					<pre><code>$M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]]).maxColumnIndexes()</code></pre><p>returns a vector of minimum column indexes ([1 2]):</p>
+					<pre><code>$M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]]).minColumnIndexes();</code></pre><p>returns a vector of max values ([3 6]):</p>
+					<pre><code>$M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]]).maxColumns()</code></pre><p>returns a vector of minimum values ([1 4]):</p>
+					<pre><code>$M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">6</span>]]).minColumns()</code></pre><p>create a 2x3 matrix of ones:</p>
+					<pre><code><span class="hljs-keyword">var</span> Ones = <span class="hljs-keyword">Matrix</span>.<span class="hljs-keyword">One</span>(2, 3);</code></pre><p>LU decomposition (with partial pivoting)</p>
+					<p>var lu = A.lu();
+						console.log(lu.L);
+						console.log(lu.U);
+					console.log(lu.P);</p>
+					<p>QR decomposition (feature still inefficient and experimental, but uses pure javascript):</p>
+					<pre><code>var qr = A.<span class="hljs-string">qr()</span>;
 console.log(qr.Q);
 console.log(qr.R);</code></pre><p>SVD decomposition (feature still inefficient and experimental, but uses pure javascript):</p>
-				<pre><code>var svd = A.svd()<span class="hljs-comment">;</span>
+					<pre><code>var svd = A.svd()<span class="hljs-comment">;</span>
 console.log(svd.U)<span class="hljs-comment">;</span>
 console.log(svd.S)<span class="hljs-comment">;</span>
 console.log(svd.V)<span class="hljs-comment">;</span></code></pre><p>PCA</p>
-				<pre><code><span class="hljs-keyword">var</span> A = <span class="hljs-variable">$M</span>([[1, 2], [5, 7]]).pcaProject(1).eql(<span class="hljs-variable">$M</span>([
+					<pre><code><span class="hljs-keyword">var</span> A = <span class="hljs-variable">$M</span>([[1, 2], [5, 7]]).pcaProject(1).eql(<span class="hljs-variable">$M</span>([
             [-2.2120098720461616],
             [-8.601913944732665]
         ]);
 <span class="hljs-keyword">var</span> <span class="hljs-keyword">pca</span> = A.pcaProject(1);
 <span class="hljs-keyword">var</span> Z = <span class="hljs-keyword">pca</span>.Z;
 <span class="hljs-keyword">var</span> A = Z.pcaRecover(<span class="hljs-keyword">pca</span>.<span class="hljs-keyword">U</span>);</code></pre><p>Solving systems of equations</p>
-				<pre><code><span class="hljs-comment">// sovle Ax = b for x</span>
+					<pre><code><span class="hljs-comment">// sovle Ax = b for x</span>
 var A = $M([[<span class="hljs-number">2</span>, <span class="hljs-number">4</span>], [<span class="hljs-number">2</span>, <span class="hljs-number">1</span>]]);
 var b = $V([<span class="hljs-number">1</span>, <span class="hljs-number">0</span>]);
 console.log(A.solve(b));</code></pre><p>== Old Stuff</p>
-				<p>Below is a basic illustration of standard matrix/vector math using the standard
-				Sylvester API. This documentation is rather incomplete and for further details please consult {the official sylvester API documentation}[<a href="http://sylvester.jcoglan.com/docs%5D">http://sylvester.jcoglan.com/docs]</a> at <a href="http://sylvester.jcoglan.com/docs">http://sylvester.jcoglan.com/docs</a>.</p>
-				<a href="#vectors" id="vectors" style="color: inherit; text-decoration: none;">
-					<h3>Vectors</h3>
-				</a>
-				<pre><code><span class="hljs-built_in">require</span>(<span class="hljs-string">'sylvester'</span>);</code></pre><p>create two vectors:</p>
-				<pre><code>var a = $V([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
+					<p>Below is a basic illustration of standard matrix/vector math using the standard
+					Sylvester API. This documentation is rather incomplete and for further details please consult {the official sylvester API documentation}[<a href="http://sylvester.jcoglan.com/docs%5D">http://sylvester.jcoglan.com/docs]</a> at <a href="http://sylvester.jcoglan.com/docs">http://sylvester.jcoglan.com/docs</a>.</p>
+					<a href="#vectors" id="vectors" style="color: inherit; text-decoration: none;">
+						<h3>Vectors</h3>
+					</a>
+					<pre><code><span class="hljs-built_in">require</span>(<span class="hljs-string">'sylvester'</span>);</code></pre><p>create two vectors:</p>
+					<pre><code>var a = $V([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]);
 var b = $V([<span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>]);</code></pre><p>compute the dot product:</p>
-				<pre><code>var r = a.dot(b)<span class="hljs-comment">;</span></code></pre><p>add two vectors:</p>
-				<pre><code><span class="hljs-keyword">var</span> c = a.<span class="hljs-keyword">add</span>(b);</code></pre><p>multiply by scalar:</p>
-				<pre><code><span class="hljs-keyword">var</span> d = a.<span class="hljs-symbol">x</span>(<span class="hljs-number">2</span>);</code></pre>
-				<a href="#matrices" id="matrices" style="color: inherit; text-decoration: none;">
-					<h3>Matrices</h3>
-				</a>
-				<pre><code><span class="hljs-built_in">require</span>(<span class="hljs-string">'sylvester'</span>);</code></pre><p>create two matrices:</p>
-				<pre><code>var A = $M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>]]);
+					<pre><code>var r = a.dot(b)<span class="hljs-comment">;</span></code></pre><p>add two vectors:</p>
+					<pre><code><span class="hljs-keyword">var</span> c = a.<span class="hljs-keyword">add</span>(b);</code></pre><p>multiply by scalar:</p>
+					<pre><code><span class="hljs-keyword">var</span> d = a.<span class="hljs-symbol">x</span>(<span class="hljs-number">2</span>);</code></pre>
+					<a href="#matrices" id="matrices" style="color: inherit; text-decoration: none;">
+						<h3>Matrices</h3>
+					</a>
+					<pre><code><span class="hljs-built_in">require</span>(<span class="hljs-string">'sylvester'</span>);</code></pre><p>create two matrices:</p>
+					<pre><code>var A = $M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>], [<span class="hljs-number">3</span>, <span class="hljs-number">4</span>]]);
 var B = $M([[<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], [<span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>]]);</code></pre><p>multiply the matrices:</p>
-				<pre><code><span class="hljs-keyword">var</span> C = A.<span class="hljs-symbol">x</span>(B);</code></pre><p>transpose a matrix:</p>
-				<pre><code><span class="hljs-symbol">var</span> <span class="hljs-keyword">B_T </span>= <span class="hljs-keyword">B.transpose();
-</span>// <span class="hljs-keyword">B </span>is <span class="hljs-number">2</span>x3, <span class="hljs-keyword">B_T </span>is <span class="hljs-number">3</span>x2</code></pre>
-				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
-					<h2>Contributing</h2>
-				</a>
-				<p>Contributions to node-sylvester are more than welcome. If you changed or added functionality, you should make sure tests pass. You can do this locally by running <code>npm test</code>, after running <code>npm install</code> initially.</p>
-				<p>Development depends on the lapack module, which requires the LAPACK linear algebra library to be installed locally.</p>
-				<ul>
-					<li><p>OSX seems to have lapack installed by default.</p>
-					</li>
-					<li><p>On Linux, lapack is available via most package managers, <a href="https://astroiisc.wikispaces.com/Lapack+Installation+in+Ubuntu">including apt</a>.</p>
-					</li>
-					<li><p>On Windows, the easiest way is to use Docker. Build the Dockerfile in this repository once: <code>docker build -t node-sylvester .</code>. Then:</p>
-						<ul>
-							<li>On the default shell: <code>docker run --rm -v \</code>pwd`:/sylv -w /sylv node-sylvester sh -c /bin/watch`</li>
-							<li>On Cygwin: <code>docker run --rm -v \</code>cygpath -aw $(pwd)`:/sylv -w /sylv node-sylvester sh -c /bin/watch`</li>
-						</ul>
-					</li>
-				</ul>
+					<pre><code><span class="hljs-keyword">var</span> C = A.<span class="hljs-symbol">x</span>(B);</code></pre><p>transpose a matrix:</p>
+					<pre><code><span class="hljs-symbol">var</span> <span class="hljs-keyword">B_T </span>= <span class="hljs-keyword">B.transpose();
+</span>// <span class="hljs-keyword">B </span>is <span class="hljs-number">2</span>x3, <span class="hljs-keyword">B_T </span>is <span class="hljs-number">3</span>x2</code></pre></details>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
