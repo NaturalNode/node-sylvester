@@ -1,0 +1,10 @@
+{
+  "env": {
+    "version": "v12.13.1",
+    "os": "linux"
+  },
+  "data": {
+    "Vector.snapTo-0": 21306880.128399312,
+    "Vector.snapTo-1": 15517378.33465349
+  }
+}

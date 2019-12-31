@@ -3,12 +3,27 @@ import { Component, ConverterComponent } from 'typedoc/dist/lib/converter/compon
 import { Context } from 'typedoc/dist/lib/converter/context';
 import { CommentTag } from 'typedoc/dist/lib/models/comments';
 import { PageEvent, RendererEvent } from 'typedoc/dist/lib/output/events';
-import { IRecording, RecordedValue } from './record';
+import { IRecording, RecordedValue, IBenchmarks } from './record';
 import { renderToString } from 'katex';
-import { copySync } from 'fs-extra';
+import { copySync, readJsonSync } from 'fs-extra';
 import { join } from 'path';
+import { highlight } from 'highlight.js';
+import * as prettier from 'prettier';
+
+const magicNumbers: [number, string][] = [
+  [Math.PI, '\\pi'],
+  [Math.PI / 2, '\\frac{\\pi}{2}'],
+  [Math.PI / 3, '\\frac{\\pi}{3}'],
+  [Math.PI / 4, '\\frac{\\pi}{4}'],
+];
 
 const numberToTex = (v: number, digits: number = 2) => {
+  for (const [magic, tex] of magicNumbers) {
+    if (Math.abs(v - magic) < 1e-6) {
+      return tex;
+    }
+  }
+
   let places = 0;
   const original = v;
   for (; places < digits; places++) {
@@ -22,22 +37,52 @@ const numberToTex = (v: number, digits: number = 2) => {
   return original.toFixed(places);
 };
 
-function symbolToTex(data: RecordedValue): string {
+type TexVars = { [key: string]: string | { tex: string; decorated: string } };
+
+const getPreferredVarName = (char: string, existing: TexVars) => {
+  // If we have a character we want to use for this, try to get n, n_1, n_2, etc.
+  let increment = 1;
+  const initial = `${char}_1`;
+  if (existing[char] !== undefined) {
+    existing[initial] = existing[char];
+  }
+
+  if (existing[initial] === undefined) {
+    return char;
+  }
+
+  for (; existing[`${char}_${increment}`] === undefined; increment++) {}
+
+  return `${char}_${increment}`;
+};
+
+const nameVar = (existing: TexVars) => {
+  let chr = 'A'.charCodeAt(0);
+  while (existing[String.fromCharCode(chr)] !== undefined) {
+    chr++;
+  }
+
+  return String.fromCharCode(chr);
+};
+
+const vectorToTex = (elements: ReadonlyArray<number>) => `\\begin{bmatrix}
+${elements.map(v => numberToTex(v)).join(' & ')}
+\\end{bmatrix}`;
+
+function symbolToTex(data: RecordedValue, vars: TexVars): string {
   switch (data.type) {
     case 'Matrix':
       return `\\begin{bmatrix}
       ${data.elements.map(r => r.map(v => numberToTex(v)).join(' & ')).join('\\\\\n')}
       \\end{bmatrix}`;
     case 'Vector':
-      return `\\begin{bmatrix}
-      ${data.elements.map(v => numberToTex(v)).join(' & ')}
-      \\end{bmatrix}`;
+      return vectorToTex(data.elements);
     case 'Object':
       const obj = data.value;
       return (
         '\\left\\{' +
         Object.keys(obj)
-          .map(key => `\\mathrm{${key}\\!:}\\,${symbolToTex(obj[key])}`)
+          .map(key => `\\mathrm{${key}\\!:}\\,${symbolToTex(obj[key], vars)}`)
           .join(', ') +
         '\\right\\}'
       );
@@ -50,25 +95,62 @@ function symbolToTex(data: RecordedValue): string {
         default:
           return `\\mathbf{${data.value}}`;
       }
+    case 'Constructor':
+      return data.name;
+    case 'Line':
+      const anchor = nameVar(vars);
+      vars[anchor] = vectorToTex(data.anchor);
+      const direction = nameVar(vars);
+      vars[direction] = vectorToTex(data.direction);
+      return `\\overleftrightarrow{${anchor}${direction}}`;
+    case 'Segment':
+      const start = nameVar(vars);
+      vars[start] = vectorToTex(data.start);
+      const end = nameVar(vars);
+      vars[end] = vectorToTex(data.end);
+      return `\\overline{${start}${end}}`;
+    case 'Plane':
+      const point = nameVar(vars);
+      vars[point] = vectorToTex(data.anchor);
+      const normal = getPreferredVarName('n', vars);
+      const decoNormal = `\\overrightarrow{${normal}}`;
+      vars[normal] = { tex: vectorToTex(data.norm), decorated: decoNormal };
+      return `\\mathrm{Plane} \\lbrace ${point}, ${decoNormal} \\rbrace`;
+    case 'Polygon':
+      const poly = nameVar(vars);
+      const points = data.verticies.map(v => {
+        const name = getPreferredVarName(poly, vars);
+        vars[name] = vectorToTex(v);
+        return name;
+      });
+
+      return `\\mathrm{Polygon} \\lbrace ${points.join(' \\rightarrow ')} \\rbrace`;
     default:
-      return `${data.type} not implemented`;
+      return `${data} not implemented`;
   }
 }
 
 let data: { [key: string]: IRecording };
 try {
-  data = require('./recorded-tests.json');
+  data = readJsonSync(`${__dirname}/recorded-tests.json`);
 } catch (e) {
   throw new Error('cannot load recorded diagrams, run npm test first');
 }
 
-/**
- * Mermaid plugin component.
- */
+const benchmarkFormat = Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 });
+let benchmarks: IBenchmarks;
+try {
+  benchmarks = readJsonSync(`${__dirname}/../../../benchmark-results.json`);
+} catch (e) {
+  throw new Error('cannot load recorded benchmarks, run npm test --benchmark first');
+}
+
+let diagramId = 0;
+
 @Component({ name: 'diagram' })
 export class DiagramPlugin extends ConverterComponent {
   public convertCommentTagText(tagText: string): string {
-    if (tagText.startsWith('<div class="tex">')) {
+    if (tagText.startsWith('<div')) {
       return tagText; // already converted
     }
 
@@ -76,7 +158,7 @@ export class DiagramPlugin extends ConverterComponent {
 
     const diagrams = Object.keys(data)
       .filter(k => k === tagText || k.replace(/-[0-9]+$/, '') === tagText)
-      .map(k => data[k]);
+      .map(k => ({ speed: benchmarks.data[k], ...data[k] }));
 
     if (diagrams.length === 0) {
       throw new Error(`Diagram for ${tagText} not found`);
@@ -85,17 +167,46 @@ export class DiagramPlugin extends ConverterComponent {
     return (
       diagrams
         // Generate tex for the diagram
-        .map(
-          ({ callee, method, args, retValue }) =>
-            symbolToTex(callee) +
+        .map(({ speed, callee, method, args, retValue, code }) => {
+          const vars: TexVars = {};
+          const body =
+            symbolToTex(callee, vars) +
             `\\!\\!{.}\\mathrm{${method}}` +
-            `(${args.map(a => symbolToTex(a)).join(', ')}) =` +
-            symbolToTex(retValue),
-        )
-        // Render it in KaTeX
-        .map(tex => renderToString(tex))
-        // Create the final html
-        .map(html => `<div class="tex">${html}</div>`)
+            `(${args.map(a => symbolToTex(a, vars)).join(', ')}) =` +
+            symbolToTex(retValue, vars);
+
+          const head = Object.keys(vars)
+            .filter(v => !!vars[v])
+            .map(v => {
+              const value = vars[v];
+              return typeof value === 'string'
+                ? `${v}=${value}`
+                : `${value.decorated}=${value.tex}`;
+            })
+            .join(' \\enspace ');
+
+          const texHtml = renderToString(head + '\\\\[0.5em]\n' + body);
+          const codeHtml = highlight(
+            'js',
+            prettier.format(code, {
+              parser: 'babel',
+              printWidth: 100,
+              singleQuote: true,
+            }),
+          );
+
+          const id = `example-${diagramId++}`;
+          return `<div class="example" id="${id}">
+            <button onClick="document.getElementById('${id}').classList.toggle('show-code')">
+              <span class="button-code">Code</span>
+              <span class="button-tex">Diagram</span>
+            </button>${
+              speed ? `<div class="speed">${benchmarkFormat.format(speed)} ops/sec</div>` : ''
+            }
+            <pre><code>${codeHtml.value}</code></pre>
+            <div class="tex">${texHtml}</div>
+          </div>`;
+        })
         .join('')
     );
   }
