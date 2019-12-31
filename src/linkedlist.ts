@@ -5,8 +5,14 @@ export class Node<T> {
   constructor(public readonly data: T, public prev: Node<T>, public  next: Node<T>) {}
 }
 
+/**
+ * @private
+ */
 const defaultEquality = (a: unknown, b: unknown) => a === b;
 
+/**
+ * An immutable (linked) list. Used to store {@link Polygon} {@link Vertex} instances.
+ */
 export interface IImmutableList<T> {
   /**
    * Linked list length.
@@ -64,6 +70,7 @@ export interface IImmutableList<T> {
 
 /**
  * Circular linked list. All operations are constant-time.
+ * @private
  */
 export class CircularLinkedList<T> implements IImmutableList<T> {
   /**

@@ -6,6 +6,9 @@ import { Sylvester, InvalidOperationError } from './sylvester';
 import { Vector } from './vector';
 import { VectorOrList } from './likeness';
 
+/**
+ * @private
+ */
 const vertexCompare = (a: Vector, b: Vector) => a.eql(b);
 
 export class Polygon {
@@ -418,7 +421,7 @@ export class Vertex extends Vector {
   /**
    * Returns true iff the vertex's internal angle is 0 <= x < 180
    * in the context of the given polygon object.
-   * @throws {InvalidOperationError} if the vertex is not in the polygon
+   * @throws A {@link InvalidOperationError} if the vertex is not in the polygon
    */
   public isConvex(polygon: Polygon, epsilon = Sylvester.precision): boolean {
     const node = polygon.nodeFor(this);
@@ -441,7 +444,7 @@ export class Vertex extends Vector {
 
   /**
    * Returns true iff the vertex's internal angle is 180 <= x < 360.
-   * @throws {InvalidOperationError} if the vertex is not in the polygon
+   * @throws A {@link InvalidOperationError} if the vertex is not in the polygon
    */
   isReflex(polygon: Polygon) {
     const result = this.isConvex(polygon);

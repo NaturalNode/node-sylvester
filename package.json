@@ -14,6 +14,7 @@
     "test:unit": "mocha --opts mocha.opts",
     "test:lint": "echo todo",
     "build": "rimraf dist && tsc",
+    "docs": "rimraf doc && typedoc --mode file --excludePrivate --out doc src",
     "watch": "npm run build -- --watch",
     "test": "npm run build && npm-run-all --parallel --silent test:unit test:lint test:fmt",
     "fmt": "prettier --write \"{src,test}/**/*.js\" \"*.md\" && npm run test:lint -- --fix"
@@ -57,6 +58,7 @@
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
     "source-map-support": "^0.5.16",
+    "typedoc": "^0.15.6",
     "typescript": "^3.7.3"
   },
   "browser": {

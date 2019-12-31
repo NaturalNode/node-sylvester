@@ -10,11 +10,17 @@ const lapack = (() => {
   }
 })();
 
+/**
+ * @private
+ */
 function sign(x: number) {
   return x < 0 ? -1 : 1;
 }
 
-// augment a matrix M with identity rows/cols
+/**
+ * Augment a matrix M with identity rows/cols
+ * @private
+ */
 function identSize(e: number[][], m: number, n: number, k: number) {
   let i = k - 1;
 
@@ -37,6 +43,9 @@ function identSize(e: number[][], m: number, n: number, k: number) {
   return new Matrix(e);
 }
 
+/**
+ * @private
+ */
 function pca(X: Matrix) {
   const Sigma = X.transpose()
     .x(X)
@@ -48,11 +57,17 @@ function pca(X: Matrix) {
   };
 }
 
+/**
+ * @private
+ */
 const sizeStr = (matrix: MatrixLike) =>
   matrix instanceof Matrix
     ? `${matrix.rows}x${matrix.cols} matrix`
     : `${matrix.length}x${matrix[0].length}`;
 
+/**
+ * @private
+ */
 const extractElements = (
   matrixOrRows: MatrixLike | VectorOrList,
 ): ReadonlyArray<ReadonlyArray<number>> => {
@@ -67,6 +82,7 @@ const extractElements = (
 /**
  * Returns a mutable copy of the matrix elements. Used internally only to avoid
  * unnecessary duplication. Dangerous to expose.
+ * @private
  */
 const takeOwnership = (matrix: Matrix): number[][] => (matrix as any).elements;
 
@@ -190,7 +206,7 @@ export class Matrix {
    * Returns th element at (i, j) in the matrix.
    * @param {Number} i Matrix row
    * @param {Number} j Matrix column
-   * @throws {OutOfRangeError} if (i, j) is out of range.
+   * @throws A {@link OutOfRangeError} if (i, j) is out of range.
    * @return {Number}
    */
   public e(i: number, j: number) {
@@ -205,7 +221,7 @@ export class Matrix {
 
   /**
    * Returns a vector containing the values in row o.
-   * @throws {OutOfRangeError} if o is out of range
+   * @throws A {@link OutOfRangeError} if o is out of range
    */
   public row(i: number): Vector {
     if (i < 1 || i > this.elements.length) {
@@ -216,7 +232,7 @@ export class Matrix {
 
   /**
    * Returns a vector containing the values in column j.
-   * @throws {OutOfRangeError} if j is out of range
+   * @throws A {@link OutOfRangeError} if j is out of range
    */
   public col(j: number): Vector {
     if (j < 1 || j > this.elements[0].length) {
@@ -288,7 +304,7 @@ export class Matrix {
 
   /**
    * Adds the number or matrix to this matrix.
-   * @throws {DimensionalityMismatchError} If the matrix is a different size than this one
+   * @throws A {@link DimensionalityMismatchError} If the matrix is a different size than this one
    */
   public add(matrix: number | MatrixLike) {
     if (typeof matrix === 'number') {
@@ -307,7 +323,7 @@ export class Matrix {
 
   /**
    * Subtracts the number or matrix to this matrix.
-   * @throws {DimensionalityMismatchError} If the matrix is a different size than this one
+   * @throws A {@link DimensionalityMismatchError} If the matrix is a different size than this one
    */
   public subtract(matrix: number | MatrixLike) {
     if (typeof matrix === 'number') {
@@ -409,7 +425,7 @@ export class Matrix {
    * the argument is a vector, a vector is returned, which saves you having
    * to remember calling col(1) on the result.
    *
-   * @throws {DimensionalityMismatchError} If the divisor is an
+   * @throws A {@link DimensionalityMismatchError} If the divisor is an
    * inappropriately sized matrix
    */
   public div(divisor: VectorOrList): Vector;
@@ -427,7 +443,7 @@ export class Matrix {
    * to remember calling col(1) on the result.
    *
    * @param {Matrix|Vector|number} multiplicand
-   * @throws {DimensionalityMismatchError} If the multiplicand is an
+   * @throws A {@link DimensionalityMismatchError} If the multiplicand is an
    * inappropriately sized matrix
    * @return {Matrix|Vector}
    */
@@ -451,7 +467,7 @@ export class Matrix {
   /**
    * Multiplies matrix elements individually.
    * @param {Matrix} v
-   * @throws {DimensionalityMismatchError} If v is not the same size as this matrix
+   * @throws A {@link DimensionalityMismatchError} If v is not the same size as this matrix
    * @returns {Matrix}
    */
   public elementMultiply(v: Matrix) {
@@ -621,7 +637,7 @@ export class Matrix {
 
   /**
    * If the matrix is square, returns the diagonal elements as a vector.
-   * @throws {DimensionalityMismatchError} if the matrix is not square
+   * @throws A {@link DimensionalityMismatchError} if the matrix is not square
    */
   public diagonal() {
     if (!this.isSquare()) {
@@ -691,7 +707,7 @@ export class Matrix {
 
   /**
    * Returns the determinant of a square matrix.
-   * @throws {DimensionalityMismatchError} If the matrix is not square
+   * @throws A {@link DimensionalityMismatchError} If the matrix is not square
    */
   public determinant(): number {
     if (!this.isSquare()) {
@@ -713,7 +729,7 @@ export class Matrix {
 
   /**
    * Alias for {@link determinant}
-   * @throws {DimensionalityMismatchError} If the matrix is not square
+   * @throws A {@link DimensionalityMismatchError} If the matrix is not square
    */
   public det(): number {
     return this.determinant();
@@ -728,7 +744,7 @@ export class Matrix {
 
   /**
    * Returns the trace for square matrices
-   * @throws {DimensionalityMismatchError} if the matrix is not square
+   * @throws A {@link DimensionalityMismatchError} if the matrix is not square
    */
   public trace(): number {
     if (!this.isSquare()) {
@@ -747,7 +763,7 @@ export class Matrix {
 
   /**
    * Alias for {@link Matrix.trace}.
-   * @throws {DimensionalityMismatchError} if the matrix is not square
+   * @throws A {@link DimensionalityMismatchError} if the matrix is not square
    */
   public tr() {
     return this.trace();
@@ -806,7 +822,7 @@ export class Matrix {
 
   /**
    * Returns the inverse of the matrix.
-   * @throws {DimensionalityMismatchError} if the matrix is not invertible
+   * @throws A {@link DimensionalityMismatchError} if the matrix is not invertible
    * @return {Matrix}
    */
   public inverse() {
@@ -864,7 +880,7 @@ export class Matrix {
 
   /**
    * Alias of {@link Matrix.inverse}
-   * @throws {DimensionalityMismatchError} if the matrix is not invertible
+   * @throws A {@link DimensionalityMismatchError} if the matrix is not invertible
    * @return {Matrix}
    */
   public inv() {

@@ -1,0 +1,3 @@
+{
+  "search.exclude": { "**/doc": true }
+}

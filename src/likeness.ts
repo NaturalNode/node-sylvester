@@ -11,6 +11,7 @@ export type Geometry = Plane | Vector | Line | Segment | ReadonlyArray<number>;
  * Gets whether the object is any recognizable geometry object.
  * @param {*} obj
  * @returns {Boolean}
+ * @private
  */
 export const isGeometry = (obj: any): obj is Geometry =>
   obj && !!(obj.direction || obj.normal || obj.start || obj.to3D || obj instanceof Array);

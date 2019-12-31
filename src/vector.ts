@@ -13,8 +13,7 @@ import { Plane } from './plane';
 
 /**
  * Returns the elements from the given vector or number array.
- * @param {Vector|Number[]} vectorOrList
- * @returns {Number[]}
+ * @private
  */
 const getElements = (vectorOrList: VectorOrList): ReadonlyArray<number> =>
   (vectorOrList as any).elements || vectorOrList;
@@ -205,7 +204,7 @@ export class Vector {
    * Returns the angle between this vector the argument in radians. If the
    * vectors are mirrored across their axes this will return `NaN`.
    *
-   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
    */
   public angleFrom(vector: VectorOrList) {
@@ -296,7 +295,7 @@ export class Vector {
   /**
    * When the input is a constant, this returns the result of adding it to
    * all cevtor elements. When it's a vector, the vectors will be added.
-   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
    */
   public add(value: VectorOrList | number) {
@@ -306,7 +305,7 @@ export class Vector {
   /**
    * When the input is a constant, this returns the result of subtracting it
    * from all vector elements. When it's a vector, the vectors will be subtracted.
-   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
    */
   public subtract(value: VectorOrList | number) {
@@ -317,7 +316,7 @@ export class Vector {
    * When the input is a constant, this returns the result of multiplying it
    * with all vector elements. When it's a vector, the vectors will be
    * element-wise multiplied.
-   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
    */
   public multiply(value: VectorOrList | number) {
@@ -389,7 +388,7 @@ export class Vector {
   /**
    * Returns the scalar (dot) product of the vector with the argument.
    * @see https://en.wikipedia.org/wiki/Scalar_product
-   * @throws {DimensionalityMismatchError} If a vector is passed in with
+   * @throws A {@link DimensionalityMismatchError} If a vector is passed in with
    *     different dimensions
    */
   public dot(vector: VectorOrList) {
@@ -410,7 +409,7 @@ export class Vector {
 
   /**
    * Returns the vector product of the vector with the argument.
-   * @throws {DimensionalityMismatchError} if either this or the other vector
+   * @throws A {@link DimensionalityMismatchError} if either this or the other vector
    *   is not three-dimensional.
    */
   public cross(vector: VectorOrList) {
@@ -613,7 +612,7 @@ export class Vector {
 
   /**
    * Utility to make sure vectors are 3D. If they are 1/2D, a zero component is added.
-   * @throws {DimensionalityMismatchError} if the vector has greater than three elements
+   * @throws A {@link DimensionalityMismatchError} if the vector has greater than three elements
    */
   public to3D() {
     return this.toDimension(3);
@@ -621,7 +620,7 @@ export class Vector {
 
   /**
    * Pads the vector with zero's until it reaches the given dimension.
-   * @throws {DimensionalityMismatchError} if the vector has greater than n elements
+   * @throws A {@link DimensionalityMismatchError} if the vector has greater than n elements
    */
   public toDimension(n: number) {
     if (this.elements.length > n) {
