@@ -1,0 +1,24 @@
+name: Publish Docs
+on:
+  push:
+    branches:
+    - master
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        node-version: '12.x'
+    - uses: borales/actions-yarn@v2.0.0
+      with:
+        cmd: install
+    - uses: borales/actions-yarn@v2.0.0
+      with:
+        cmd: docs
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v2
+      env:
+        ACTIONS_DEPLOY_KEY: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: ./doc

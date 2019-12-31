@@ -1,14 +1,20 @@
 # sylvester
 
+[![Actions Status](https://github.com/NaturalNode/node-sylvester/workflows/Run%20Tests/badge.svg)](https://github.com/NaturalNode/node-sylvester/actions)
+
 Modern and expanded implementation of James Coglan's "Sylvester" matrix math library. The original project can be found at http://sylvester.jcoglan.com/
+
+```
+npm install sylvester
+```
 
 # Documentation
 
+Updated documentation for version 0.3 can be found at [naturalnode.github.io/node-sylvester](https://naturalnode.github.io/node-sylvester).
+
+<details><summary>Documentation for versions prior to 0.3</summary>
+
 The original documentation for "Sylvester" should help you through basic operations. An intro that contains node-specific features can also be found {on Chris Umbel's blog}[http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math]. We're looking for someone to help get the documentation situation under control.
-
-# Installation
-
-    npm install sylvester
 
 # Usage
 
@@ -190,15 +196,4 @@ transpose a matrix:
     var B_T = B.transpose();
     // B is 2x3, B_T is 3x2
 
-## Contributing
-
-Contributions to node-sylvester are more than welcome. If you changed or added functionality, you should make sure tests pass. You can do this locally by running `npm test`, after running `npm install` initially.
-
-Development depends on the lapack module, which requires the LAPACK linear algebra library to be installed locally.
-
-- OSX seems to have lapack installed by default.
-- On Linux, lapack is available via most package managers, [including apt](https://astroiisc.wikispaces.com/Lapack+Installation+in+Ubuntu).
-- On Windows, the easiest way is to use Docker. Build the Dockerfile in this repository once: `docker build -t node-sylvester .`. Then:
-
-  - On the default shell: `docker run --rm -v \`pwd\`:/sylv -w /sylv node-sylvester sh -c /bin/watch`
-  - On Cygwin: `docker run --rm -v \`cygpath -aw \$(pwd)\`:/sylv -w /sylv node-sylvester sh -c /bin/watch`
+</details>
