@@ -35,6 +35,18 @@ describe('line', () => {
     testParallelTo(Line);
   });
 
+  it('Line.getAngleFromObject', () => {
+    record(lineA)
+      .getAngleFromObject(new Vector([0, 1]))
+      .to.approx.equal(Math.PI / 4);
+    record(lineA)
+      .getAngleFromObject(lineB)
+      .to.approx.equal(Math.PI / 2);
+    record(lineA)
+      .getAngleFromObject(new Segment([1, 2], [2, 1]))
+      .to.approx.equal(Math.PI / 2);
+  });
+
   it('Line.isPerpendicularTo', () => {
     testPerpendicularTo(Vector);
   });
@@ -95,7 +107,7 @@ describe('line', () => {
     record(lineA).pointClosestTo(lineA.translate([0, 1])).to.be.null;
     record(lineA)
       .pointClosestTo(new Line([0, 1, 1], [1, 1, 3]))
-      .to.vector.equal([0.166666, 0.166666, 0]);
+      .to.vector.equal([1 / 6, 1 / 6, 0]);
 
     record(lineA)
       .pointClosestTo(new Plane([-1, -1, -1], [1, 1, 3], [2, 0, 1]))
@@ -157,7 +169,21 @@ describe('line', () => {
         .to.equal(5);
     });
 
-    it('Segment.length', () => {
+    it('Segment.pointClosestTo', () => {
+      record(segA)
+        .pointClosestTo(new Vector([0, 0]))
+        .to.vector.equal([1, 2, 0]);
+
+      record(segA)
+        .pointClosestTo(new Vector([10, 10]))
+        .to.vector.equal([4, 6, 0]);
+
+      record(segA)
+        .pointClosestTo(new Vector([3, 3]))
+        .to.vector.equal([2.2, 3.6, 0]);
+    });
+
+    it('Segment.toVector', () => {
       record(segA)
         .toVector()
         .to.vector.equal([3, 4, 0]);

@@ -85,6 +85,11 @@ describe('polygon', () => {
     ).isTriangle().to.be.false;
   });
 
+  it('Polygon.hasEdgeContaining', () => {
+    record(simple).hasEdgeContaining(new Vector([1, 1, 1])).to.be.false;
+    record(simple).hasEdgeContaining(new Vector([0, 0.5, 0])).to.be.true;
+  });
+
   it('Polygon.area', () => {
     record(simple)
       .area()

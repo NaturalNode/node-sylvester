@@ -2,14 +2,6 @@ import { Sylvester, OutOfRangeError, DimensionalityMismatchError } from './sylve
 import { Vector } from './vector';
 import { VectorOrList, isVectorLike, MatrixLike, isMatrixLike } from './likeness';
 
-const lapack = (() => {
-  try {
-    return require('lapack');
-  } catch (err) {
-    return null;
-  }
-})();
-
 /**
  * @private
  */
@@ -144,8 +136,10 @@ export class Matrix {
     const Ureduce = U.slice(1, U.rows, 1, k);
     return this.x(Ureduce.transpose());
   }
+
   /**
    * Grab the upper triangular part of the matrix
+   * @diagram Matrix.triu
    */
   public triu(k: number = 0): Matrix {
     return this.map((x, i, j) => {
@@ -153,17 +147,16 @@ export class Matrix {
     });
   }
 
-  //
-
   /**
    * Unroll a matrix into a vector
+   * @diagram Matrix.unroll
    */
   public unroll(): Vector {
     const v = [];
 
     for (let i = 1; i <= this.cols; i++) {
       for (let j = 1; j <= this.rows; j++) {
-        v.push(this.e(j, i));
+        v.push(this.e(j, i)!);
       }
     }
 
@@ -177,9 +170,10 @@ export class Matrix {
    * @param startCol - Left-most starting column.
    * @param endCol - Right-most ending column. If 0, takes the whole matrix.
    * @return {Matrix}
+   * @diagram Matrix.slice
    */
   public slice(startRow: number, endRow: number, startCol: number, endCol: number): Matrix {
-    const x = [];
+    const x: number[][] = [];
 
     if (endRow === 0) {
       endRow = this.rows;
@@ -190,10 +184,10 @@ export class Matrix {
     }
 
     for (let i = Math.max(1, startRow); i <= endRow; i++) {
-      const row = [];
+      const row: number[] = [];
 
       for (let j = Math.max(1, startCol); j <= endCol; j++) {
-        row.push(this.e(i, j));
+        row.push(this.e(i, j)!);
       }
 
       x.push(row);
@@ -203,17 +197,14 @@ export class Matrix {
   }
 
   /**
-   * Returns th element at (i, j) in the matrix.
+   * Returns the element at (i, j) in the matrix, or null if out of bounds.
    * @param {Number} i Matrix row
    * @param {Number} j Matrix column
-   * @throws A {@link OutOfRangeError} if (i, j) is out of range.
-   * @return {Number}
+   * @diagram Matrix.e
    */
-  public e(i: number, j: number) {
+  public e(i: number, j: number): number | null {
     if (i < 1 || i > this.elements.length || j < 1 || j > this.elements[0].length) {
-      throw new OutOfRangeError(
-        `The location (${i}, ${j}) is outside the bounds of this ${sizeStr(this)}`,
-      );
+      return null;
     }
 
     return this.elements[i - 1][j - 1];
@@ -222,17 +213,20 @@ export class Matrix {
   /**
    * Returns a vector containing the values in row o.
    * @throws A {@link OutOfRangeError} if o is out of range
+   * @diagram Matrix.row
    */
   public row(i: number): Vector {
     if (i < 1 || i > this.elements.length) {
       throw new OutOfRangeError(`Row ${i} is outside the bounds of this ${sizeStr(this)}`);
     }
+
     return new Vector(this.elements[i - 1]);
   }
 
   /**
    * Returns a vector containing the values in column j.
    * @throws A {@link OutOfRangeError} if j is out of range
+   * @diagram Matrix.col
    */
   public col(j: number): Vector {
     if (j < 1 || j > this.elements[0].length) {
@@ -296,6 +290,7 @@ export class Matrix {
 
   /**
    * Returns whether this matrix is the same size as the other one.
+   * @diagram Matrix.isSameSizeAs
    */
   public isSameSizeAs(matrix: MatrixLike) {
     const M = extractElements(matrix);
@@ -305,6 +300,7 @@ export class Matrix {
   /**
    * Adds the number or matrix to this matrix.
    * @throws A {@link DimensionalityMismatchError} If the matrix is a different size than this one
+   * @diagram Matrix.add
    */
   public add(matrix: number | MatrixLike) {
     if (typeof matrix === 'number') {
@@ -324,6 +320,7 @@ export class Matrix {
   /**
    * Subtracts the number or matrix to this matrix.
    * @throws A {@link DimensionalityMismatchError} If the matrix is a different size than this one
+   * @diagram Matrix.subtract
    */
   public subtract(matrix: number | MatrixLike) {
     if (typeof matrix === 'number') {
@@ -356,12 +353,8 @@ export class Matrix {
    * the argument is a vector, a vector is returned, which saves you having
    * to remember calling col(1) on the result.
    *
-   * @private
-   * @param {Matrix|Vector|number} matrix
-   * @param {function(left: number, right: number): number} op Operation to run,
-   * taking the matrix value on the 'left' side and the provided multiplicand
-   * on the right.
-   * @return {Matrix|Vector}
+   * @param op - Operation to run, taking the matrix value on the 'left' side
+   * and the provided multiplicand on the right.
    */
   public mulOp(matrix: VectorOrList, op: (left: number, right: number) => number): Vector;
   public mulOp(matrix: MatrixLike | number, op: (left: number, right: number) => number): Matrix;
@@ -442,10 +435,9 @@ export class Matrix {
    * the argument is a vector, a vector is returned, which saves you having
    * to remember calling col(1) on the result.
    *
-   * @param {Matrix|Vector|number} multiplicand
    * @throws A {@link DimensionalityMismatchError} If the multiplicand is an
    * inappropriately sized matrix
-   * @return {Matrix|Vector}
+   * @diagram Matrix.multiply
    */
   public multiply(multiplicand: VectorOrList): Vector;
   public multiply(multiplicand: MatrixLike | number): Matrix;
@@ -466,9 +458,8 @@ export class Matrix {
 
   /**
    * Multiplies matrix elements individually.
-   * @param {Matrix} v
    * @throws A {@link DimensionalityMismatchError} If v is not the same size as this matrix
-   * @returns {Matrix}
+   * @diagram Matrix.elementMultiply
    */
   public elementMultiply(v: Matrix) {
     if (!this.isSameSizeAs(v)) {
@@ -477,12 +468,13 @@ export class Matrix {
       );
     }
     return this.map((k, i, j) => {
-      return v.e(i, j) * k;
+      return v.e(i, j)! * k;
     });
   }
 
   /**
    * Sums all the elements of the matrix.
+   * @diagram Matrix.sum
    */
   public sum() {
     let sum = 0;
@@ -497,7 +489,7 @@ export class Matrix {
 
   /**
    * Returns the arithmetic mean of each column.
-   * @return {Vector}
+   * @diagram Matrix.mean
    */
   mean() {
     const r = [];
@@ -509,6 +501,7 @@ export class Matrix {
 
   /**
    * Returns a Vector of each column's standard deviation
+   * @diagram Matrix.std
    */
   public std(): Vector {
     const mMean = this.mean();
@@ -522,14 +515,8 @@ export class Matrix {
   }
 
   /**
-   * Alias for {@link Matrix.col}
-   */
-  public column(n: number): Vector {
-    return this.col(n);
-  }
-
-  /**
    * Runs an element-wise logarithm on the matrix.
+   * @diagram Matrix.log
    */
   public log(base = Math.E): Matrix {
     const logBase = Math.log(base); // change of base
@@ -542,6 +529,7 @@ export class Matrix {
    * perform row/column cycling or copy-augmenting.
    * @param nrows - Rows to copy
    * @param ncols - Columns to copy
+   * @diagram Matrix.minor
    */
   minor(startRow: number, startCol: number, nrows: number, ncols: number) {
     const elements: number[][] = [];
@@ -565,9 +553,9 @@ export class Matrix {
 
   /**
    * Returns the transposition of the matrix.
-   * @return {Matrix}
+   * @diagram Matrix.transpose
    */
-  transpose() {
+  public transpose() {
     const rows = this.elements.length;
     const cols = this.elements[0].length;
     const elements: number[][] = [];
@@ -585,7 +573,7 @@ export class Matrix {
 
   /**
    * Returns whether this is a square matrix.
-   * @returns {Boolean}
+   * @diagram Matrix.isSquare
    */
   isSquare() {
     return this.elements.length === this.elements[0].length;
@@ -593,7 +581,7 @@ export class Matrix {
 
   /**
    * Returns the absolute largest element of the matrix
-   * @returns {Number}
+   * @diagram Matrix.max
    */
   max() {
     let m = 0;
@@ -615,6 +603,7 @@ export class Matrix {
   /**
    * Returns the index of the first occurence of x found
    * by reading row-by-row from left to right, or null.
+   * @diagram Matrix.indexOf
    */
   public indexOf(x: number) {
     const ni = this.elements.length;
@@ -638,6 +627,7 @@ export class Matrix {
   /**
    * If the matrix is square, returns the diagonal elements as a vector.
    * @throws A {@link DimensionalityMismatchError} if the matrix is not square
+   * @diagram Matrix.diagonal
    */
   public diagonal() {
     if (!this.isSquare()) {
@@ -657,6 +647,7 @@ export class Matrix {
    * Make the matrix upper (right) triangular by Gaussian elimination.
    * This method only adds multiples of rows to other rows. No rows are
    * scaled up or switched, and the determinant is preserved.
+   * @diagram Matrix.toRightTriangular
    */
   public toRightTriangular(): Matrix {
     const m = this.toArray();
@@ -699,15 +690,9 @@ export class Matrix {
   }
 
   /**
-   * Alias for {@link Matrix.toRightTriangular}
-   */
-  public toUpperTriangular(): Matrix {
-    return this.toRightTriangular();
-  }
-
-  /**
    * Returns the determinant of a square matrix.
    * @throws A {@link DimensionalityMismatchError} If the matrix is not square
+   * @diagram Matrix.determinant
    */
   public determinant(): number {
     if (!this.isSquare()) {
@@ -730,6 +715,7 @@ export class Matrix {
   /**
    * Alias for {@link determinant}
    * @throws A {@link DimensionalityMismatchError} If the matrix is not square
+   * @diagram Matrix.determinant
    */
   public det(): number {
     return this.determinant();
@@ -737,6 +723,7 @@ export class Matrix {
 
   /**
    * Returns true if the matrix is singular
+   * @diagram Matrix.isSingular
    */
   public isSingular(): boolean {
     return this.isSquare() && this.determinant() === 0;
@@ -745,6 +732,7 @@ export class Matrix {
   /**
    * Returns the trace for square matrices
    * @throws A {@link DimensionalityMismatchError} if the matrix is not square
+   * @diagram Matrix.trace
    */
   public trace(): number {
     if (!this.isSquare()) {
@@ -762,16 +750,9 @@ export class Matrix {
   }
 
   /**
-   * Alias for {@link Matrix.trace}.
-   * @throws A {@link DimensionalityMismatchError} if the matrix is not square
-   */
-  public tr() {
-    return this.trace();
-  }
-
-  /**
    * Returns the rank of the matrix.
-   * @param {Number} epsilon for comparison against 0
+   * @param epsilon - for comparison against 0
+   * @diagram Matrix.rank
    */
   public rank(epsilon = Sylvester.precision): number {
     const M = this.toRightTriangular();
@@ -792,14 +773,9 @@ export class Matrix {
   }
 
   /**
-   * Alias for {@link Matrix.rank}
-   */
-  public rk(epsilon = Sylvester.precision): number {
-    return this.rank(epsilon);
-  }
-
-  /**
-   * Returns the result of attaching the given argument to the right-hand side of the matrix
+   * Returns the result of attaching the given argument to the
+   * right-hand side of the matrix.
+   * @diagram Matrix.augment
    */
   public augment(matrix: MatrixLike): Matrix {
     const M = extractElements(matrix);
@@ -823,7 +799,7 @@ export class Matrix {
   /**
    * Returns the inverse of the matrix.
    * @throws A {@link DimensionalityMismatchError} if the matrix is not invertible
-   * @return {Matrix}
+   * @diagram Matrix.inverse
    */
   public inverse() {
     if (!this.isSquare()) {
@@ -879,17 +855,8 @@ export class Matrix {
   }
 
   /**
-   * Alias of {@link Matrix.inverse}
-   * @throws A {@link DimensionalityMismatchError} if the matrix is not invertible
-   * @return {Matrix}
-   */
-  public inv() {
-    return this.inverse();
-  }
-
-  /**
    * Rounds all values in the matrix.
-   * @return {Matrix}
+   * @diagram Matrix.inverse
    */
   public round() {
     return this.map(x => Math.round(x));
@@ -897,10 +864,8 @@ export class Matrix {
 
   /**
    * Returns a copy of the matrix with elements set to the given value if they
-   * differ from it by less than the epislon.
-   * @param {Number} target
-   * @param {Number} epsilon
-   * @return {Matrix}
+   * differ from it by less than the epsilon.
+   * @diagram Matrix.snapTo
    */
   public snapTo(target: number, epsilon = Sylvester.precision) {
     return this.map(p => (Math.abs(p - target) <= epsilon ? target : p));
@@ -934,6 +899,7 @@ export class Matrix {
 
   /**
    * Return the indexes of the columns with the largest value for each row.
+   * @diagram Matrix.maxColumnIndexes
    */
   public maxColumnIndexes(): Vector {
     const maxes = [];
@@ -943,7 +909,7 @@ export class Matrix {
       let maxIndex = -1;
 
       for (let j = 1; j <= this.cols; j++) {
-        if (max === null || this.e(i, j) > max) {
+        if (max === null || this.e(i, j)! > max) {
           max = this.e(i, j);
           maxIndex = j;
         }
@@ -957,6 +923,7 @@ export class Matrix {
 
   /**
    * Return the largest values in each row.
+   * @diagram Matrix.maxColumns
    */
   public maxColumns(): Vector {
     const maxes = [];
@@ -965,7 +932,7 @@ export class Matrix {
       let max = null;
 
       for (let j = 1; j <= this.cols; j++) {
-        if (max === null || this.e(i, j) > max) {
+        if (max === null || this.e(i, j)! > max) {
           max = this.e(i, j);
         }
       }
@@ -978,6 +945,7 @@ export class Matrix {
 
   /**
    * Return the indexes of the columns with the smallest values for each row.
+   * @diagram Matrix.minColumnIndexes
    */
   public minColumnIndexes(): Vector {
     const mins = [];
@@ -987,7 +955,7 @@ export class Matrix {
       let minIndex = -1;
 
       for (let j = 1; j <= this.cols; j++) {
-        if (min === null || this.e(i, j) < min) {
+        if (min === null || this.e(i, j)! < min) {
           min = this.e(i, j);
           minIndex = j;
         }
@@ -1001,6 +969,7 @@ export class Matrix {
 
   /**
    * Return the smallest values in each row.
+   * @diagram Matrix.minColumns
    */
   public minColumns(): Vector {
     const mins: number[] = [];
@@ -1009,7 +978,7 @@ export class Matrix {
       let min = null;
 
       for (let j = 1; j <= this.cols; j++) {
-        if (min === null || this.e(i, j) < min) {
+        if (min === null || this.e(i, j)! < min) {
           min = this.e(i, j);
         }
       }
@@ -1022,6 +991,7 @@ export class Matrix {
 
   /**
    * Solve lower-triangular matrix * x = b via forward substitution
+   * @diagram Matrix.forwardSubstitute
    */
   public forwardSubstitute(b: Vector): Vector {
     const xa = [];
@@ -1030,17 +1000,18 @@ export class Matrix {
       let w = 0;
 
       for (let j = 1; j < i; j++) {
-        w += this.e(i, j) * xa[j - 1];
+        w += this.e(i, j)! * xa[j - 1];
       }
 
-      xa.push((b.e(i)! - w) / this.e(i, i));
+      xa.push((b.e(i)! - w) / this.e(i, i)!);
     }
 
     return new Vector(xa);
   }
 
   /**
-   * solve an upper-triangular matrix * x = b via back substitution
+   * Solve an upper-triangular matrix * x = b via back substitution
+   * @diagram Matrix.backSubstitute
    */
   public backSubstitute(b: Vector): Vector {
     const xa = [];
@@ -1049,10 +1020,10 @@ export class Matrix {
       let w = 0;
 
       for (let j = this.cols; j > i; j--) {
-        w += this.e(i, j) * xa[this.rows - j];
+        w += this.e(i, j)! * xa[this.rows - j];
       }
 
-      xa.push((b.e(i)! - w) / this.e(i, i));
+      xa.push((b.e(i)! - w) / this.e(i, i)!);
     }
 
     return new Vector(xa.reverse());
@@ -1067,10 +1038,10 @@ export class Matrix {
     const maxLoop = 100;
 
     while (err > 2.2737e-13 && i < maxLoop) {
-      let qr = S.transpose().qrJs();
+      let qr = S.transpose().qr();
       S = qr.R;
       V = V.x(qr.Q);
-      qr = S.transpose().qrJs();
+      qr = S.transpose().qr();
       U = U.x(qr.Q);
       S = qr.R;
 
@@ -1110,19 +1081,11 @@ export class Matrix {
     };
   }
 
-  // singular value decomposition using LAPACK
-  svdPack() {
-    const result = lapack.sgesvd('A', 'A', this.elements);
-
-    return {
-      U: new Matrix(result.U),
-      S: new Matrix(result.S).column(1).toDiagonalMatrix(),
-      V: new Matrix(result.VT).transpose(),
-    };
-  }
-
-  // QR decomposition in pure javascript
-  qrJs() {
+  /**
+   * Runs a QR decomposition (QR facorization) on the matrix.
+   * @see https://en.wikipedia.org/wiki/QR_decomposition
+   */
+  qr() {
     const m = this.rows;
     const n = this.cols;
     let Q = Matrix.I(m);
@@ -1145,7 +1108,7 @@ export class Matrix {
           .div(
             Vk.transpose()
               .x(Vk)
-              .e(1, 1),
+              .e(1, 1)!,
           ),
       );
       const Qk = identSize(takeOwnership(Hk), m, n, k);
@@ -1160,18 +1123,8 @@ export class Matrix {
     };
   }
 
-  // QR decomposition using LAPACK
-  qrPack() {
-    const qr = lapack.qr(this.elements);
-
-    return {
-      Q: new Matrix(qr.Q),
-      R: new Matrix(qr.R),
-    };
-  }
-
   /**
-   * LU factorization.
+   * LU factorization for the matrix.
    */
   lu() {
     const rows = this.rows;
@@ -1179,7 +1132,7 @@ export class Matrix {
     const L = Matrix.I(rows).toArray();
     const A = this.toArray();
     const P = Matrix.I(rows).toArray();
-    const U = Matrix.Zeros(rows, this.cols).toArray();
+    const U = Matrix.Zero(rows, this.cols).toArray();
 
     let p = 1;
 
@@ -1243,7 +1196,6 @@ export class Matrix {
 
   /**
    * Creates am identity matrix of the given size.
-   * @param {Number} size
    */
   static I(size: number) {
     const elements = [];
@@ -1261,8 +1213,10 @@ export class Matrix {
 
   /**
    * Creates a diagonal matrix from the given elements.
+   * @diagram Matrix.Diagonal
    */
-  static Diagonal(elements: ReadonlyArray<number>) {
+  static Diagonal(vector: VectorOrList) {
+    const elements = Vector.toElements(vector);
     const rows = [];
     for (let y = 0; y < elements.length; y++) {
       const row = [];
@@ -1281,6 +1235,7 @@ export class Matrix {
    * @param theta - angle in radians
    * @param axis - 3-element vector describing the axis to rotate
    * around. If not provided, creates a 2D rotation.
+   * @diagram Matrix.Rotation
    */
   static Rotation(theta: number, axis?: Vector) {
     if (!axis) {
@@ -1317,6 +1272,7 @@ export class Matrix {
   /**
    * Creates a three-dimensional rotation matrix that rotates around the x axis.
    * @param t - angle in radians
+   * @diagram Matrix.RotationX
    */
   static RotationX(t: number) {
     const c = Math.cos(t);
@@ -1331,6 +1287,7 @@ export class Matrix {
   /**
    * Creates a three-dimensional rotation matrix that rotates around the y axis.
    * @param t - angle in radians
+   * @diagram Matrix.RotationY
    */
   static RotationY(t: number) {
     const c = Math.cos(t);
@@ -1345,6 +1302,7 @@ export class Matrix {
   /**
    * Creates a three-dimensional rotation matrix that rotates around the z axis.
    * @param t - angle in radians
+   * @diagram Matrix.RotationZ
    */
   static RotationZ(t: number) {
     const c = Math.cos(t);
@@ -1372,6 +1330,7 @@ export class Matrix {
    * Creates an `n` by `m` matrix filled with the given value.
    * @param n - rows
    * @param m - columns
+   * @diagram Matrix.Fill
    */
   static Fill(n: number, m: number, value: number) {
     if (arguments.length === 2) {
@@ -1399,35 +1358,19 @@ export class Matrix {
    * Creates an `n` by `m` matrix filled with 0's.
    * @param n - rows
    * @param m - columns
+   * @diagram Matrix.Zero
    */
   static Zero(n: number, m: number) {
     return Matrix.Fill(n, m, 0);
   }
 
   /**
-   * Creates an `n` by `m` matrix filled with 0's.
-   * @param n - rows
-   * @param m - columns
-   */
-  static Zeros(n: number, m: number) {
-    return Matrix.Zero(n, m);
-  }
-
-  /**
    * Creates an `n` by `m` matrix filled with 1's.
    * @param n - rows
    * @param m - columns
+   * @diagram Matrix.One
    */
   static One(n: number, m: number) {
     return Matrix.Fill(n, m, 1);
-  }
-
-  /**
-   * Creates an `n` by `m` matrix filled with 1's.
-   * @param n - rows
-   * @param m - columns
-   */
-  static Ones(n: number, m: number) {
-    return Matrix.One(n, m);
   }
 }

@@ -177,7 +177,6 @@ export class Vector {
 
   /**
    * Iterates through the elements of the vector
-   * @param {Function} fn called with the `(element, index)`
    */
   public each(fn: (value: number, index: number) => void) {
     const n = this.elements.length;
@@ -492,7 +491,6 @@ export class Vector {
 
   /**
    * Returns a diagonal matrix with the vector's elements as its diagonal elements
-   * @returns {Matrix}
    */
   public toDiagonalMatrix() {
     return Matrix.Diagonal(this.elements);
@@ -500,7 +498,6 @@ export class Vector {
 
   /**
    * Returns the result of rounding the elements of the vector
-   * @returns {Vector}
    * @diagram Vector.round
    */
   public round() {
@@ -509,7 +506,6 @@ export class Vector {
 
   /**
    * Transpose a Vector, return a 1xn Matrix.
-   * @returns {Matrix}
    * @diagram Vector.transpose
    */
   public transpose() {
@@ -533,7 +529,6 @@ export class Vector {
 
   /**
    * Returns the vector's distance from the argument, when considered as a point in space
-   * @param {Vector|Line|Plane} obj
    * @diagram Vector.distanceFrom
    */
   public distanceFrom(obj: Geometry): number {

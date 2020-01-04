@@ -10,9 +10,9 @@ npm install sylvester
 
 # Documentation
 
-Updated documentation for version 0.3 can be found at [naturalnode.github.io/node-sylvester](https://naturalnode.github.io/node-sylvester).
+Updated documentation for version >=0.1.0 can be found at [naturalnode.github.io/node-sylvester](https://naturalnode.github.io/node-sylvester).
 
-<details><summary>Documentation for versions prior to 0.3</summary>
+<details><summary>Documentation for versions prior to 0.1.0</summary>
 
 The original documentation for "Sylvester" should help you through basic operations. An intro that contains node-specific features can also be found {on Chris Umbel's blog}[http://www.chrisumbel.com/article/sylvester_node_js_matrix_vector_math]. We're looking for someone to help get the documentation situation under control.
 

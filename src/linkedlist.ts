@@ -56,14 +56,11 @@ export interface IImmutableList<T> {
 
   /**
    * Returns whether the predicate returns true for any item in the list.
-   * @param {function(data: Node, index: number): boolean} predicate
-   * @returns {Boolean}
    */
   some(predicate: (data: Readonly<Node<T>>, index: number) => boolean): boolean;
 
   /**
    * Converts the linked list to an array.
-   * @returns {Array}
    */
   toArray(): T[];
 }
@@ -126,7 +123,6 @@ export class CircularLinkedList<T> implements IImmutableList<T> {
 
   /**
    * Prepends a new node to the head of the list.
-   * @param {Node} node
    */
   public prepend(data: T) {
     if (this.first === null || this.last === null) {
@@ -193,9 +189,7 @@ export class CircularLinkedList<T> implements IImmutableList<T> {
 
   /**
    * Gets a node from its containing data.
-   * @param {*} data
-   * @param {function(item: *): boolean} equalityCheck
-   * @returns {Node|null} The node that was removed
+   * @returns The node that was removed, if any
    */
   public findNode<T2>(
     data: T2,
@@ -220,8 +214,6 @@ export class CircularLinkedList<T> implements IImmutableList<T> {
 
   /**
    * Returns a new linked list formed by mapping this list's items.
-   * @param {function(data: Node, index: number)} items
-   * @returns {CircularLinkedList}
    */
   public map<R>(transformation: (data: T, index: number) => R): CircularLinkedList<R> {
     const linked = new CircularLinkedList<R>();
@@ -236,7 +228,6 @@ export class CircularLinkedList<T> implements IImmutableList<T> {
 
   /**
    * Runs the function for every item in the list.
-   * @param {function(data: Node, index: number): void} fn
    */
   public forEach(fn: (node: Node<T>, index: number) => void) {
     if (!this.first) {
@@ -252,8 +243,6 @@ export class CircularLinkedList<T> implements IImmutableList<T> {
 
   /**
    * Returns whether the predicate returns true for any item in the list.
-   * @param {function(data: Node, index: number): boolean} predicate
-   * @returns {Boolean}
    */
   public some(predicate: (data: Node<T>, index: number) => boolean): boolean {
     let node = this.first!;
@@ -284,8 +273,6 @@ export class CircularLinkedList<T> implements IImmutableList<T> {
 
   /**
    * Returns a linked list from the array.
-   * @param {Array} list
-   * @returns {CircularLinkedList}
    */
   public static fromArray<T>(list: ReadonlyArray<Node<T> | T>): CircularLinkedList<T> {
     const linked = new CircularLinkedList<T>();

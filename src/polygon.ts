@@ -30,8 +30,6 @@ export class Polygon {
   /**
    * Creates a new polygon formed from the given points, optionally projected
    * onto the plane.
-   * @param {(Vector|number[])[]} points
-   * @param {Plane} plane
    */
   constructor(points: ReadonlyArray<VectorOrList> | IImmutableList<VectorOrList>, plane: Plane) {
     if (points.length === 0) {
@@ -84,6 +82,7 @@ export class Polygon {
 
   /**
    * Returns the vertex at the given position on the vertex list, numbered from 1.
+   * @diagram Polygon.v
    */
   public v(i: number) {
     return this.vertices.at(i - 1)!.data;
@@ -98,6 +97,7 @@ export class Polygon {
 
   /**
    * Translates the polygon by the given vector and returns the polygon.
+   * @diagram Polygon.translate
    */
   public translate(vector: VectorOrList) {
     const elements = Vector.toElements(vector, 3);
@@ -110,6 +110,7 @@ export class Polygon {
   /**
    * Rotates the polygon about the given line and returns the polygon.
    * @param t - degrees in radians
+   * @diagram Polygon.rotate
    */
   public rotate(t: number, line: Line) {
     const R = Matrix.Rotation(t, line.direction);
@@ -123,6 +124,7 @@ export class Polygon {
    * Scales the polygon relative to the given point and returns the polygon.
    * @param k - amount of scale
    * @param point - origin to scale from
+   * @diagram Polygon.scale
    */
   public scale(k: number, point: VectorOrList = Vector.Zero(3)) {
     const P = Vector.toElements(point, 3);
@@ -142,7 +144,7 @@ export class Polygon {
 
   /**
    * Returns true iff the polygon is a triangle.
-   * @returns {Boolean}
+   * @diagram Polygon.isTriangle
    */
   isTriangle() {
     return this.vertices.length === 3;
@@ -157,7 +159,6 @@ export class Polygon {
    * with the polygon. They are cached after first calculation and should remain in sync
    * with changes to the parent polygon.
    * @private
-   * @returns {Polygon[]}
    */
   trianglesForSurfaceIntegral() {
     if (this.surfaceIntegralElements) {
@@ -196,7 +197,7 @@ export class Polygon {
   /**
    * Returns the area of the polygon. Requires that the polygon
    * be converted to triangles, so use with caution.
-   * @returns {Number}
+   * @diagram Polygon.area
    */
   area() {
     if (this.isTriangle()) {
@@ -230,7 +231,7 @@ export class Polygon {
   /**
    * Returns the centroid of the polygon. Requires division into
    * triangles - use with caution.
-   * @returns {Vector}
+   * @diagram Polygon.centroid
    */
   centroid() {
     if (this.isTriangle()) {
@@ -262,6 +263,7 @@ export class Polygon {
 
   /**
    * Returns the polygon's projection on the given plane as another polygon
+   * @diagram Polygon.projectionOn
    */
   public projectionOn(plane: Plane) {
     return new Polygon(
@@ -273,8 +275,7 @@ export class Polygon {
   /**
    * Removes the given vertex from the polygon as long as it's not triangular.
    * No-op if it is triangular, or if the vertex doesn't exist.
-   * @param {Vertex} vertex
-   * @returns {Polygon}
+   * @diagram Polygon.removeVertex
    */
   public removeVertex(vertex: Vector) {
     if (this.isTriangle()) {
@@ -289,6 +290,7 @@ export class Polygon {
 
   /**
    * Returns true iff the point is strictly inside the polygon
+   * @diagram Polygon.contains
    */
   public contains(point: VectorOrList, epsilon = Sylvester.precision): boolean {
     return this.containsByWindingNumber(point, epsilon);
@@ -297,6 +299,7 @@ export class Polygon {
   /**
    * Returns true iff the given point is strictly inside the polygon using
    * the winding number method.
+   * @diagram Polygon.contains
    */
   public containsByWindingNumber(point: VectorOrList, epsilon = Sylvester.precision): boolean {
     const P = Vector.toElements(point, 3);
@@ -336,6 +339,7 @@ export class Polygon {
   /**
    * Returns true if the given point lies on an edge of the polygon
    * May cause problems with 'hole-joining' edges.
+   * @diagram Polygon.hasEdgeContaining
    */
   public hasEdgeContaining(point: VectorOrList, epsilon = Sylvester.precision): boolean {
     const P = Vector.toElements(point);
@@ -346,7 +350,7 @@ export class Polygon {
 
   /**
    * Returns an array of 3-vertex polygons that the original has been split into.
-   * @returns {Polygon[]}
+   * @diagram Polygon.toTriangles
    */
   toTriangles() {
     if (!this.triangles) {
@@ -360,7 +364,7 @@ export class Polygon {
    * Implementation of ear clipping algorithm. Found in 'Triangulation by ear
    * clipping', by David Eberly at {@link http://www.geometrictools.com}. This
    * will not deal with overlapping sections - contruct your polygons sensibly.
-   * @returns {Polygon[]}
+   * @diagram Polygon.toTriangles
    */
   triangulateByEarClipping() {
     let poly: Polygon = this;
@@ -404,7 +408,6 @@ export class Polygon {
 
   /**
    * Returns a string representation of the polygon's vertices.
-   * @returns {String}
    */
   public toString() {
     const points: string[] = [];

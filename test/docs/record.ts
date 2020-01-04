@@ -50,12 +50,20 @@ export type RecordedValue =
  * });
  * @param  {String} name identifier of the diagram
  */
-export const record = <T extends Geometry>(obj: T): T =>
+export const record = <T extends Geometry>(obj: T, name?: string): T =>
   new Proxy(obj, {
     get(callee: any, method: string) {
+      const getKey = (index: number) => `${name ?? testName}-${index}`;
+
       return (...args: any[]) => {
         const retValue = callee[method](...args);
-        examples[`${testName}-${testIndex++}`] = {
+
+        let testIndex = 0;
+        while (examples[getKey(testIndex)]) {
+          testIndex++;
+        }
+
+        examples[getKey(testIndex)] = {
           callee: toRecordedValue(callee),
           args: args.map(toRecordedValue),
           method,
@@ -114,6 +122,8 @@ const toRecordedValue = (value: unknown): RecordedValue => {
     return { type: 'Segment', start: value.start.elements, end: value.end.elements };
   } else if (value instanceof Polygon) {
     return { type: 'Polygon', verticies: value.vertices.toArray().map(v => v.elements) };
+  } else if (value instanceof Array && !value.some(v => typeof v !== 'number')) {
+    return { type: 'Vector', elements: value };
   } else if (typeof value === 'object' && !!value) {
     const out: { [key: string]: RecordedValue } = {};
     for (const key of Object.keys(value)) {
@@ -168,11 +178,9 @@ async function benchmark(file: string) {
 }
 
 let testName = '';
-let testIndex = 0;
 
 beforeEach(function() {
   testName = this.currentTest?.title ?? '';
-  testIndex = 0;
 });
 
 after(async function() {

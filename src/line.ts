@@ -44,8 +44,6 @@ export class Line {
 
   /**
    * Creates a new line from the anchor in the given direction.
-   * @param {Vector|number[]} anchor
-   * @param {Vector|number[]} direction
    */
   constructor(anchor: VectorOrList, direction: VectorOrList) {
     anchor = new Vector(anchor).to3D();
@@ -68,6 +66,7 @@ export class Line {
   /**
    * Returns true if the argument occupies the same space as the line
    * @param epsilon - Precision at which to calculate equality
+   * @diagram Line.eql
    */
   public eql(line: unknown, epsilon = Sylvester.precision) {
     return (
@@ -77,6 +76,7 @@ export class Line {
 
   /**
    * Returns the result of translating the line by the given vector/array
+   * @diagram Line.translate
    */
   public translate(vector: VectorOrList): Line {
     const V = Vector.toElements(vector, 3);
@@ -96,6 +96,7 @@ export class Line {
    * the line's own direction. A line is parallel to a plane if the two do not
    * have a unique intersection.
    * @param epsilon - Precision at which to calculate angle equality
+   * @diagram Line.isParallelTo
    */
   public isParallelTo(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isPlaneLike(obj)) {
@@ -112,6 +113,7 @@ export class Line {
    * the line's own direction. A line is parallel to a plane if the two do not
    * have a unique intersection.
    * @param epsilon - Precision at which to calculate angle equality
+   * @diagram Line.isPerpendicularTo
    */
   public isPerpendicularTo(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isPlaneLike(obj)) {
@@ -124,6 +126,7 @@ export class Line {
 
   /**
    * Gets the angle from the object to this element.
+   * @diagram Line.getAngleFromObject
    */
   public getAngleFromObject(obj: Line | Segment | VectorOrList) {
     if (isLineLike(obj)) {
@@ -144,6 +147,7 @@ export class Line {
   /**
    * Returns the line's perpendicular distance from the argument,
    * which can be a point, a line or a plane
+   * @diagram Line.distanceFrom
    */
   distanceFrom(obj: Geometry): number {
     if (isPlaneLike(obj) || isSegmentLike(obj)) {
@@ -189,6 +193,7 @@ export class Line {
    * Returns true iff the argument is a point on the line, or if the argument
    * is a line segment lying within the receiver
    * @param epsilon - epsilon for returning object distance
+   * @diagram Line.contains
    */
   contains(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isSegmentLike(obj)) {
@@ -204,6 +209,7 @@ export class Line {
    * are returned for points that are in the opposite direction to the line's
    * direction from the line's anchor point.
    * @returns A number or null if the point is not on the line
+   * @diagram Line.positionOf
    */
   public positionOf(point: VectorOrList): number | null {
     if (!this.contains(point)) {
@@ -217,6 +223,7 @@ export class Line {
 
   /**
    * Returns whether the line lies in the given plan.
+   * @diagram Line.liesIn
    */
   public liesIn(plane: Plane) {
     return plane.contains(this);
@@ -225,6 +232,7 @@ export class Line {
   /**
    * Returns true iff the line has a unique point of intersection with the argument
    * @param epsilon - Precision at which to calculate angle equality
+   * @diagram Line.intersects
    */
   public intersects(obj: Plane | Line | Segment, epsilon = Sylvester.precision) {
     if (isPlaneLike(obj)) {
@@ -236,8 +244,7 @@ export class Line {
   /**
    * Returns the unique intersection point with the argument, if one exists,
    * or null.
-   * @param {Plane|Line|Segment} obj
-   * @returns {?Vector}
+   * @diagram Line.intersectionWith
    */
   public intersectionWith(obj: Plane | Line | Segment): Vector | null {
     if (isPlaneLike(obj) || isSegmentLike(obj)) {
@@ -273,6 +280,7 @@ export class Line {
    * Returns the point on the line that is closest to the given
    * point or line/line segment.
    * @returns a vector, or null if this is parallel to the object
+   * @diagram Line.pointClosestTo
    */
   public pointClosestTo(obj: VectorOrList): Vector;
   public pointClosestTo(obj: Geometry): Vector | null;
@@ -347,6 +355,7 @@ export class Line {
    * axis' direction affects the outcome!
    * @param t - degrees in radians
    * @param pivot - axis to rotate around or point (for 2D rotation)
+   * @diagram Line.rotate
    */
   rotate(theta: number, pivot: Line | VectorOrList) {
     // If we're working in 2D
@@ -383,7 +392,7 @@ export class Line {
   /**
    * Returns a copy of the line with its direction vector reversed.
    * Useful when using lines for rotations.
-   * @returns {Line}
+   * @diagram Line.reverse
    */
   reverse() {
     return new Line(this.anchor, this.direction.multiply(-1));
@@ -391,8 +400,7 @@ export class Line {
 
   /**
    * Returns the line's reflection in the given point or line.
-   * @param {Plane|Line|Vector} obj
-   * @returns {Line}
+   * @diagram Line.reflectionIn
    */
   reflectionIn(obj: Line | Plane | VectorOrList) {
     if (isPlaneLike(obj)) {
@@ -433,7 +441,6 @@ export class Line {
 
   /**
    * Returns a textual representation of the object.
-   * @returns {String}
    */
   toString() {
     return `Line<${this.anchor.toString()} @ ${this.direction.toString()}>`;
@@ -472,6 +479,7 @@ export class Segment {
 
   /**
    * Returns true iff the line segment is equal to the argument
+   * @diagram Segment.eql
    */
   public eql(segment: unknown) {
     return (
@@ -483,6 +491,7 @@ export class Segment {
 
   /**
    * Returns the length of the line segment.
+   * @diagram Segment.length
    */
   public length() {
     const A = this.start.elements;
@@ -496,6 +505,7 @@ export class Segment {
   /**
    * Returns the line segment as a vector equal to its
    * end point relative to its endpoint.
+   * @diagram Segment.toVector
    */
   public toVector() {
     const A = this.start.elements;
@@ -505,6 +515,7 @@ export class Segment {
 
   /**
    * Returns the segment's midpoint as a vector
+   * @diagram Segment.midpoint
    */
   public midpoint() {
     const A = this.start.elements;
@@ -513,7 +524,9 @@ export class Segment {
   }
 
   /**
-   * Returns the plane that bisects the segment
+   * Returns the plane that bisects the segment, anchored at the midpoint with
+   * its normal along the segment's line.
+   * @diagram Segment.bisectingPlane
    */
   public bisectingPlane() {
     return new Plane(this.midpoint(), this.toVector());
@@ -521,6 +534,7 @@ export class Segment {
 
   /**
    * Returns the result of translating the line by the given vector/array.
+   * @diagram Segment.translate
    */
   public translate(vector: VectorOrList) {
     const V = Vector.toElements(vector, 3);
@@ -535,6 +549,7 @@ export class Segment {
   /**
    * Returns true iff the line segment is parallel to the argument.
    * @param epsilon - Precision at which to calculate angle equality
+   * @diagram Segment.isParallelTo
    */
   public isParallelTo(obj: Geometry, epsilon = Sylvester.precision) {
     return this.line.isParallelTo(obj, epsilon);
@@ -543,6 +558,7 @@ export class Segment {
   /**
    * Returns true iff the line segment is perpendicular to the argument.
    * @param epsilon - Precision at which to calculate angle equality
+   * @diagram Segment.isPerpendicularTo
    */
   public isPerpendicularTo(obj: Geometry, epsilon = Sylvester.precision) {
     return this.line.isPerpendicularTo(obj, epsilon);
@@ -550,6 +566,7 @@ export class Segment {
 
   /**
    * Returns the distance between the argument and the line segment's closest point to the argument
+   * @diagram Segment.distanceFrom
    */
   public distanceFrom(obj: Geometry) {
     if (isVectorOrListLike(obj)) {
@@ -564,7 +581,7 @@ export class Segment {
 
   /**
    * Returns true iff the given point lies on the segment
-   * @param {Segment|Vector} obj
+   * @diagram Segment.contains
    */
   public contains(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isSegmentLike(obj)) {
@@ -591,8 +608,7 @@ export class Segment {
 
   /**
    * Returns true iff the line segment intersects the argument
-   * @param {Line|Segment|Plane} obj
-   * @returns {Boolean}
+   * @diagram Segment.intersects
    */
   intersects(obj: Line | Segment | Plane): boolean {
     return this.intersectionWith(obj) !== null;
@@ -600,8 +616,8 @@ export class Segment {
 
   /**
    * Returns true iff the line segment intersects the argument
-   * @param {Line|Segment|Plane} obj
-   * @returns {Vector|null} the point, or null if there is no intersection
+   * @returns The point, or null if there is no intersection
+   * @diagram Segment.intersectionWith
    */
   intersectionWith(obj: Line | Segment | Plane): Vector | null {
     if (!this.line.intersects(obj)) {
@@ -615,6 +631,7 @@ export class Segment {
   /**
    * Returns the point on the line segment closest to the given object
    * @returns The vector, or null if the object is parallel to the segment.
+   * @diagram Segment.pointClosestTo
    */
   public pointClosestTo(obj: Geometry): Vector | null {
     if (isPlaneLike(obj)) {
@@ -642,7 +659,6 @@ export class Segment {
 
   /**
    * Returns a textual representation of the object.
-   * @returns {String}
    */
   toString() {
     return `Line.Segment<${this.start.toString()} -> ${this.end.toString()}>`;

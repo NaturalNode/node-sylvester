@@ -15,12 +15,18 @@ const magicNumbers: [number, string][] = [
   [Math.PI / 2, '\\frac{\\pi}{2}'],
   [Math.PI / 3, '\\frac{\\pi}{3}'],
   [Math.PI / 4, '\\frac{\\pi}{4}'],
+  [Math.sqrt(2), '\\sqrt{2}'],
+  [1 / Math.sqrt(2), '1 / {\\sqrt{2}}'],
 ];
 
 const numberToTex = (v: number, digits: number = 2) => {
   for (const [magic, tex] of magicNumbers) {
     if (Math.abs(v - magic) < 1e-6) {
       return tex;
+    }
+
+    if (Math.abs(-v - magic) < 1e-6) {
+      return `-${tex}`;
     }
   }
 
@@ -40,18 +46,10 @@ const numberToTex = (v: number, digits: number = 2) => {
 type TexVars = { [key: string]: string | { tex: string; decorated: string } };
 
 const getPreferredVarName = (char: string, existing: TexVars) => {
-  // If we have a character we want to use for this, try to get n, n_1, n_2, etc.
   let increment = 1;
-  const initial = `${char}_1`;
-  if (existing[char] !== undefined) {
-    existing[initial] = existing[char];
+  while (existing[`${char}_${increment}`] !== undefined) {
+    increment++;
   }
-
-  if (existing[initial] === undefined) {
-    return char;
-  }
-
-  for (; existing[`${char}_${increment}`] === undefined; increment++) {}
 
   return `${char}_${increment}`;
 };
@@ -96,7 +94,7 @@ function symbolToTex(data: RecordedValue, vars: TexVars): string {
           return `\\mathbf{${data.value}}`;
       }
     case 'Constructor':
-      return data.name;
+      return `\\mathrm{${data.name}}.`;
     case 'Line':
       const anchor = nameVar(vars);
       vars[anchor] = vectorToTex(data.anchor);
@@ -115,7 +113,7 @@ function symbolToTex(data: RecordedValue, vars: TexVars): string {
       const normal = getPreferredVarName('n', vars);
       const decoNormal = `\\overrightarrow{${normal}}`;
       vars[normal] = { tex: vectorToTex(data.norm), decorated: decoNormal };
-      return `\\mathrm{Plane} \\lbrace ${point}, ${decoNormal} \\rbrace`;
+      return `\\mathrm{Plane}(${point}, ${decoNormal})`;
     case 'Polygon':
       const poly = nameVar(vars);
       const points = data.verticies.map(v => {
@@ -124,7 +122,7 @@ function symbolToTex(data: RecordedValue, vars: TexVars): string {
         return name;
       });
 
-      return `\\mathrm{Polygon} \\lbrace ${points.join(' \\rightarrow ')} \\rbrace`;
+      return `\\mathrm{Polygon}(${points.join(' \\rightarrow ')})`;
     default:
       return `${data} not implemented`;
   }
@@ -171,7 +169,7 @@ export class DiagramPlugin extends ConverterComponent {
           const vars: TexVars = {};
           const body =
             symbolToTex(callee, vars) +
-            `\\!\\!{.}\\mathrm{${method}}` +
+            `\\!\\!\\>{.}\\mathrm{${method}}` +
             `(${args.map(a => symbolToTex(a, vars)).join(', ')}) =` +
             symbolToTex(retValue, vars);
 

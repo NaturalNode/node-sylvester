@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { OutOfRangeError, Matrix, Vector, DimensionalityMismatchError } from '../src';
+import { record } from './docs/record';
 
 const A = new Matrix([
   [1, 2, 3],
@@ -7,7 +8,7 @@ const A = new Matrix([
 ]);
 
 describe('matrix', () => {
-  it('forwardSubstitute', () => {
+  it('Matrix.forwardSubstitute', () => {
     const L = new Matrix([
       [1, 0, 0],
       [0.5, 1, 0],
@@ -15,20 +16,28 @@ describe('matrix', () => {
     ]);
     const b = new Vector([1, 2, 3]);
 
-    expect(L.forwardSubstitute(b)).to.vector.equal([1, 1.5, -3.5]);
+    record(L)
+      .forwardSubstitute(b)
+      .to.vector.equal([1, 1.5, -3.5]);
   });
 
-  it('backSubstitute', () => {
+  it('Matrix.backSubstitute', () => {
     const L = new Matrix([
       [4, 4],
       [0, 1],
     ]);
     const b = new Vector([1, 1.5]);
 
-    expect(L.backSubstitute(b)).to.vector.equal([-1.25, 1.5]);
+    record(L)
+      .backSubstitute(b)
+      .to.vector.equal([-1.25, 1.5]);
   });
 
-  it('solve', () => {
+  it('Matrix.eql', () => {
+    A.should;
+  });
+
+  it('Matrix.solve', () => {
     // 2x + 3y = 2
     // 4x + 4y = 1
     // x = -1.25
@@ -103,16 +112,11 @@ describe('matrix', () => {
         [5, 7],
       ]).pcaProject(1);
 
-      expect(pca.Z.eql(new Matrix([[-2.2120098720461616], [-8.601913944732665]]))).to.be.true;
-
-      expect(
-        pca.U.eql(
-          new Matrix([
-            [-0.5732529283807336, -0.819378471832714],
-            [-0.819378471832714, 0.5732529283807336],
-          ]),
-        ),
-      ).to.be.true;
+      expect(pca.Z).to.matrix.equal([[-2.2120098720461616], [-8.601913944732665]]);
+      expect(pca.U).to.matrix.equal([
+        [-0.5732529283807336, -0.819378471832714],
+        [-0.819378471832714, 0.5732529283807336],
+      ]);
     });
 
     it('should recover', () => {
@@ -129,7 +133,7 @@ describe('matrix', () => {
     });
   });
 
-  it('triu', () => {
+  it('Matrix.triu', () => {
     const A2 = new Matrix([
       [1, -1, 2, 2],
       [-1, 2, 1, -1],
@@ -137,39 +141,49 @@ describe('matrix', () => {
       [2, -1, 2, 1],
     ]);
 
-    expect(A2.triu()).to.matrix.equal([
-      [1, -1, 2, 2],
-      [0, 2, 1, -1],
-      [0, 0, 3, 2],
-      [0, 0, 0, 1],
-    ]);
+    record(A2)
+      .triu()
+      .to.matrix.equal([
+        [1, -1, 2, 2],
+        [0, 2, 1, -1],
+        [0, 0, 3, 2],
+        [0, 0, 0, 1],
+      ]);
 
-    expect(A2.triu(1)).to.matrix.equal([
-      [0, -1, 2, 2],
-      [0, 0, 1, -1],
-      [0, 0, 0, 2],
-      [0, 0, 0, 0],
-    ]);
+    record(A2)
+      .triu(1)
+      .to.matrix.equal([
+        [0, -1, 2, 2],
+        [0, 0, 1, -1],
+        [0, 0, 0, 2],
+        [0, 0, 0, 0],
+      ]);
   });
 
-  it('unroll', () => {
-    expect(A.unroll()).to.vector.equal([1, 4, 2, 5, 3, 6]);
+  it('Matrix.unroll', () => {
+    record(A)
+      .unroll()
+      .to.vector.equal([1, 4, 2, 5, 3, 6]);
   });
 
-  it('slice', () => {
+  it('Matrix.slice', () => {
     const A2 = new Matrix([
       [1, 2, 3],
       [4, 5, 6],
       [7, 8, 9],
     ]);
-    expect(A2.slice(2, 3, 2, 3)).to.matrix.equal([
-      [5, 6],
-      [8, 9],
-    ]);
-    expect(A2.slice(2, 0, 2, 0)).to.matrix.equal([
-      [5, 6],
-      [8, 9],
-    ]);
+    record(A2)
+      .slice(2, 3, 2, 3)
+      .to.matrix.equal([
+        [5, 6],
+        [8, 9],
+      ]);
+    record(A2)
+      .slice(2, 0, 2, 0)
+      .to.matrix.equal([
+        [5, 6],
+        [8, 9],
+      ]);
   });
 
   const U = new Matrix([
@@ -226,7 +240,7 @@ describe('matrix', () => {
   ]);
 
   it('should qr from javascript', () => {
-    const qr = QRin.qrJs();
+    const qr = QRin.qr();
     expect(qr.Q).to.matrix.equal(Qout);
     expect(qr.R).to.matrix.equal(Rout);
   });
@@ -239,46 +253,56 @@ describe('matrix', () => {
     ]);
   });
 
-  it('column', () => {
-    expect(() => A.column(0)).to.throw(OutOfRangeError);
-    expect(() => A.column(5)).to.throw(OutOfRangeError);
-    expect(A.column(1)).to.vector.equal([1, 4]);
+  it('Matrix.col', () => {
+    expect(() => A.col(0)).to.throw(OutOfRangeError);
+    expect(() => A.col(5)).to.throw(OutOfRangeError);
+    record(A)
+      .col(1)
+      .to.vector.equal([1, 4]);
   });
 
-  it('row', () => {
+  it('Matrix.row', () => {
     expect(() => A.row(0)).to.throw(OutOfRangeError);
     expect(() => A.row(5)).to.throw(OutOfRangeError);
-    expect(A.row(1)).to.vector.equal([1, 2, 3]);
+    record(A)
+      .row(1)
+      .to.vector.equal([1, 2, 3]);
   });
 
-  it('log', () => {
-    expect(A.log()).to.matrix.equal([
-      [0, 0.6931471805599453, 1.0986122886681098],
-      [1.3862943611198906, 1.6094379124341003, 1.791759469228055],
-    ]);
+  it('Matrix.log', () => {
+    record(A)
+      .log()
+      .to.matrix.equal([
+        [0, 0.6931471805599453, 1.0986122886681098],
+        [1.3862943611198906, 1.6094379124341003, 1.791759469228055],
+      ]);
   });
 
-  it('sum', () => {
-    expect(A.sum()).to.equal(21);
+  it('Matrix.sum', () => {
+    record(A)
+      .sum()
+      .to.equal(21);
   });
 
-  it('std', () => {
-    expect(A.std()).to.vector.equal([1.5, 1.5, 1.5]);
+  it('Matrix.std', () => {
+    record(A)
+      .std()
+      .to.vector.equal([1.5, 1.5, 1.5]);
   });
 
-  it('multiply', () => {
-    expect(
-      A.multiply(
+  it('Matrix.multiply', () => {
+    record(A)
+      .multiply(
         new Matrix([
           [1, 2],
           [3, 4],
           [5, 6],
         ]),
-      ),
-    ).to.matrix.equal([
-      [22, 28],
-      [49, 64],
-    ]);
+      )
+      .to.matrix.equal([
+        [22, 28],
+        [49, 64],
+      ]);
     expect(
       A.multiply([
         [1, 2],
@@ -344,80 +368,113 @@ describe('matrix', () => {
     });
   });
 
-  it('snapTo', () => {
-    expect(
+  it('Matrix.snapTo', () => {
+    record(
       new Matrix([
         [1, 1.1, 1.00000001],
         [4, 5, 6],
-      ]).snapTo(1),
-    ).to.matrix.equal([
-      [1, 1.1, 1],
-      [4, 5, 6],
-    ]);
+      ]),
+    )
+      .snapTo(1)
+      .to.matrix.equal([
+        [1, 1.1, 1],
+        [4, 5, 6],
+      ]);
   });
 
-  it('minColumnIndexes', () => {
-    expect(
+  it('Matrix.minColumnIndexes', () => {
+    record(
       new Matrix([
         [1, 2, 3],
         [2, 1, 3],
         [2, 1, 0],
-      ]).minColumnIndexes(),
-    ).to.vector.equal([1, 2, 3]);
+      ]),
+    )
+      .minColumnIndexes()
+      .to.vector.equal([1, 2, 3]);
   });
 
-  it('minColumns', () => {
-    expect(
+  it('Matrix.minColumns', () => {
+    record(
       new Matrix([
         [1, 2, 3],
         [2, 1, 3],
         [2, 1, 0],
-      ]).minColumns(),
-    ).to.vector.equal([1, 1, 0]);
+      ]),
+    )
+      .minColumns()
+      .to.vector.equal([1, 1, 0]);
   });
 
-  it('maxColumnIndexes', () => {
-    expect(
+  it('Matrix.maxColumnIndexes', () => {
+    record(
       new Matrix([
         [1, 2, 3],
         [2, 3, 2],
         [2, 1, 0],
-      ]).maxColumnIndexes(),
-    ).to.vector.equal([3, 2, 1]);
+      ]),
+    )
+      .maxColumnIndexes()
+      .to.vector.equal([3, 2, 1]);
   });
 
-  it('maxColumns', () => {
-    expect(
+  it('Matrix.maxColumns', () => {
+    record(
       new Matrix([
         [1, 2, 3],
         [2, 1, 3],
         [2, 1, 0],
-      ]).maxColumns(),
-    ).to.vector.equal([3, 3, 2]);
+      ]),
+    )
+      .maxColumns()
+      .to.vector.equal([3, 3, 2]);
   });
 
-  it('e', () => {
-    expect(A.e(1, 2)).to.equal(2);
-    expect(() => A.e(0, 1)).to.throw(OutOfRangeError);
-    expect(() => A.e(1, 0)).to.throw(OutOfRangeError);
-    expect(() => A.e(5, 0)).to.throw(OutOfRangeError);
-    expect(() => A.e(0, 5)).to.throw(OutOfRangeError);
+  it('Matrix.e', () => {
+    record(A)
+      .e(1, 2)
+      .to.equal(2);
+    record(A).e(0, 1).to.be.null;
+    expect(A.e(1, 0)).to.be.null;
+    expect(A.e(5, 0)).to.be.null;
+    expect(A.e(0, 5)).to.be.null;
   });
 
   describe('add', () => {
     it('adds a number', () => {
-      expect(
+      record(
         new Matrix([
           [1, 2],
           [3, 4],
-        ]).add(2),
-      ).to.matrix.equal([
-        [3, 4],
-        [5, 6],
-      ]);
+        ]),
+        'Matrix.add',
+      )
+        .add(2)
+        .to.matrix.equal([
+          [3, 4],
+          [5, 6],
+        ]);
     });
 
     it('adds two matrices', () => {
+      record(
+        new Matrix([
+          [1, 2],
+          [3, 4],
+        ]),
+        'Matrix.add',
+      )
+        .add(
+          new Matrix([
+            [2, 1],
+            [5, 1],
+          ]),
+        )
+        .to.matrix.equal([
+          [3, 3],
+          [8, 5],
+        ]);
+
       expect(
         new Matrix([
           [1, 2],
@@ -426,20 +483,6 @@ describe('matrix', () => {
           [2, 1],
           [5, 1],
         ]),
-      ).to.matrix.equal([
-        [3, 3],
-        [8, 5],
-      ]);
-      expect(
-        new Matrix([
-          [1, 2],
-          [3, 4],
-        ]).add(
-          new Matrix([
-            [2, 1],
-            [5, 1],
-          ]),
-        ),
       ).to.matrix.equal([
         [3, 3],
         [8, 5],
@@ -458,18 +501,38 @@ describe('matrix', () => {
 
   describe('subtract', () => {
     it('subtracts a number', () => {
-      expect(
+      record(
         new Matrix([
           [1, 2],
           [3, 4],
-        ]).subtract(2),
-      ).to.matrix.equal([
-        [-1, 0],
-        [1, 2],
-      ]);
+        ]),
+        'Matrix.subtract',
+      )
+        .subtract(2)
+        .to.matrix.equal([
+          [-1, 0],
+          [1, 2],
+        ]);
     });
 
     it('subtracts two matrices', () => {
+      record(
+        new Matrix([
+          [1, 2],
+          [3, 4],
+        ]),
+        'Matrix.subtract',
+      )
+        .subtract(
+          new Matrix([
+            [2, 1],
+            [5, 1],
+          ]),
+        )
+        .to.matrix.equal([
+          [-1, 1],
+          [-2, 3],
+        ]);
       expect(
         new Matrix([
           [1, 2],
@@ -478,20 +541,6 @@ describe('matrix', () => {
           [2, 1],
           [5, 1],
         ]),
-      ).to.matrix.equal([
-        [-1, 1],
-        [-2, 3],
-      ]);
-      expect(
-        new Matrix([
-          [1, 2],
-          [3, 4],
-        ]).subtract(
-          new Matrix([
-            [2, 1],
-            [5, 1],
-          ]),
-        ),
       ).to.matrix.equal([
         [-1, 1],
         [-2, 3],
@@ -508,33 +557,24 @@ describe('matrix', () => {
     });
   });
 
-  it('isSameSizeAs', () => {
-    expect(
+  it('Matrix.isSameSizeAs', () => {
+    record(
       new Matrix([
         [1, 2],
         [3, 4],
-      ]).isSameSizeAs(
-        new Matrix([
-          [2, 3],
-          [4, 5],
-        ]),
-      ),
-    ).to.be.true;
-    expect(
+      ]),
+    ).isSameSizeAs(
       new Matrix([
-        [1, 2],
-        [3, 4],
-      ]).isSameSizeAs([
         [2, 3],
         [4, 5],
       ]),
     ).to.be.true;
-    expect(
+    record(
       new Matrix([
         [1, 2],
         [3, 4],
-      ]).isSameSizeAs(new Matrix([[2], [4]])),
-    ).to.be.false;
+      ]),
+    ).isSameSizeAs(new Matrix([[2], [4]])).to.be.false;
     expect(
       new Matrix([
         [1, 2],
@@ -543,21 +583,23 @@ describe('matrix', () => {
     ).to.be.false;
   });
 
-  it('elementMultiply', () => {
-    expect(
+  it('Matrix.elementMultiply', () => {
+    record(
       new Matrix([
         [1, 2],
         [3, 4],
-      ]).elementMultiply(
+      ]),
+    )
+      .elementMultiply(
         new Matrix([
           [2, 4],
           [6, 8],
         ]),
-      ),
-    ).to.matrix.equal([
-      [2, 8],
-      [18, 32],
-    ]);
+      )
+      .to.matrix.equal([
+        [2, 8],
+        [18, 32],
+      ]);
     expect(() =>
       new Matrix([
         [1, 2],
@@ -566,209 +608,254 @@ describe('matrix', () => {
     ).throw(DimensionalityMismatchError);
   });
 
-  it('mean', () => {
-    expect(A.mean()).to.vector.equal([2.5, 3.5, 4.5]);
+  it('Matrix.mean', () => {
+    record(A)
+      .mean()
+      .to.vector.equal([2.5, 3.5, 4.5]);
   });
 
-  it('isSquare', () => {
-    expect(
+  it('Matrix.isSquare', () => {
+    record(
       new Matrix([
         [1, 2],
         [3, 4],
-      ]).isSquare(),
-    ).to.be.true;
-    expect(new Matrix([[1, 2]]).isSquare()).to.be.false;
+      ]),
+    ).isSquare().to.be.true;
+    record(new Matrix([[1, 2]])).isSquare().to.be.false;
   });
 
-  it('max', () => {
-    expect(A.max()).to.equal(6);
+  it('Matrix.max', () => {
+    record(A)
+      .max()
+      .to.equal(6);
   });
 
-  it('indexOf', () => {
-    expect(A.indexOf(6)).to.deep.equal({ i: 2, j: 3 });
-    expect(
+  it('Matrix.indexOf', () => {
+    record(A)
+      .indexOf(6)
+      .to.deep.equal({ i: 2, j: 3 });
+    record(
       new Matrix([
         [1, 2],
         [1, 2],
-      ]).indexOf(2),
-    ).to.deep.equal({ i: 1, j: 2 });
-    expect(A.indexOf(-1)).to.be.null;
+      ]),
+    )
+      .indexOf(2)
+      .to.deep.equal({ i: 1, j: 2 });
+    record(A).indexOf(-1).to.be.null;
   });
 
-  it('minor', () => {
-    expect(A.minor(2, 2, 3, 4)).to.matrix.equal([
-      [5, 6, 4, 5],
-      [2, 3, 1, 2],
-      [5, 6, 4, 5],
-    ]);
+  it('Matrix.minor', () => {
+    record(A)
+      .minor(2, 2, 3, 4)
+      .to.matrix.equal([
+        [5, 6, 4, 5],
+        [2, 3, 1, 2],
+        [5, 6, 4, 5],
+      ]);
   });
 
-  it('diagonal', () => {
+  it('Matrix.diagonal', () => {
     expect(() => A.diagonal()).to.throw(DimensionalityMismatchError);
-    expect(
+    record(
       new Matrix([
         [1, 2],
         [3, 4],
-      ]).diagonal(),
-    ).to.vector.equal([1, 4]);
+      ]),
+    )
+      .diagonal()
+      .to.vector.equal([1, 4]);
   });
 
-  it('toRightTriangular', () => {
-    expect(
+  it('Matrix.toRightTriangular', () => {
+    record(
       new Matrix([
         [1, -3, 1, 4],
         [2, -8, 8, -2],
         [-6, 3, -15, 9],
-      ]).toUpperTriangular(),
-    ).to.matrix.equal([
-      [1, -3, 1, 4],
-      [0, -2, 6, -10],
-      [0, 0, -54, 108],
-    ]);
+      ]),
+    )
+      .toRightTriangular()
+      .to.matrix.equal([
+        [1, -3, 1, 4],
+        [0, -2, 6, -10],
+        [0, 0, -54, 108],
+      ]);
 
-    expect(
+    record(
       new Matrix([
         [0, 0, 2, 4], // => [2, -8, 10, 2] after correction
         [0, 4, -5, 7],
         [2, -8, 8, -2],
-      ]).toUpperTriangular(),
-    ).to.matrix.equal([
-      [2, -8, 10, 2],
-      [0, 4, -5, 7],
-      [0, 0, -2, -4],
-    ]);
+      ]),
+    )
+      .toRightTriangular()
+      .to.matrix.equal([
+        [2, -8, 10, 2],
+        [0, 4, -5, 7],
+        [0, 0, -2, -4],
+      ]);
   });
 
-  it('determinant', () => {
-    expect(new Matrix([[42]]).det()).to.equal(42);
-    expect(new Matrix([[1]]).det()).to.equal(1);
-    expect(
+  it('Matrix.determinant', () => {
+    record(new Matrix([[42]]))
+      .det()
+      .to.equal(42);
+    record(
       new Matrix([
         [1, 2],
         [3, 4],
-      ]).det(),
-    ).to.equal(-2);
+      ]),
+    )
+      .det()
+      .to.equal(-2);
     expect(() => A.det()).to.throw(DimensionalityMismatchError);
   });
 
-  it('singular', () => {
-    expect(A.isSingular()).to.be.false;
-    expect(
+  it('Matrix.isSingular', () => {
+    record(A).isSingular().to.be.false;
+    record(
       new Matrix([
         [1, 2],
         [3, 4],
-      ]).isSingular(),
-    ).to.be.false;
-    expect(
+      ]),
+    ).isSingular().to.be.false;
+    record(
       new Matrix([
         [1, 2],
         [2, 4],
-      ]).isSingular(),
-    ).to.be.true;
+      ]),
+    ).isSingular().to.be.true;
   });
 
-  it('trace', () => {
-    expect(() => A.tr()).to.throw(DimensionalityMismatchError);
-    expect(
+  it('Matrix.trace', () => {
+    expect(() => A.trace()).to.throw(DimensionalityMismatchError);
+    record(
       new Matrix([
         [3, 2],
         [3, 4],
-      ]).tr(),
-    ).to.equal(7);
+      ]),
+    )
+      .trace()
+      .to.equal(7);
   });
 
-  it('rank', () => {
-    expect(A.rk()).to.equal(2);
-    expect(
+  it('Matrix.transpose', () => {
+    record(A)
+      .transpose()
+      .to.matrix.equal([
+        [1, 4],
+        [2, 5],
+        [3, 6],
+      ]);
+  });
+
+  it('Matrix.rank', () => {
+    record(A)
+      .rank()
+      .to.equal(2);
+    record(
       new Matrix([
         [1, 2],
         [2, 4],
-      ]).rk(),
-    ).to.equal(1);
+      ]),
+    )
+      .rank()
+      .to.equal(1);
   });
 
-  it('inverse', () => {
-    expect(() => A.inv()).to.throw(DimensionalityMismatchError, /must be square/);
+  it('Matrix.inverse', () => {
+    expect(() => A.inverse()).to.throw(DimensionalityMismatchError, /must be square/);
     expect(() =>
       new Matrix([
         [1, 2],
         [2, 4],
-      ]).inv(),
+      ]).inverse(),
     ).to.throw(DimensionalityMismatchError, /determinant=0/);
-    expect(
+    record(
       new Matrix([
         [1, 2],
         [3, 4],
-      ]).inv(),
-    ).to.matrix.equal([
-      [-2, 1],
-      [1.5, -0.5],
-    ]);
+      ]),
+    )
+      .inverse()
+      .to.matrix.equal([
+        [-2, 1],
+        [1.5, -0.5],
+      ]);
   });
 
-  it('round', () => {
-    expect(new Matrix([0.25, 0.5]).round()).to.matrix.equal([0, 1]);
+  it('Matrix.round', () => {
+    record(new Matrix([0.25, 0.5]))
+      .round()
+      .to.matrix.equal([0, 1]);
   });
 
-  it('snapTo', () => {
-    expect(new Matrix([-1, 0.25, 0.5, 0.75, 1]).snapTo(0.3, 0.5)).to.matrix.equal([
-      -1,
-      0.3,
-      0.3,
-      0.3,
-      1,
-    ]);
+  it('Matrix.snapTo', () => {
+    record(new Matrix([-1, 0.25, 0.5, 0.75, 1]))
+      .snapTo(0.3, 0.5)
+      .to.matrix.equal([-1, 0.3, 0.3, 0.3, 1]);
   });
 
-  it('toString', () => {
+  it('Matrix.toString', () => {
     expect(A.toString()).to.equal('Matrix<\n  [1, 2, 3]\n  [4, 5, 6]\n>');
   });
 
-  it('toArray', () => {
+  it('Matrix.toArray', () => {
     expect(A.toArray()).to.deep.equal([
       [1, 2, 3],
       [4, 5, 6],
     ]);
   });
 
-  it('Rotation', () => {
-    expect(Matrix.Rotation(Math.PI / 5)).to.matrix.equal([
-      [0.80902, -0.58779],
-      [0.58779, 0.80902],
-    ]);
-    expect(Matrix.Rotation(Math.PI / 5, new Vector([1, 2, 3]))).to.matrix.equal([
-      [0.82265, -0.44399, 0.3551],
-      [0.49855, 0.86358, -0.07524],
-      [-0.27325, 0.23894, 0.93179],
-    ]);
+  it('Matrix.Rotation', () => {
+    record(Matrix)
+      .Rotation(Math.PI / 5)
+      .to.matrix.equal([
+        [0.80902, -0.58779],
+        [0.58779, 0.80902],
+      ]);
+    record(Matrix)
+      .Rotation(Math.PI / 5, new Vector([1, 2, 3]))
+      .to.matrix.equal([
+        [0.82265, -0.44399, 0.3551],
+        [0.49855, 0.86358, -0.07524],
+        [-0.27325, 0.23894, 0.93179],
+      ]);
     expect(() => Matrix.Rotation(0, new Vector([1]))).to.throw(DimensionalityMismatchError);
   });
 
-  it('RotationX', () => {
-    expect(Matrix.RotationX(Math.PI / 2)).to.matrix.equal([
-      [1, 0, 0],
-      [0, 0, -1],
-      [0, 1, 0],
-    ]);
+  it('Matrix.RotationX', () => {
+    record(Matrix)
+      .RotationX(Math.PI / 2)
+      .to.matrix.equal([
+        [1, 0, 0],
+        [0, 0, -1],
+        [0, 1, 0],
+      ]);
   });
 
-  it('RotationY', () => {
-    expect(Matrix.RotationY(Math.PI / 2)).to.matrix.equal([
-      [0, 0, 1],
-      [0, 1, 0],
-      [-1, 0, 0],
-    ]);
+  it('Matrix.RotationY', () => {
+    record(Matrix)
+      .RotationY(Math.PI / 2)
+      .to.matrix.equal([
+        [0, 0, 1],
+        [0, 1, 0],
+        [-1, 0, 0],
+      ]);
   });
 
-  it('RotationZ', () => {
-    expect(Matrix.RotationZ(Math.PI / 2)).to.matrix.equal([
-      [0, -1, 0],
-      [1, 0, 0],
-      [0, 0, 1],
-    ]);
+  it('Matrix.RotationZ', () => {
+    record(Matrix)
+      .RotationZ(Math.PI / 2)
+      .to.matrix.equal([
+        [0, -1, 0],
+        [1, 0, 0],
+        [0, 0, 1],
+      ]);
   });
 
-  it('Random', () => {
+  it('Matrix.Random', () => {
     const r1 = Matrix.Random(2, 3);
     expect(r1.rows).to.equal(2);
     expect(r1.cols).to.equal(3);
@@ -779,11 +866,13 @@ describe('matrix', () => {
     expect(r2.cols).to.equal(2);
   });
 
-  it('augment', () => {
-    expect(A.augment(Matrix.I(2))).to.matrix.equal([
-      [1, 2, 3, 1, 0],
-      [4, 5, 6, 0, 1],
-    ]);
+  it('Matrix.augment', () => {
+    record(A)
+      .augment(Matrix.I(2))
+      .to.matrix.equal([
+        [1, 2, 3, 1, 0],
+        [4, 5, 6, 0, 1],
+      ]);
 
     expect(
       A.augment([
@@ -798,28 +887,44 @@ describe('matrix', () => {
     expect(() => A.augment([[1]])).to.throw(DimensionalityMismatchError);
   });
 
-  it('Fill', () => {
-    expect(Matrix.Fill(2, 3, 4)).to.matrix.equal([
-      [4, 4, 4],
-      [4, 4, 4],
-    ]);
+  it('Matrix.Fill', () => {
+    record(Matrix)
+      .Fill(2, 3, 4)
+      .to.matrix.equal([
+        [4, 4, 4],
+        [4, 4, 4],
+      ]);
     expect(Matrix.Fill(2, 4)).to.matrix.equal([
       [4, 4],
       [4, 4],
     ]);
   });
 
-  it('Ones', () => {
-    expect(Matrix.Ones(2, 3, 4)).to.matrix.equal([
-      [1, 1, 1],
-      [1, 1, 1],
-    ]);
+  it('Matrix.One', () => {
+    record(Matrix)
+      .One(2, 3)
+      .to.matrix.equal([
+        [1, 1, 1],
+        [1, 1, 1],
+      ]);
   });
 
-  it('Zeros', () => {
-    expect(Matrix.Zeros(2, 3, 4)).to.matrix.equal([
-      [0, 0, 0],
-      [0, 0, 0],
-    ]);
+  it('Matrix.Zero', () => {
+    record(Matrix)
+      .Zero(2, 3)
+      .to.matrix.equal([
+        [0, 0, 0],
+        [0, 0, 0],
+      ]);
+  });
+
+  it('Matrix.Diagonal', () => {
+    record(Matrix)
+      .Diagonal([1, 2, 3])
+      .to.matrix.equal([
+        [1, 0, 0],
+        [0, 2, 0],
+        [0, 0, 3],
+      ]);
   });
 });

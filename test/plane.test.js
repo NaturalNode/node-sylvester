@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Plane, Line, Matrix, OutOfRangeError } from '../src';
+import { Plane, Line, Matrix, OutOfRangeError, Vector, Segment } from '../src';
 import { record } from './docs/record';
 import {
   testParallelTo,
@@ -23,6 +23,49 @@ describe('plane', () => {
 
   it('Plane.distanceFrom', () => {
     testDistanceFrom(Plane);
+  });
+
+  it('Plane.pointClosestTo', () => {
+    const p = new Plane([1, 2, 3], [1, 0, 1]);
+    record(p)
+      .pointClosestTo(new Vector([5, 3, 1]))
+      .to.vector.equal([4, 3, 0]);
+    record(p)
+      .pointClosestTo(new Line([0, 0], [1, 1, 1]))
+      .to.vector.equal([2, 2, 2]);
+    record(p).pointClosestTo(new Line([0, 0], [0, 1, 0])).to.be.null;
+  });
+
+  it('Plane.intersects', () => {
+    const p = new Plane([1, 2, 3], [1, 0, 1]);
+    record(p).intersects(new Vector([2, 2, 2])).to.be.true;
+    record(p).intersects(new Vector([2, 2, 1])).to.be.false;
+
+    record(p).intersects(new Line([0, 0, 0], [0, 1, 1])).to.be.true;
+    record(p).intersects(new Line([0, 0, 0], [0, 1, 0])).to.be.false;
+
+    record(p).intersects(new Segment([0, 0, 0], [0, 0, 1])).to.be.false;
+    record(p).intersects(new Segment([0, 0, 0], [0, 0, 10])).to.be.true;
+    record(p).intersects(new Segment([0, 0, 0], [0, 10, 0])).to.be.false;
+
+    record(p).intersects(new Plane([0, 0, 0], [2, 0, 2])).to.be.false;
+    record(p).intersects(new Plane([0, 0, 0], [0, 1, 0])).to.be.true;
+  });
+
+  it('Plane.contains', () => {
+    const p = new Plane([1, 2, 3], [1, 0, 1]);
+    record(p).contains(new Vector([2, 2, 2])).to.be.true;
+    record(p).contains(new Vector([2, 2, 1])).to.be.false;
+
+    record(p).contains(new Line([1, 2, 3], [0, 1, 0])).to.be.true;
+    record(p).contains(new Line([1, 2, 3], [0, 0, 1])).to.be.false;
+    record(p).contains(new Line([1, 2, 4], [0, 1, 0])).to.be.false;
+
+    record(p).contains(new Segment([1, 2, 3], [1, 1, 3])).to.be.true;
+    record(p).contains(new Segment([1, 2, 3], [1, 1, 4])).to.be.false;
+
+    record(p).contains(new Plane([1, 5, 3], [2, 0, 2])).to.be.true;
+    record(p).contains(new Plane([1, 5, 3], [2, 0, 1])).to.be.false;
   });
 
   it('Plane.translate', () => {

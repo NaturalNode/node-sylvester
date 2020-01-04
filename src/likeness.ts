@@ -14,8 +14,6 @@ export interface IGeometry {}
 
 /**
  * Gets whether the object is any recognizable geometry object.
- * @param {*} obj
- * @returns {Boolean}
  * @private
  */
 export const isGeometry = (obj: any): obj is Geometry =>
@@ -24,8 +22,6 @@ export const isGeometry = (obj: any): obj is Geometry =>
 /**
  * Gets whether the object looks like a line.
  * @private
- * @param {*} obj
- * @returns {Boolean}
  */
 export const isLineLike = (obj: unknown): obj is Line =>
   typeof obj === 'object' && !!obj && 'direction' in obj;
@@ -33,8 +29,6 @@ export const isLineLike = (obj: unknown): obj is Line =>
 /**
  * Gets whether the object looks like a plane.
  * @private
- * @param {*} obj
- * @returns {Boolean}
  */
 export const isPlaneLike = (obj: unknown): obj is Plane =>
   typeof obj === 'object' && !!obj && 'normal' in obj;
@@ -42,8 +36,6 @@ export const isPlaneLike = (obj: unknown): obj is Plane =>
 /**
  * Gets whether the object looks like a line segment.
  * @private
- * @param {*} obj
- * @returns {Boolean}
  */
 export const isSegmentLike = (obj: unknown): obj is Segment =>
   typeof obj === 'object' && !!obj && 'start' in obj;

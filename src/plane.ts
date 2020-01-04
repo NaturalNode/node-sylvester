@@ -1,4 +1,4 @@
-import { Line } from './line';
+import { Line, Segment } from './line';
 import { Matrix } from './matrix';
 import { Sylvester, OutOfRangeError, InvalidOperationError } from './sylvester';
 import { Vector } from './vector';
@@ -7,7 +7,6 @@ import {
   isLineLike,
   isSegmentLike,
   isVectorOrListLike,
-  isGeometry,
   VectorOrList,
   Geometry,
 } from './likeness';
@@ -28,10 +27,6 @@ export class Plane {
    * arguments are specified, the normal is calculated by assuming the three
    * points should lie in the same plane. If only two are sepcified, the second
    * is taken to be the normal. Normal vector is normalised before storage.
-   * @param {Vector|number[]} anchor
-   * @param {Vector|number[]} v1
-   * @param {?(Vector|number[])} v2
-   * @returns {Plane}
    */
   constructor(anchor: VectorOrList, v1: VectorOrList, v2?: VectorOrList) {
     anchor = new Vector(anchor).to3D();
@@ -91,6 +86,7 @@ export class Plane {
 
   /**
    * Returns the result of translating the plane by the given vector
+   * @diagram Plane.translate
    */
   public translate(vector: VectorOrList): Plane {
     const V = Vector.toElements(vector, 3);
@@ -108,6 +104,7 @@ export class Plane {
    * Returns true iff the plane is parallel to the argument. Will return true
    * if the planes are equal, or if you give a line and it lies in the plane.
    * @param epsilon - precision used for comparing angles
+   * @diagram Plane.isParallelTo
    */
   public isParallelTo(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isPlaneLike(obj)) {
@@ -126,6 +123,7 @@ export class Plane {
   /**
    * Returns true iff the receiver is perpendicular to the argument.
    * @param epsilon - precision used for comparing angles
+   * @diagram Plane.isPerpendicularTo
    */
   public isPerpendicularTo(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isPlaneLike(obj)) {
@@ -143,6 +141,7 @@ export class Plane {
 
   /**
    * Returns the plane's distance from the given object (point, line or plane)
+   * @diagram Plane.distanceFrom
    */
   public distanceFrom(obj: Geometry): number {
     if (this.intersects(obj) || this.contains(obj)) {
@@ -169,6 +168,7 @@ export class Plane {
   /**
    * Returns true iff the plane contains the given point or line.
    * @param epsilon - precision used for comparing angles
+   * @diagram Plane.contains
    */
   public contains(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isLineLike(obj)) {
@@ -192,17 +192,18 @@ export class Plane {
 
   /**
    * Returns true iff the plane has a unique point/line of intersection with the argument.
-   * @param {Plane|Line|Segment|Vector} obj
-   * @param {Number} epsilon precision used for comparing angles
-   * @returns {Boolean}
+   * @param epsilon - precision used for comparing angles
+   * @diagram Plane.intersects
    */
   public intersects(obj: Geometry, epsilon = Sylvester.precision): boolean {
     if (isVectorOrListLike(obj)) {
       return this.contains(obj, epsilon);
-    } else if (isGeometry(obj)) {
-      return !this.isParallelTo(obj, epsilon);
+    } else if (isSegmentLike(obj)) {
+      // for segments, we need to compute the intersection to ensure that it's
+      // within the start and end bounds.
+      return this.intersectionWith(obj) !== null;
     } else {
-      throw new InvalidOperationError(`Cannot get a plane's intersection with ${obj}`);
+      return !this.isParallelTo(obj, epsilon);
     }
   }
 
@@ -210,11 +211,15 @@ export class Plane {
    * Returns the unique intersection with the argument, if one exists. The result
    * will be a vector if a line is supplied, and a line if a plane is supplied.
    * @param epsilon - precision used for comparing angles
+   * @diagram Plane.intersectionWith
    */
-  intersectionWith(obj: Line, epsilon?: number): Vector;
-  intersectionWith(obj: Plane, epsilon?: number): Line;
-  intersectionWith(obj: Plane | Line, epsilon = Sylvester.precision): Line | Vector | null {
-    if (!this.intersects(obj, epsilon)) {
+  intersectionWith(obj: Line | Segment, epsilon?: number): Vector | null;
+  intersectionWith(obj: Plane, epsilon?: number): Line | null;
+  intersectionWith(
+    obj: Plane | Line | Segment,
+    epsilon = Sylvester.precision,
+  ): Line | Vector | null {
+    if (!isSegmentLike(obj) && !this.intersects(obj, epsilon)) {
       return null;
     }
 
@@ -237,7 +242,7 @@ export class Plane {
 
     if (isSegmentLike(obj)) {
       const point = this.intersectionWith(obj.line);
-      return obj.contains(point) ? point : null;
+      return point && obj.contains(point) ? point : null;
     }
 
     if (isPlaneLike(obj)) {
@@ -281,10 +286,18 @@ export class Plane {
 
   /**
    * Returns the point in the plane closest to the given point.
-   * @param {Vector|number[]} point
-   * @returns {Vector}
+   * @diagram Plane.pointClosestTo
    */
-  public pointClosestTo(point: VectorOrList): Vector {
+  public pointClosestTo(point: Line | Segment, epsilon?: number): Vector | null;
+  public pointClosestTo(point: VectorOrList, epsilon?: number): Vector;
+  public pointClosestTo(
+    point: Line | Segment | VectorOrList,
+    epsilon = Sylvester.precision,
+  ): Vector | null {
+    if (isLineLike(point) || isSegmentLike(point)) {
+      return this.intersectionWith(point, epsilon);
+    }
+
     const P = Vector.toElements(point, 3);
     const A = this.anchor.elements;
     const N = this.normal.elements;
@@ -296,6 +309,7 @@ export class Plane {
    * Returns a copy of the plane, rotated by t radians about the given line.
    * See notes on {@link Line.rotate}.
    * @param t - degrees in radians
+   * @diagram Plane.rotate
    */
   public rotate(t: number | Matrix, line: Line): Plane {
     const R = t instanceof Matrix ? t.elements : Matrix.Rotation(t, line.direction).elements;
@@ -327,6 +341,7 @@ export class Plane {
 
   /**
    * Returns the reflection of the plane in the given point, line or plane.
+   * @diagram Plane.reflectionIn
    */
   public reflectionIn(obj: Geometry): Plane {
     if (isPlaneLike(obj)) {
@@ -368,7 +383,6 @@ export class Plane {
 
   /**
    * Returns a textual representation of the object.
-   * @returns {String}
    */
   public toString() {
     return `Plane<${this.anchor.toString()}, ${this.normal.toString()}>`;
@@ -377,8 +391,7 @@ export class Plane {
   /**
    * Returns the plane containing the given points (can be arrays as
    * well as vectors). If the points are not coplanar, returns null.
-   * @param {(Vector|number)[]} points
-   * @returns {Vector|null}
+   * @diagram Plane.fromPoints
    */
   public static fromPoints(...points: ReadonlyArray<VectorOrList>) {
     const np = points.length;

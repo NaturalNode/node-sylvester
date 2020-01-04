@@ -9,6 +9,9 @@ Initial stable release. Notable changes from 0.x:
 | `Vector.rotate()`                   | `Vector.rotate2D()` and `Vector.rotate3D()` |
 | `Matrix.rows()`, `Vector.rows()`    | `Matrix.rows`, `Vector.rows` (property)     |
 | `Matrix.cols()`, `Vector.cols()`    | `Matrix.cols`, `Vector.cols` (property)     |
+| `Matrix.rk()`                       | `Matrix.rank()`                             |
+| `Matrix.tr()`                       | `Matrix.trace()`                            |
+| `Matrix.inv()`                      | `Matrix.inverse()`                          |
 
 1.  Objects are now immutable and always return a new object after having been operated upon.
 
