@@ -74,7 +74,7 @@ export const record = <T extends Geometry>(
           code: `${toCode(callee)}.${method}(${args.map(toCode).join(',')})`,
           benchmark: () => {
             reset?.(callee);
-            callee[method](...args);
+            return callee[method](...args);
           },
         };
 

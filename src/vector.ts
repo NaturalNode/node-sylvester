@@ -10,6 +10,7 @@ import {
 import { Matrix } from './matrix';
 import { Line } from './line';
 import { Plane } from './plane';
+import { asm } from './asm';
 
 /**
  * Returns the elements from the given vector or number array.
@@ -86,12 +87,10 @@ export class Vector {
    * @diagram Vector.magnitude
    */
   public magnitude() {
-    let sum = 0;
-    for (let i = 0; i < this.elements.length; i++) {
-      sum += this.elements[i] * this.elements[i];
-    }
-
-    return Math.sqrt(sum);
+    const arr = asm.__retain(asm.__allocArray(asm.FLOAT64ARRAY, this.elements));
+    const result = asm.vectorMagnitude(arr);
+    asm.__release(arr);
+    return result;
   }
 
   /**
