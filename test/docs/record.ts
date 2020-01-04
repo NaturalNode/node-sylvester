@@ -50,7 +50,10 @@ export type RecordedValue =
  * });
  * @param  {String} name identifier of the diagram
  */
-export const record = <T extends Geometry>(obj: T, name?: string): T =>
+export const record = <T extends Geometry>(
+  obj: T,
+  { name, reset }: { name?: string; reset?: (obj: T) => void } = {},
+): T =>
   new Proxy(obj, {
     get(callee: any, method: string) {
       const getKey = (index: number) => `${name ?? testName}-${index}`;
@@ -69,7 +72,10 @@ export const record = <T extends Geometry>(obj: T, name?: string): T =>
           method,
           retValue: toRecordedValue(retValue),
           code: `${toCode(callee)}.${method}(${args.map(toCode).join(',')})`,
-          benchmark: () => callee[method](...args),
+          benchmark: () => {
+            reset?.(callee);
+            callee[method](...args);
+          },
         };
 
         return expect(retValue);
@@ -97,7 +103,7 @@ const toCode = (value: unknown): string => {
       value.end.elements,
     )})`;
   } else if (value instanceof Polygon) {
-    return `new Polygon(${JSON.stringify(value.vertices.toArray().map(v => v.elements))})`;
+    return `new Polygon(${JSON.stringify(value.vertices.map(v => v.elements))})`;
   } else if (value instanceof Array) {
     return JSON.stringify(value.map(toCode));
   } else if (value === undefined) {
@@ -121,7 +127,7 @@ const toRecordedValue = (value: unknown): RecordedValue => {
   } else if (value instanceof Segment) {
     return { type: 'Segment', start: value.start.elements, end: value.end.elements };
   } else if (value instanceof Polygon) {
-    return { type: 'Polygon', verticies: value.vertices.toArray().map(v => v.elements) };
+    return { type: 'Polygon', verticies: value.vertices.map(v => v.elements) };
   } else if (value instanceof Array && !value.some(v => typeof v !== 'number')) {
     return { type: 'Vector', elements: value };
   } else if (typeof value === 'object' && !!value) {
