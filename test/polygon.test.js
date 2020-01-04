@@ -91,7 +91,7 @@ describe('polygon', () => {
   });
 
   it('Polygon.area', () => {
-    record(simple)
+    record(simple, { reset: p => p.decache() })
       .area()
       .to.approx.equal(0.5);
     record(
@@ -101,6 +101,7 @@ describe('polygon', () => {
         [1, 1],
         [0, 1],
       ]),
+      { reset: p => p.decache() },
     )
       .area()
       .to.approx.equal(1);
@@ -112,19 +113,20 @@ describe('polygon', () => {
         [1, 1],
         [0, 1],
       ]),
+      { reset: p => p.decache() },
     )
       .area()
       .to.approx.equal(1);
-    record(complex)
+    record(complex, { reset: p => p.decache() })
       .area()
       .to.approx.equal(30);
   });
 
   it('Polygon.centroid', () => {
-    record(simple)
+    record(simple, { reset: p => p.decache() })
       .centroid()
       .to.vector.equal([1 / 3, 1 / 3, 0]);
-    record(complex)
+    record(complex, { reset: p => p.decache() })
       .centroid()
       .to.vector.equal([7.166667, 7.611111, 0]);
   });
@@ -170,7 +172,7 @@ describe('polygon', () => {
 
   it('Polygon.toTriangles', () => {
     const result = complex.toTriangles();
-    record(complex).toTriangles(); // for docs
+    record(complex, { reset: p => p.decache() }).toTriangles(); // for docs
 
     for (const triangle of result) {
       expect(triangle.isTriangle()).to.be.true;

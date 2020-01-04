@@ -447,7 +447,7 @@ describe('matrix', () => {
           [1, 2],
           [3, 4],
         ]),
-        'Matrix.add',
+        { name: 'Matrix.add' },
       )
         .add(2)
         .to.matrix.equal([
@@ -462,7 +462,7 @@ describe('matrix', () => {
           [1, 2],
           [3, 4],
         ]),
-        'Matrix.add',
+        { name: 'Matrix.add' },
       )
         .add(
           new Matrix([
@@ -506,7 +506,7 @@ describe('matrix', () => {
           [1, 2],
           [3, 4],
         ]),
-        'Matrix.subtract',
+        { name: 'Matrix.subtract' },
       )
         .subtract(2)
         .to.matrix.equal([
@@ -521,7 +521,7 @@ describe('matrix', () => {
           [1, 2],
           [3, 4],
         ]),
-        'Matrix.subtract',
+        { name: 'Matrix.subtract' },
       )
         .subtract(
           new Matrix([
