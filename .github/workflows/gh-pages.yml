@@ -17,7 +17,7 @@ jobs:
       with:
         cmd: docs
     - name: Deploy
-      uses: JamesIves/github-pages-deploy-action@4.1.7
-      with:
-        branch: gh-pages # The branch the action should deploy to.
-        folder: . # The folder the action should deploy.
+      uses: peaceiris/actions-gh-pages@v2
+      env:
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: .
