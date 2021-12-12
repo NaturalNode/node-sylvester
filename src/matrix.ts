@@ -98,11 +98,11 @@ export class Matrix {
     if (input instanceof Matrix) {
       this.elements = input.elements;
     } else if (input instanceof Vector) {
-      this.elements = input.elements.map(e => [e]);
+      this.elements = input.elements.map((e) => [e]);
     } else if (input[0] instanceof Array) {
       this.elements = input as number[][];
     } else {
-      this.elements = (input as number[]).map(e => [e]);
+      this.elements = (input as number[]).map((e) => [e]);
     }
 
     this.rows = this.elements.length;
@@ -304,7 +304,7 @@ export class Matrix {
    */
   public add(matrix: number | MatrixLike) {
     if (typeof matrix === 'number') {
-      return this.map(x => x + matrix);
+      return this.map((x) => x + matrix);
     }
 
     const M = extractElements(matrix);
@@ -324,7 +324,7 @@ export class Matrix {
    */
   public subtract(matrix: number | MatrixLike) {
     if (typeof matrix === 'number') {
-      return this.map(x => x - matrix);
+      return this.map((x) => x - matrix);
     }
 
     const M = extractElements(matrix);
@@ -363,7 +363,7 @@ export class Matrix {
     op: (left: number, right: number) => number,
   ) {
     if (typeof matrix === 'number') {
-      return this.map(x => {
+      return this.map((x) => {
         return op(x, matrix);
       });
     }
@@ -520,7 +520,7 @@ export class Matrix {
    */
   public log(base = Math.E): Matrix {
     const logBase = Math.log(base); // change of base
-    return this.map(x => Math.log(x) / logBase);
+    return this.map((x) => Math.log(x) / logBase);
   }
 
   /**
@@ -859,7 +859,7 @@ export class Matrix {
    * @diagram Matrix.inverse
    */
   public round() {
-    return this.map(x => Math.round(x));
+    return this.map((x) => Math.round(x));
   }
 
   /**
@@ -868,7 +868,7 @@ export class Matrix {
    * @diagram Matrix.snapTo
    */
   public snapTo(target: number, epsilon = Sylvester.precision) {
-    return this.map(p => (Math.abs(p - target) <= epsilon ? target : p));
+    return this.map((p) => (Math.abs(p - target) <= epsilon ? target : p));
   }
 
   /**
@@ -1045,9 +1045,7 @@ export class Matrix {
       U = U.x(qr.Q);
       S = qr.R;
 
-      const e = S.triu(1)
-        .unroll()
-        .magnitude();
+      const e = S.triu(1).unroll().magnitude();
       let f = S.diagonal().magnitude();
 
       if (f === 0) {
@@ -1103,13 +1101,7 @@ export class Matrix {
       const vk = ak.add(oneZeroVec.x(ak.magnitude() * sign(ak.e(1)!)));
       const Vk = new Matrix(vk);
       const Hk = Matrix.I(m - k + 1).subtract(
-        Vk.x(2)
-          .x(Vk.transpose())
-          .div(
-            Vk.transpose()
-              .x(Vk)
-              .e(1, 1)!,
-          ),
+        Vk.x(2).x(Vk.transpose()).div(Vk.transpose().x(Vk).e(1, 1)!),
       );
       const Qk = identSize(takeOwnership(Hk), m, n, k);
       A = Qk.x(A);

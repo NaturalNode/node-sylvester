@@ -103,7 +103,7 @@ const toCode = (value: unknown): string => {
       value.end.elements,
     )})`;
   } else if (value instanceof Polygon) {
-    return `new Polygon(${JSON.stringify(value.vertices.map(v => v.elements))})`;
+    return `new Polygon(${JSON.stringify(value.vertices.map((v) => v.elements))})`;
   } else if (value instanceof Array) {
     return JSON.stringify(value.map(toCode));
   } else if (value === undefined) {
@@ -127,8 +127,8 @@ const toRecordedValue = (value: unknown): RecordedValue => {
   } else if (value instanceof Segment) {
     return { type: 'Segment', start: value.start.elements, end: value.end.elements };
   } else if (value instanceof Polygon) {
-    return { type: 'Polygon', verticies: value.vertices.map(v => v.elements) };
-  } else if (value instanceof Array && !value.some(v => typeof v !== 'number')) {
+    return { type: 'Polygon', verticies: value.vertices.map((v) => v.elements) };
+  } else if (value instanceof Array && !value.some((v) => typeof v !== 'number')) {
     return { type: 'Vector', elements: value };
   } else if (typeof value === 'object' && !!value) {
     const out: { [key: string]: RecordedValue } = {};
@@ -176,7 +176,7 @@ async function benchmark(file: string) {
     console.log(`${name.padStart(30)} @ ${evt.target.hz.toFixed(0)} ops/sec ${delta}`);
   });
 
-  const complete = new Promise(resolve => suite.on('complete', resolve));
+  const complete = new Promise((resolve) => suite.on('complete', resolve));
   suite.run();
   await complete;
 
@@ -185,11 +185,11 @@ async function benchmark(file: string) {
 
 let testName = '';
 
-beforeEach(function() {
+beforeEach(function () {
   testName = this.currentTest?.title ?? '';
 });
 
-after(async function() {
+after(async function () {
   fs.writeFileSync(`${__dirname}/recorded-tests.json`, JSON.stringify(examples));
 
   if (process.argv.includes('--benchmark') || process.env.SYL_BENCHMARK) {

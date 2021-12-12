@@ -64,14 +64,14 @@ const nameVar = (existing: TexVars) => {
 };
 
 const vectorToTex = (elements: ReadonlyArray<number>) => `\\begin{bmatrix}
-${elements.map(v => numberToTex(v)).join(' & ')}
+${elements.map((v) => numberToTex(v)).join(' & ')}
 \\end{bmatrix}`;
 
 function symbolToTex(data: RecordedValue, vars: TexVars): string {
   switch (data.type) {
     case 'Matrix':
       return `\\begin{bmatrix}
-      ${data.elements.map(r => r.map(v => numberToTex(v)).join(' & ')).join('\\\\\n')}
+      ${data.elements.map((r) => r.map((v) => numberToTex(v)).join(' & ')).join('\\\\\n')}
       \\end{bmatrix}`;
     case 'Vector':
       return vectorToTex(data.elements);
@@ -80,7 +80,7 @@ function symbolToTex(data: RecordedValue, vars: TexVars): string {
       return (
         '\\left\\{' +
         Object.keys(obj)
-          .map(key => `\\mathrm{${key}\\!:}\\,${symbolToTex(obj[key], vars)}`)
+          .map((key) => `\\mathrm{${key}\\!:}\\,${symbolToTex(obj[key], vars)}`)
           .join(', ') +
         '\\right\\}'
       );
@@ -116,7 +116,7 @@ function symbolToTex(data: RecordedValue, vars: TexVars): string {
       return `\\mathrm{Plane}(${point}, ${decoNormal})`;
     case 'Polygon':
       const poly = nameVar(vars);
-      const points = data.verticies.map(v => {
+      const points = data.verticies.map((v) => {
         const name = getPreferredVarName(poly, vars);
         vars[name] = vectorToTex(v);
         return name;
@@ -155,8 +155,8 @@ export class DiagramPlugin extends ConverterComponent {
     tagText = tagText.trim();
 
     const diagrams = Object.keys(data)
-      .filter(k => k === tagText || k.replace(/-[0-9]+$/, '') === tagText)
-      .map(k => ({ speed: benchmarks.data[k], ...data[k] }));
+      .filter((k) => k === tagText || k.replace(/-[0-9]+$/, '') === tagText)
+      .map((k) => ({ speed: benchmarks.data[k], ...data[k] }));
 
     if (diagrams.length === 0) {
       throw new Error(`Diagram for ${tagText} not found`);
@@ -170,12 +170,12 @@ export class DiagramPlugin extends ConverterComponent {
           const body =
             symbolToTex(callee, vars) +
             `\\!\\!\\>{.}\\mathrm{${method}}` +
-            `(${args.map(a => symbolToTex(a, vars)).join(', ')}) =` +
+            `(${args.map((a) => symbolToTex(a, vars)).join(', ')}) =` +
             symbolToTex(retValue, vars);
 
           const head = Object.keys(vars)
-            .filter(v => !!vars[v])
-            .map(v => {
+            .filter((v) => !!vars[v])
+            .map((v) => {
               const value = vars[v];
               return typeof value === 'string'
                 ? `${v}=${value}`
@@ -229,15 +229,15 @@ export class DiagramPlugin extends ConverterComponent {
       // get reflection from context
       .values(context.project.reflections)
       // get CommentTags from Comment
-      .map(reflection => reflection.comment?.tags)
+      .map((reflection) => reflection.comment?.tags)
       // filter only CommentTags exist
       .filter((tag): tag is CommentTag[] => !!tag)
       // merge all CommentTags
       .reduce((a, b) => a.concat(b), [])
       // filter tag that paramName is 'mermaid'
-      .filter(tag => tag.tagName === 'diagram')
+      .filter((tag) => tag.tagName === 'diagram')
       // Swap out the tag text with the appropriate LaTeX
-      .forEach(tag => (tag.text = this.convertCommentTagText(tag.text)));
+      .forEach((tag) => (tag.text = this.convertCommentTagText(tag.text)));
   }
 
   public onRendererBegin(event: RendererEvent) {

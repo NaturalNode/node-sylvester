@@ -26,9 +26,7 @@ describe('line', () => {
   });
 
   it('Line.translate', () => {
-    record(lineA)
-      .translate([2, 3])
-      .to.line.equal([2, 3], [1, 1]);
+    record(lineA).translate([2, 3]).to.line.equal([2, 3], [1, 1]);
   });
 
   it('Line.isParallelTo', () => {
@@ -89,12 +87,8 @@ describe('line', () => {
   });
 
   it('Line.pointClosestTo', () => {
-    record(lineA)
-      .pointClosestTo([3, 1])
-      .to.vector.equal([2, 2, 0]);
-    record(lineA)
-      .pointClosestTo([1, 1])
-      .to.vector.equal([1, 1, 0]);
+    record(lineA).pointClosestTo([3, 1]).to.vector.equal([2, 2, 0]);
+    record(lineA).pointClosestTo([1, 1]).to.vector.equal([1, 1, 0]);
 
     record(lineA)
       .pointClosestTo(new Segment([-2, 2], [1, 2]))
@@ -130,24 +124,16 @@ describe('line', () => {
       .rotate(Math.PI / 2, new Line([0, 0, 0], [1, 1, 1]))
       .to.line.equal([0, 0], [0.063156, 0.879654, 0.471402]);
 
-    record(lineA)
-      .rotate(Math.PI, [0, 1])
-      .to.line.equal([0, 2], [-1, -1, 0]);
+    record(lineA).rotate(Math.PI, [0, 1]).to.line.equal([0, 2], [-1, -1, 0]);
   });
 
   it('Line.reverse', () => {
-    record(lineA)
-      .reverse()
-      .to.line.equal([0, 0], [-1, -1]);
+    record(lineA).reverse().to.line.equal([0, 0], [-1, -1]);
   });
 
   it('Line.reflectionIn', () => {
-    record(lineA)
-      .reflectionIn([-1, 1])
-      .to.line.equal([-2, 2], [1, 1]);
-    record(lineA)
-      .reflectionIn(Line.Y)
-      .to.line.equal([0, 0], [-1, 1]);
+    record(lineA).reflectionIn([-1, 1]).to.line.equal([-2, 2], [1, 1]);
+    record(lineA).reflectionIn(Line.Y).to.line.equal([0, 0], [-1, 1]);
     record(lineA)
       .reflectionIn(new Plane([1, 1, 1], [0, 0, 1], [2, 1, 1]))
       .to.line.equal([0, 0, 2], [1, 1, 0]);
@@ -164,9 +150,7 @@ describe('line', () => {
     });
 
     it('Segment.length', () => {
-      record(segA)
-        .length()
-        .to.equal(5);
+      record(segA).length().to.equal(5);
     });
 
     it('Segment.pointClosestTo', () => {
@@ -184,15 +168,11 @@ describe('line', () => {
     });
 
     it('Segment.toVector', () => {
-      record(segA)
-        .toVector()
-        .to.vector.equal([3, 4, 0]);
+      record(segA).toVector().to.vector.equal([3, 4, 0]);
     });
 
     it('Segment.midpoint', () => {
-      record(segA)
-        .midpoint()
-        .to.vector.equal([2.5, 4, 0]);
+      record(segA).midpoint().to.vector.equal([2.5, 4, 0]);
     });
 
     it('Segment.bisectingPlane', () => {

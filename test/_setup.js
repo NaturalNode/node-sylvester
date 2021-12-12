@@ -3,11 +3,11 @@ import { Matrix, Vector, Sylvester, Line, Plane } from '../src';
 import { Segment } from '../src/line';
 import { Polygon } from '../src/polygon';
 
-chai.Assertion.addProperty('matrix', function() {
+chai.Assertion.addProperty('matrix', function () {
   new chai.Assertion(this._obj).to.be.instanceOf(Matrix);
 
   return {
-    equal: other => {
+    equal: (other) => {
       if (!(other instanceof Matrix)) {
         other = new Matrix(other);
       }
@@ -24,11 +24,11 @@ chai.Assertion.addProperty('matrix', function() {
   };
 });
 
-chai.Assertion.addProperty('vector', function() {
+chai.Assertion.addProperty('vector', function () {
   new chai.Assertion(this._obj).to.be.instanceOf(Vector);
 
   return {
-    equal: other => {
+    equal: (other) => {
       if (!(other instanceof Vector)) {
         other = new Vector(other);
       }
@@ -45,7 +45,7 @@ chai.Assertion.addProperty('vector', function() {
   };
 });
 
-chai.Assertion.addProperty('line', function() {
+chai.Assertion.addProperty('line', function () {
   new chai.Assertion(this._obj).to.be.instanceOf(Line);
 
   return {
@@ -66,7 +66,7 @@ chai.Assertion.addProperty('line', function() {
   };
 });
 
-chai.Assertion.addProperty('segment', function() {
+chai.Assertion.addProperty('segment', function () {
   new chai.Assertion(this._obj).to.be.instanceOf(Segment);
 
   return {
@@ -87,9 +87,9 @@ chai.Assertion.addProperty('segment', function() {
   };
 });
 
-chai.Assertion.addProperty('geo', function() {
+chai.Assertion.addProperty('geo', function () {
   return {
-    equal: expectedPlane => {
+    equal: (expectedPlane) => {
       this.assert(
         this._obj.eql(expectedPlane, 0.001),
         'expected #{this} to equal #{exp}',
@@ -102,9 +102,9 @@ chai.Assertion.addProperty('geo', function() {
   };
 });
 
-chai.Assertion.addProperty('approx', function() {
+chai.Assertion.addProperty('approx', function () {
   return {
-    equal: other => {
+    equal: (other) => {
       this.assert(
         Math.abs(this._obj - other) < Sylvester.precision,
         'expected #{this} to about equal #{exp}',

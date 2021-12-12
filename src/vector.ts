@@ -196,7 +196,7 @@ export class Vector {
       return this;
     }
 
-    return this.map(x => x / r);
+    return this.map((x) => x / r);
   }
 
   /**
@@ -283,7 +283,7 @@ export class Vector {
 
   private _runBinaryOp(value: VectorOrList | number, operator: (a: number, b: number) => number) {
     if (typeof value === 'number') {
-      return this.map(v => operator(v, value));
+      return this.map((v) => operator(v, value));
     }
 
     const values = getElements(value);
@@ -342,7 +342,7 @@ export class Vector {
    */
   public sum() {
     let sum = 0;
-    this.each(x => {
+    this.each((x) => {
       sum += x;
     });
     return sum;
@@ -388,7 +388,7 @@ export class Vector {
    */
   public product() {
     let p = 1;
-    this.each(v => {
+    this.each((v) => {
       p *= v;
     });
 
@@ -501,7 +501,7 @@ export class Vector {
    * @diagram Vector.round
    */
   public round() {
-    return this.map(x => Math.round(x));
+    return this.map((x) => Math.round(x));
   }
 
   /**
@@ -524,7 +524,7 @@ export class Vector {
    * @diagram Vector.snapTo
    */
   public snapTo(target: number, epsilon = Sylvester.precision) {
-    return this.map(p => (Math.abs(p - target) <= epsilon ? target : p));
+    return this.map((p) => (Math.abs(p - target) <= epsilon ? target : p));
   }
 
   /**
@@ -623,7 +623,7 @@ export class Vector {
    */
   public log(base = Math.E) {
     const logBase = Math.log(base); // change of base
-    return this.map(x => Math.log(x) / logBase);
+    return this.map((x) => Math.log(x) / logBase);
   }
 
   /**

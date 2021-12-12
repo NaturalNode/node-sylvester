@@ -30,12 +30,12 @@ export class Polygon {
       throw new InvalidOperationError('Cannot create a polygon with zero points');
     }
 
-    this.vertices = points.map(point => (point instanceof Vertex ? point : new Vertex(point)));
+    this.vertices = points.map((point) => (point instanceof Vertex ? point : new Vertex(point)));
     this.plane = plane || Plane.fromPoints(...this.vertices);
 
     this.convexVertices = [];
     this.reflexVertices = [];
-    this.vertices.forEach(node => {
+    this.vertices.forEach((node) => {
       if (node.isConvex(this)) {
         this.convexVertices.push(node);
       } else {
@@ -80,7 +80,7 @@ export class Polygon {
   public translate(vector: VectorOrList) {
     const elements = Vector.toElements(vector, 3);
     return new Polygon(
-      this.vertices.map(v => v.add(elements)),
+      this.vertices.map((v) => v.add(elements)),
       this.plane.translate(elements),
     );
   }
@@ -93,7 +93,7 @@ export class Polygon {
   public rotate(t: number, line: Line) {
     const R = Matrix.Rotation(t, line.direction);
     return new Polygon(
-      this.vertices.map(v => v.rotate3D(R, line)),
+      this.vertices.map((v) => v.rotate3D(R, line)),
       this.plane.rotate(R, line),
     );
   }
@@ -108,7 +108,7 @@ export class Polygon {
     const P = Vector.toElements(point, 3);
 
     return new Polygon(
-      this.vertices.map(node => {
+      this.vertices.map((node) => {
         const E = node.elements;
         return new Vector([
           P[0] + k * (E[0] - P[0]),
@@ -237,7 +237,7 @@ export class Polygon {
    */
   public projectionOn(plane: Plane) {
     return new Polygon(
-      this.vertices.map(node => plane.pointClosestTo(node)),
+      this.vertices.map((node) => plane.pointClosestTo(node)),
       plane,
     );
   }
@@ -253,7 +253,7 @@ export class Polygon {
     }
 
     return new Polygon(
-      this.vertices.filter(n => !vertex.eql(n)),
+      this.vertices.filter((n) => !vertex.eql(n)),
       this.plane,
     );
   }
@@ -356,7 +356,7 @@ export class Polygon {
         // For convex vertices, this order will always be anticlockwise
         trig = new Polygon([convexNode, next, prev], this.plane);
         // Now test whether any reflex vertices lie within the ear
-        success = !poly.reflexVertices.some(node => {
+        success = !poly.reflexVertices.some((node) => {
           // Don't test points belonging to this triangle. node won't be
           // equal to convexNode as node is reflex and vertex is convex.
           if (node !== prev && node !== next) {
@@ -384,7 +384,7 @@ export class Polygon {
    */
   public toString() {
     const points: string[] = [];
-    this.vertices.forEach(node => {
+    this.vertices.forEach((node) => {
       points.push(node.toString());
     });
     return `Polygon<${points.join(' -> ')}>`;

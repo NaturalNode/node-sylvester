@@ -18,14 +18,10 @@ describe('polygon', () => {
   ]);
 
   it('Polygon.v', () => {
-    record(simple)
-      .v(1)
-      .to.vector.equal([0, 0, 0]);
+    record(simple).v(1).to.vector.equal([0, 0, 0]);
     expect(simple.v(2)).to.vector.equal([1, 0, 0]);
     expect(simple.v(3)).to.vector.equal([0, 1, 0]);
-    record(simple)
-      .v(4)
-      .to.vector.equal([0, 0, 0]);
+    record(simple).v(4).to.vector.equal([0, 0, 0]);
   });
 
   it('Polygon.translate', () => {
@@ -91,7 +87,7 @@ describe('polygon', () => {
   });
 
   it('Polygon.area', () => {
-    record(simple, { reset: p => p.decache() })
+    record(simple, { reset: (p) => p.decache() })
       .area()
       .to.approx.equal(0.5);
     record(
@@ -101,7 +97,7 @@ describe('polygon', () => {
         [1, 1],
         [0, 1],
       ]),
-      { reset: p => p.decache() },
+      { reset: (p) => p.decache() },
     )
       .area()
       .to.approx.equal(1);
@@ -113,20 +109,20 @@ describe('polygon', () => {
         [1, 1],
         [0, 1],
       ]),
-      { reset: p => p.decache() },
+      { reset: (p) => p.decache() },
     )
       .area()
       .to.approx.equal(1);
-    record(complex, { reset: p => p.decache() })
+    record(complex, { reset: (p) => p.decache() })
       .area()
       .to.approx.equal(30);
   });
 
   it('Polygon.centroid', () => {
-    record(simple, { reset: p => p.decache() })
+    record(simple, { reset: (p) => p.decache() })
       .centroid()
       .to.vector.equal([1 / 3, 1 / 3, 0]);
-    record(complex, { reset: p => p.decache() })
+    record(complex, { reset: (p) => p.decache() })
       .centroid()
       .to.vector.equal([7.166667, 7.611111, 0]);
   });
@@ -172,7 +168,7 @@ describe('polygon', () => {
 
   it('Polygon.toTriangles', () => {
     const result = complex.toTriangles();
-    record(complex, { reset: p => p.decache() }).toTriangles(); // for docs
+    record(complex, { reset: (p) => p.decache() }).toTriangles(); // for docs
 
     for (const triangle of result) {
       expect(triangle.isTriangle()).to.be.true;

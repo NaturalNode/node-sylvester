@@ -3,36 +3,44 @@ import { assert } from 'chai';
 import { record } from './docs/record';
 import { Geometry } from '../src/likeness';
 
-const testCommunitiveCases = (method: string, testCases: [Geometry, Geometry, any][]) => (ForType: {
-  new (...args: any[]): Geometry;
-}) => {
-  const compare = (a: Geometry | number, b: Geometry | number) =>
-    a && typeof a === 'object' && 'eql' in a
-      ? a.eql(b)
-      : typeof a === 'number' && typeof b === 'number'
-      ? Math.abs(a - b) < 0.0001
-      : a === b;
+const testCommunitiveCases =
+  (method: string, testCases: [Geometry, Geometry, any][]) =>
+  (ForType: { new (...args: any[]): Geometry }) => {
+    const compare = (a: Geometry | number, b: Geometry | number) =>
+      a && typeof a === 'object' && 'eql' in a
+        ? a.eql(b)
+        : typeof a === 'number' && typeof b === 'number'
+        ? Math.abs(a - b) < 0.0001
+        : a === b;
 
-  for (let [a, b, expected] of testCases) {
-    if (b instanceof ForType && !(a instanceof ForType)) {
-      [a, b] = [b, a];
-    }
-
-    if (a instanceof ForType) {
-      if (!compare((a as any)[method](b), expected)) {
-        const actual = (a as any)[method](b);
-        assert.fail(actual, expected, `Expected ${a}.${method}(${b}) = ${expected}, got ${actual}`);
+    for (let [a, b, expected] of testCases) {
+      if (b instanceof ForType && !(a instanceof ForType)) {
+        [a, b] = [b, a];
       }
 
-      if (!compare((b as any)[method](a), expected)) {
-        const actual = (b as any)[method](a);
-        assert.fail(actual, expected, `Expected ${b}.${method}(${a}) = ${expected}, got ${actual}`);
-      }
+      if (a instanceof ForType) {
+        if (!compare((a as any)[method](b), expected)) {
+          const actual = (a as any)[method](b);
+          assert.fail(
+            actual,
+            expected,
+            `Expected ${a}.${method}(${b}) = ${expected}, got ${actual}`,
+          );
+        }
 
-      record(a as any)[method](b); // just for the docs
+        if (!compare((b as any)[method](a), expected)) {
+          const actual = (b as any)[method](a);
+          assert.fail(
+            actual,
+            expected,
+            `Expected ${b}.${method}(${a}) = ${expected}, got ${actual}`,
+          );
+        }
+
+        record(a as any)[method](b); // just for the docs
+      }
     }
-  }
-};
+  };
 
 export const testPerpendicularTo = testCommunitiveCases('isPerpendicularTo', [
   // Lines:

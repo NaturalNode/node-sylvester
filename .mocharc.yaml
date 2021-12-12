@@ -1,0 +1,5 @@
+require:
+  - 'source-map-support/register'
+  - 'dist/test/_setup.js'
+spec:
+  - 'dist/test/*.test.js'

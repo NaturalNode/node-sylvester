@@ -16,9 +16,7 @@ describe('matrix', () => {
     ]);
     const b = new Vector([1, 2, 3]);
 
-    record(L)
-      .forwardSubstitute(b)
-      .to.vector.equal([1, 1.5, -3.5]);
+    record(L).forwardSubstitute(b).to.vector.equal([1, 1.5, -3.5]);
   });
 
   it('Matrix.backSubstitute', () => {
@@ -28,9 +26,7 @@ describe('matrix', () => {
     ]);
     const b = new Vector([1, 1.5]);
 
-    record(L)
-      .backSubstitute(b)
-      .to.vector.equal([-1.25, 1.5]);
+    record(L).backSubstitute(b).to.vector.equal([-1.25, 1.5]);
   });
 
   it('Matrix.eql', () => {
@@ -161,9 +157,7 @@ describe('matrix', () => {
   });
 
   it('Matrix.unroll', () => {
-    record(A)
-      .unroll()
-      .to.vector.equal([1, 4, 2, 5, 3, 6]);
+    record(A).unroll().to.vector.equal([1, 4, 2, 5, 3, 6]);
   });
 
   it('Matrix.slice', () => {
@@ -256,17 +250,13 @@ describe('matrix', () => {
   it('Matrix.col', () => {
     expect(() => A.col(0)).to.throw(OutOfRangeError);
     expect(() => A.col(5)).to.throw(OutOfRangeError);
-    record(A)
-      .col(1)
-      .to.vector.equal([1, 4]);
+    record(A).col(1).to.vector.equal([1, 4]);
   });
 
   it('Matrix.row', () => {
     expect(() => A.row(0)).to.throw(OutOfRangeError);
     expect(() => A.row(5)).to.throw(OutOfRangeError);
-    record(A)
-      .row(1)
-      .to.vector.equal([1, 2, 3]);
+    record(A).row(1).to.vector.equal([1, 2, 3]);
   });
 
   it('Matrix.log', () => {
@@ -279,15 +269,11 @@ describe('matrix', () => {
   });
 
   it('Matrix.sum', () => {
-    record(A)
-      .sum()
-      .to.equal(21);
+    record(A).sum().to.equal(21);
   });
 
   it('Matrix.std', () => {
-    record(A)
-      .std()
-      .to.vector.equal([1.5, 1.5, 1.5]);
+    record(A).std().to.vector.equal([1.5, 1.5, 1.5]);
   });
 
   it('Matrix.multiply', () => {
@@ -431,9 +417,7 @@ describe('matrix', () => {
   });
 
   it('Matrix.e', () => {
-    record(A)
-      .e(1, 2)
-      .to.equal(2);
+    record(A).e(1, 2).to.equal(2);
     record(A).e(0, 1).to.be.null;
     expect(A.e(1, 0)).to.be.null;
     expect(A.e(5, 0)).to.be.null;
@@ -609,9 +593,7 @@ describe('matrix', () => {
   });
 
   it('Matrix.mean', () => {
-    record(A)
-      .mean()
-      .to.vector.equal([2.5, 3.5, 4.5]);
+    record(A).mean().to.vector.equal([2.5, 3.5, 4.5]);
   });
 
   it('Matrix.isSquare', () => {
@@ -625,15 +607,11 @@ describe('matrix', () => {
   });
 
   it('Matrix.max', () => {
-    record(A)
-      .max()
-      .to.equal(6);
+    record(A).max().to.equal(6);
   });
 
   it('Matrix.indexOf', () => {
-    record(A)
-      .indexOf(6)
-      .to.deep.equal({ i: 2, j: 3 });
+    record(A).indexOf(6).to.deep.equal({ i: 2, j: 3 });
     record(
       new Matrix([
         [1, 2],
@@ -751,9 +729,7 @@ describe('matrix', () => {
   });
 
   it('Matrix.rank', () => {
-    record(A)
-      .rank()
-      .to.equal(2);
+    record(A).rank().to.equal(2);
     record(
       new Matrix([
         [1, 2],
@@ -859,7 +835,7 @@ describe('matrix', () => {
     const r1 = Matrix.Random(2, 3);
     expect(r1.rows).to.equal(2);
     expect(r1.cols).to.equal(3);
-    r1.map(v => expect(v).to.be.within(0, 1));
+    r1.map((v) => expect(v).to.be.within(0, 1));
 
     const r2 = Matrix.Random(2);
     expect(r2.rows).to.equal(2);

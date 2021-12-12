@@ -7,50 +7,36 @@ describe('vector', () => {
   const x = new Vector([3, 4]);
 
   it('Vector.magnitude', () => {
-    record(x)
-      .magnitude()
-      .to.equal(5);
+    record(x).magnitude().to.equal(5);
   });
 
   it('Vector.e', () => {
     record(x).e(0).to.be.null;
-    record(x)
-      .e(1)
-      .to.equal(3);
+    record(x).e(1).to.equal(3);
     record(x).e(3).to.be.null;
   });
 
   it('Vector.toUnitVector', () => {
-    record(x)
-      .toUnitVector()
-      .to.vector.equal([0.6, 0.8]);
+    record(x).toUnitVector().to.vector.equal([0.6, 0.8]);
     record(new Vector([0, 0]))
       .toUnitVector()
       .to.vector.equal([0, 0]);
   });
 
   it('Vector.dimensions', () => {
-    record(x)
-      .dimensions()
-      .to.deep.equal({ rows: 1, cols: 2 });
+    record(x).dimensions().to.deep.equal({ rows: 1, cols: 2 });
   });
 
   it('Vector.rows', () => {
-    record(x)
-      .rows()
-      .to.equal(1);
+    record(x).rows().to.equal(1);
   });
 
   it('Vector.cols', () => {
-    record(x)
-      .cols()
-      .to.equal(2);
+    record(x).cols().to.equal(2);
   });
 
   it('Vector.product', () => {
-    record(x)
-      .product()
-      .to.equal(12);
+    record(x).product().to.equal(12);
   });
 
   it('Vector.eql', () => {
@@ -74,13 +60,13 @@ describe('vector', () => {
   });
 
   it('Vector.map', () => {
-    expect(x.map(y => y * 2)).to.vector.equal([6, 8]);
+    expect(x.map((y) => y * 2)).to.vector.equal([6, 8]);
     expect(x.map((y, i) => i)).to.vector.equal([1, 2]);
   });
 
   it('Vector.each', () => {
     let sum = 0;
-    x.each(y => {
+    x.each((y) => {
       sum += y;
     });
     expect(sum).to.equal(7);
@@ -108,51 +94,33 @@ describe('vector', () => {
   });
 
   it('Vector.add', () => {
-    record(x)
-      .add(2)
-      .to.vector.equal([5, 6]);
-    record(x)
-      .add([3, 2])
-      .to.vector.equal([6, 6]);
+    record(x).add(2).to.vector.equal([5, 6]);
+    record(x).add([3, 2]).to.vector.equal([6, 6]);
     expect(() => x.add(Vector.Zero(0))).to.throw(DimensionalityMismatchError);
   });
 
   it('Vector.subtract', () => {
-    record(x)
-      .subtract(2)
-      .to.vector.equal([1, 2]);
-    record(x)
-      .subtract([3, 2])
-      .to.vector.equal([0, 2]);
+    record(x).subtract(2).to.vector.equal([1, 2]);
+    record(x).subtract([3, 2]).to.vector.equal([0, 2]);
     expect(() => x.subtract(Vector.Zero(0))).to.throw(DimensionalityMismatchError);
   });
 
   it('Vector.multiply', () => {
-    record(x)
-      .multiply(2)
-      .to.vector.equal([6, 8]);
-    record(x)
-      .multiply([3, 2])
-      .to.vector.equal([9, 8]);
+    record(x).multiply(2).to.vector.equal([6, 8]);
+    record(x).multiply([3, 2]).to.vector.equal([9, 8]);
     expect(() => x.multiply(Vector.Zero(0))).to.throw(DimensionalityMismatchError);
   });
 
   it('Vector.sum', () => {
-    record(x)
-      .sum()
-      .to.equal(7);
+    record(x).sum().to.equal(7);
   });
 
   it('Vector.chomp', () => {
-    record(x)
-      .chomp(1)
-      .to.vector.equal([4]);
+    record(x).chomp(1).to.vector.equal([4]);
   });
 
   it('Vector.top', () => {
-    record(x)
-      .top(1)
-      .to.vector.equal([3]);
+    record(x).top(1).to.vector.equal([3]);
   });
 
   it('Vector.augment', () => {
@@ -162,9 +130,7 @@ describe('vector', () => {
   });
 
   it('Vector.log', () => {
-    record(x)
-      .log()
-      .to.vector.equal([1.0986122886681098, 1.38629436111989]);
+    record(x).log().to.vector.equal([1.0986122886681098, 1.38629436111989]);
     record(new Vector([2, 8]))
       .log(2)
       .to.vector.equal([1, 3]);
@@ -180,23 +146,17 @@ describe('vector', () => {
   });
 
   it('Vector.max', () => {
-    record(x)
-      .max()
-      .to.equal(4);
+    record(x).max().to.equal(4);
     expect(Vector.Zero(0).max()).to.equal(0);
   });
 
   it('Vector.maxIndex', () => {
-    record(x)
-      .maxIndex()
-      .to.equal(2);
+    record(x).maxIndex().to.equal(2);
     expect(Vector.Zero(0).maxIndex()).to.equal(-1);
   });
 
   it('Vector.indexOf', () => {
-    record(x)
-      .indexOf(4)
-      .to.equal(2);
+    record(x).indexOf(4).to.equal(2);
     expect(Vector.Zero(0).indexOf(0)).to.equal(-1);
   });
 
@@ -255,9 +215,7 @@ describe('vector', () => {
   });
 
   it('Vector.reflectionIn', () => {
-    record(x)
-      .reflectionIn(Vector.One(2))
-      .to.vector.equal([-1, -2]);
+    record(x).reflectionIn(Vector.One(2)).to.vector.equal([-1, -2]);
     record(x)
       .reflectionIn(new Line(Vector.Zero(2), new Vector([1, 2])))
       .to.vector.equal([1.4, 4.8]);
@@ -265,21 +223,15 @@ describe('vector', () => {
   });
 
   it('Vector.chomp', () => {
-    record(x)
-      .chomp(1)
-      .to.vector.equal([4]);
+    record(x).chomp(1).to.vector.equal([4]);
   });
 
   it('Vector.sum', () => {
-    record(x)
-      .sum()
-      .to.equal(7);
+    record(x).sum().to.equal(7);
   });
 
   it('Vector.augment', () => {
-    record(x)
-      .augment([4, 5])
-      .to.vector.equal([3, 4, 4, 5]);
+    record(x).augment([4, 5]).to.vector.equal([3, 4, 4, 5]);
   });
 
   it('toString', () => {
@@ -289,7 +241,7 @@ describe('vector', () => {
   it('random', () => {
     const v = Vector.Random(3);
     expect(v.elements.length).to.equal(3);
-    v.elements.forEach(e => expect(e).to.be.within(0, 1));
+    v.elements.forEach((e) => expect(e).to.be.within(0, 1));
   });
 
   it('to3D', () => {

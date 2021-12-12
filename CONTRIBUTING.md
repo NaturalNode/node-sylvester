@@ -15,9 +15,7 @@ import { record } from './docs/record';
 
 // result is wrapped in a Chai expectation
 it('my test', () => {
-  record(matrix1)
-    .multiply(matrix2)
-    .to.matrix.equal(matrix3);
+  record(matrix1).multiply(matrix2).to.matrix.equal(matrix3);
 });
 ```
 
