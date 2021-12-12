@@ -6,7 +6,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
       with:
-        node-version: '12.x'
+        node-version: '14.x'
     - uses: borales/actions-yarn@v2.0.0
       with:
         cmd: install
