@@ -98,5 +98,8 @@
     "exclude": [
       "**/*.test.{ts,js}"
     ]
+  },
+  "dependencies": {
+    "yargs-parser": "21.0.0"
   }
 }
