@@ -98,5 +98,8 @@
     "exclude": [
       "**/*.test.{ts,js}"
     ]
+  },
+  "dependencies": {
+    "nth-check": "2.0.1"
   }
 }
